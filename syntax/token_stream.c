@@ -151,7 +151,8 @@ TokenStream *TokenStream_collect(LanguageEngine *engine, TextSnapshot *snapshot)
             TokenStream_free(self);
             return nullptr;
         }
-        previousEnd = result.span.range.endByte;
+        SourceRange range = result.span.range;
+        previousEnd = range.endByte;
     }
 }
 

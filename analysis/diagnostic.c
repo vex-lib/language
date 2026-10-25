@@ -59,12 +59,14 @@ const char *DiagnosticCode_name(DiagnosticCode value) {
 }
 BoundedText Diagnostic_toString(const Diagnostic *self) {
     if (self == nullptr) return BoundedText_1("nullptr");
-    return BoundedText_format("%s: %s", DiagnosticSeverity_name((*self).severity), (*self).message.text);
+    BoundedText message = (*self).message;
+    return BoundedText_format("%s: %s", DiagnosticSeverity_name((*self).severity), message.text);
 }
 BoundedText Diagnostic_toStringStruct(const Diagnostic *self) {
     if (self == nullptr) return BoundedText_1("nullptr");
+    SourceRange range = (*self).range;
     return BoundedText_format("Diagnostic { severity=%s, code=%s, range=%u:%llu-%llu }",
         DiagnosticSeverity_name((*self).severity), DiagnosticCode_name((*self).code),
-        (*self).range.documentId, (unsigned long long) (*self).range.startByte,
-        (unsigned long long) (*self).range.endByte);
+        range.documentId, (unsigned long long) range.startByte,
+        (unsigned long long) range.endByte);
 }

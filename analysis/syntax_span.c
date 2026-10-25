@@ -50,8 +50,9 @@ const char *SyntaxSpan_resolvedStyleKey(const SyntaxSpan *self) {
 }
 BoundedText SyntaxSpan_toString(const SyntaxSpan *self) {
     if (self == nullptr) return BoundedText_1("nullptr");
+    SourceRange range = (*self).range;
     return BoundedText_format("%s [%llu,%llu)", SyntaxRole_name((*self).role),
-        (unsigned long long) (*self).range.startByte, (unsigned long long) (*self).range.endByte);
+        (unsigned long long) range.startByte, (unsigned long long) range.endByte);
 }
 BoundedText SyntaxSpan_toStringStruct(const SyntaxSpan *self) {
     if (self == nullptr) return BoundedText_1("nullptr");
