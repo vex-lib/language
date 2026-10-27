@@ -1,7 +1,8 @@
 # language — R3 grammar & LSP driver provider
 
-Future builds belong to [b](https://github.com/vex-graph/b). No runnable grammar
-target exists yet.
+The source currently implements value, styling, lexical-adapter and project
+configuration slices. The workspace build graph does not yet provide a runnable
+Language target; a source tree or owner test is not a registered product target.
 
 ## Current State
 
