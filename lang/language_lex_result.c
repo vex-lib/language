@@ -1,6 +1,5 @@
 #include "lang/language_lex_result.h"
-#include "annotation/definition.h"
-#include "annotation/overview.h"
+#include "annotation/annotation.h"
 
 ;;DEFINITION
 /** LanguageLexResult is one pull-lexer result. End-of-input always carries a
