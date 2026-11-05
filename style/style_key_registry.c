@@ -1,6 +1,5 @@
 #include "style/style_key_registry.h"
-#include "annotation/definition.h"
-#include "annotation/overview.h"
+#include "annotation/annotation.h"
 #include <string.h>
 
 ;;DEFINITION
