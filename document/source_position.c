@@ -1,6 +1,5 @@
 #include "document/source_position.h"
-#include "annotation/definition.h"
-#include "annotation/overview.h"
+#include "annotation/annotation.h"
 
 ;;DEFINITION
 /** SourcePosition is a zero-based line and negotiated character position.

@@ -1,6 +1,5 @@
 #include "document/line_index.h"
-#include "annotation/definition.h"
-#include "annotation/overview.h"
+#include "annotation/annotation.h"
 #include "exception/throw.h"
 #include <stdint.h>
 #include <stdlib.h>
