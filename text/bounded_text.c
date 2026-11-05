@@ -1,6 +1,5 @@
 #include "text/bounded_text.h"
-#include "annotation/definition.h"
-#include "annotation/overview.h"
+#include "annotation/annotation.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
