@@ -32,7 +32,7 @@ after `#include` emitted as one string-role span; and `C23InlayHints`, a conserv
 same-snapshot producer of parameter-name labels for simple direct calls. These
 emit syntax roles and virtual byte anchors only; colors and presentation remain
 consumer-owned. The C corpus at
-`../../../tests/language/adapters/c/corpus.c` records the intended cases (`*` as
+`../../tests/language/adapters/c/corpus.c` records the intended cases (`*` as
 multiply/dereference/declarator, macro object/function/generic claims,
 `;;` claims versus empty statements, and documentation comments); the C lexer
 has a strict/annotation-profile lexical subset but is not a parser or preprocessor.
@@ -40,8 +40,8 @@ has a strict/annotation-profile lexical subset but is not a parser or preprocess
 declarations, parse, or distinguish parameters from local variables beyond the
 current variable role.
 
-**New engine slice:** `lang/` provides a callback adapter contract, explicit-id
-registry and host-facing lexer engine. `adapters/c23/` registers the existing
+**New engine slice:** `lang` provides a callback adapter contract, explicit-id
+registry and host-facing lexer engine. `adapters/c23` registers the existing
 strict C23 lexer as `c23`; a host selects that id explicitly. The engine emits
 syntax spans from borrowed snapshots and does not infer dialect from suffixes.
 The document layer now owns immutable revisioned snapshots and line indexes;
@@ -59,7 +59,7 @@ lexical colors and bold brackets in the terminal shell, and the Language
 macros/constants while keeping regular and documentation comments separate; an
 angle-bracket header path after `#include` is a string span, while ordinary
 `<`/`>` operators keep their operator role. The consumer owner is
-`../../../tests/semicolon/editor/run.py` (strict C23, C ASan/UBSan and scripted
+`../../tests/semicolon/editor/run.py` (strict C23, C ASan/UBSan and scripted
 PTY scopes on macOS arm64). This does not integrate the
 generic registry/project engine, semantic classification, inlay hints,
 diagnostics or LSP; font appearance, ligature settings and physical-terminal
@@ -116,7 +116,7 @@ compatibility or automatic schema migration is assumed. GPU dispatch stays R3.
 - `adapters/c`: C23 lexical/value implementation, conservative highlight roles and inlay hints.
 - `adapters/<language>/`: future language frontends; `adapters/diff` contains
   the unified-diff line classifier.
-- `../../../tests/language`: mirrored owner tests and `run.py`; checklist evidence is
+- `../../tests/language`: mirrored owner tests and `run.py`; checklist evidence is
   being recorded separately for these Language tests.
 
 ## Laws that govern work here

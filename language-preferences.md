@@ -2,13 +2,13 @@
 > Universal constitution: `gist.md` is the compressed law list; `PREFERENCES.md` is its rationale.
 
 ## 0. Constitution Link (supreme)
-- [gist.md](https://gist.github.com/vex-graph/4132a6c45cb6d3797c3e8eff2e94035a#file-gist-md) — the compressed law list, mirrored in this workspace at `../../../metadata/gists/preferences/gist.md`. It is the only normative law text; `../../../metadata/gists/preferences/PREFERENCES.md` carries the rationale and is never ingested whole. Numbers are slice addresses inside one file, never law identity: cite by Title.
+- [gist.md](https://gist.github.com/vex-graph/4132a6c45cb6d3797c3e8eff2e94035a#file-gist-md) — the compressed law list, mirrored in this workspace at `../../metadata/gists/preferences/gist.md`. It is the only normative law text; `../../../metadata/gists/preferences/PREFERENCES.md` carries the rationale and is never ingested whole. Numbers are slice addresses inside one file, never law identity: cite by Title.
 - All universal laws bind this repository. Read one on demand from the workspace root: `./tools/prefs law "<title>"`, `./tools/prefs section "<section>"`, `./tools/prefs repo <name>`.
 - This document codifies **exclusive** preferences for `language` (R3 Language Grammars). Grammar/AST semantics stay R3; borrow R2 Vexspoke computation/behavior or Relational Engine memory/storage/native C search contracts. Implemented: callback lexical coordinator and explicit C23 adapter; immutable revisioned document snapshots; validated snapshot-bound token stream; caller-fed project/build-target model and dependency graph; versioned project symbol/reference index. Planned: filesystem discovery, parsing/AST, semantic resolution, automatic invalidation, compiler services and LSP transport. No default allocator replacement or schema migration is implied.
 
 ## 1. Repo-Local Law Index (Binding Matrix)
 
-Universal laws are inherited from the compressed constitution (`../../../metadata/gists/preferences/gist.md`); this table indexes the additional laws specific to this repository.
+Universal laws are inherited from the compressed constitution (`../../metadata/gists/preferences/gist.md`); this table indexes the additional laws specific to this repository.
 
 | Law Title | Scope | Enforcement |
 | :--- | :--- | :--- |

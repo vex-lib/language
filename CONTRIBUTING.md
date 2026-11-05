@@ -35,7 +35,7 @@ This codebase strictly enforces the verbose, explicit boilerplate required acros
 
 All architectural rules and style invariants are governed by the central constitution:
 
-- **[Compressed law list](../../../metadata/gists/preferences/gist.md)** and [published preferences](https://gist.github.com/vex-graph/4132a6c45cb6d3797c3e8eff2e94035a); read only relevant laws with `./tools/prefs`.
+- **[Compressed law list](../../metadata/gists/preferences/gist.md)** and [published preferences](https://gist.github.com/vex-graph/4132a6c45cb6d3797c3e8eff2e94035a); read only relevant laws with `./tools/prefs`.
 - **[language-preferences.md](language-preferences.md)** (repo-local mirror binding language)
 
 Under the Living Documentation Law, update affected contracts in the same cycle.
