@@ -6,7 +6,7 @@ without preprocessing, parsing, semantic resolution, or color policy. The hint
 producer recognizes only simple local function declarations/calls and places
 presentation-only parameter labels at source byte offsets.
 
-Owners are `tests/language/adapters/c/c23_lexer_test.c`,
+Owners are `../../../../tests/language/adapters/c/c23_lexer_test.c`,
 `c23_lex_step_test.c`, and `c23_inlay_hints_test.c`, run by
 `tests/language/adapters/c/c23_lexer_run.py`; syntax role coverage is owned by
 `tests/language/syntax/role_test.c`. They exercise strict C23, ASan/UBSan and

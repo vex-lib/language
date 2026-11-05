@@ -1,7 +1,6 @@
 #include "adapters/c23/c23_adapter.h"
 #include "adapters/c/c23_lexer.h"
-#include "annotation/definition.h"
-#include "annotation/overview.h"
+#include "annotation/annotation.h"
 
 ;;DEFINITION
 /** C23Adapter binds the explicit language id "c23" to the existing strict C23

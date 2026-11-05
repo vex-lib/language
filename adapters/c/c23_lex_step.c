@@ -1,7 +1,6 @@
 #include "adapters/c/c23_lex_step.h"
 
-#include "annotation/definition.h"
-#include "annotation/overview.h"
+#include "annotation/annotation.h"
 
 ;;DEFINITION
 /** C23LexStep is the returned value from one C23Lexer pull. It explicitly

@@ -1,7 +1,6 @@
 #include "adapters/c/c23_inlay_hints.h"
 #include "adapters/c/c23_lexer.h"
-#include "annotation/definition.h"
-#include "annotation/overview.h"
+#include "annotation/annotation.h"
 #include "exception/throw.h"
 #include <ctype.h>
 #include <stdlib.h>
