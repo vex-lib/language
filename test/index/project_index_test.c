@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <string.h>
 
-static Symbol makeFunction(uint64_t id, uint32_t documentId, size_t start, size_t end,
+static Symbol makeFunction(u64 id, u32 documentId, bytes start, bytes end,
                            const char *name) {
     return Symbol_5(id, 1u, SYMBOL_KIND_FUNCTION, name,
                     SourceRange_3(documentId, start, end));

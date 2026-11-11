@@ -18,26 +18,26 @@
  * reject without changing the inventory; returned file pointers are borrowed. */
 
 struct LanguageProject {
-    uint64_t id;
+    u64 id;
     char *rootPath;
     ProjectFile **files;
-    size_t fileCount;
-    size_t fileCapacity;
+    bytes fileCount;
+    bytes fileCapacity;
     BuildTarget **targets;
-    size_t targetCount;
-    size_t targetCapacity;
+    bytes targetCount;
+    bytes targetCapacity;
     ProjectConfiguration *configuration;
 };
 
 static char *copyRoot(const char *path) {
-    size_t length = strlen(path);
+    bytes length = strlen(path);
     char *copy = malloc(length + 1u);
     if (copy != nullptr)
         memcpy(copy, path, length + 1u);
     return copy;
 }
 
-LanguageProject *LanguageProject_2(uint64_t projectId, const char *rootPath) {
+LanguageProject *LanguageProject_2(u64 projectId, const char *rootPath) {
     if (projectId == 0u || rootPath == nullptr || rootPath[0] == '\0') {
         THROW("LanguageProject: rejected invalid id or root path");
         return nullptr;
@@ -67,9 +67,9 @@ LanguageProject *LanguageProject_2(uint64_t projectId, const char *rootPath) {
 void LanguageProject_free(LanguageProject *self) {
     if (self == nullptr)
         return;
-    for (size_t index = 0u; index < (*self).fileCount; ++index)
+    for (bytes index = 0u; index < (*self).fileCount; ++index)
         ProjectFile_free((*self).files[index]);
-    for (size_t index = 0u; index < (*self).targetCount; ++index)
+    for (bytes index = 0u; index < (*self).targetCount; ++index)
         BuildTarget_free((*self).targets[index]);
     ProjectConfiguration_free((*self).configuration);
     (*self).configuration = nullptr;
@@ -86,15 +86,15 @@ const ProjectFile *LanguageProject_findFile(const LanguageProject *self,
                                              const char *relativePath) {
     if (self == nullptr || relativePath == nullptr)
         return nullptr;
-    for (size_t index = 0u; index < (*self).fileCount; ++index)
+    for (bytes index = 0u; index < (*self).fileCount; ++index)
         if (strcmp(ProjectFile_getRelativePath((*self).files[index]), relativePath) == 0)
             return (*self).files[index];
     return nullptr;
 }
-const ProjectFile *LanguageProject_findFileById(const LanguageProject *self, uint64_t fileId) {
+const ProjectFile *LanguageProject_findFileById(const LanguageProject *self, u64 fileId) {
     if (self == nullptr || fileId == 0u)
         return nullptr;
-    for (size_t index = 0u; index < (*self).fileCount; ++index)
+    for (bytes index = 0u; index < (*self).fileCount; ++index)
         if (ProjectFile_getId((*self).files[index]) == fileId)
             return (*self).files[index];
     return nullptr;
@@ -114,7 +114,7 @@ const ProjectFile *LanguageProject_addFile(LanguageProject *self,
         return nullptr;
     }
     if ((*self).fileCount == (*self).fileCapacity) {
-        size_t capacity = (*self).fileCapacity == 0u ? 8u : (*self).fileCapacity * 2u;
+        bytes capacity = (*self).fileCapacity == 0u ? 8u : (*self).fileCapacity * 2u;
         if (capacity < (*self).fileCapacity || capacity > SIZE_MAX / sizeof(ProjectFile*)) {
             THROW("LanguageProject: file table capacity overflow");
             return nullptr;
@@ -127,7 +127,7 @@ const ProjectFile *LanguageProject_addFile(LanguageProject *self,
         (*self).files = grown;
         (*self).fileCapacity = capacity;
     }
-    uint64_t fileId = (uint64_t) (*self).fileCount + 1u;
+    u64 fileId = (u64) (*self).fileCount + 1u;
     ProjectFile *file = ProjectFile_4(fileId, relativePath, kind, languageId);
     if (file == nullptr)
         return nullptr;
@@ -136,7 +136,7 @@ const ProjectFile *LanguageProject_addFile(LanguageProject *self,
     return file;
 }
 
-const ProjectFile *LanguageProject_getFileAt(const LanguageProject *self, size_t index) {
+const ProjectFile *LanguageProject_getFileAt(const LanguageProject *self, bytes index) {
     if (self == nullptr || index >= (*self).fileCount)
         return nullptr;
     return (*self).files[index];
@@ -145,7 +145,7 @@ const ProjectFile *LanguageProject_getFileAt(const LanguageProject *self, size_t
 BuildTarget *LanguageProject_findTarget(const LanguageProject *self, const char *name) {
     if (self == nullptr || name == nullptr)
         return nullptr;
-    for (size_t index = 0u; index < (*self).targetCount; ++index)
+    for (bytes index = 0u; index < (*self).targetCount; ++index)
         if (strcmp(BuildTarget_getName((*self).targets[index]), name) == 0)
             return (*self).targets[index];
     return nullptr;
@@ -161,7 +161,7 @@ BuildTarget *LanguageProject_addTarget(LanguageProject *self, const char *name,
         return nullptr;
     }
     if ((*self).targetCount == (*self).targetCapacity) {
-        size_t capacity = (*self).targetCapacity == 0u ? 4u : (*self).targetCapacity * 2u;
+        bytes capacity = (*self).targetCapacity == 0u ? 4u : (*self).targetCapacity * 2u;
         if (capacity < (*self).targetCapacity || capacity > SIZE_MAX / sizeof(BuildTarget*)) {
             THROW("LanguageProject: target table capacity overflow");
             return nullptr;
@@ -174,7 +174,7 @@ BuildTarget *LanguageProject_addTarget(LanguageProject *self, const char *name,
         (*self).targets = grown;
         (*self).targetCapacity = capacity;
     }
-    BuildTarget *target = BuildTarget_3((uint64_t) (*self).targetCount + 1u,
+    BuildTarget *target = BuildTarget_3((u64) (*self).targetCount + 1u,
                                        name, languageId);
     if (target == nullptr)
         return nullptr;
@@ -182,18 +182,18 @@ BuildTarget *LanguageProject_addTarget(LanguageProject *self, const char *name,
     ++(*self).targetCount;
     return target;
 }
-bool LanguageProject_addSourceToTarget(LanguageProject *self, uint64_t targetId,
-                                       uint64_t fileId) {
+bool LanguageProject_addSourceToTarget(LanguageProject *self, u64 targetId,
+                                       u64 fileId) {
     if (self == nullptr) {
         THROW("LanguageProject: rejected source membership without project");
         return false;
     }
     BuildTarget *target = nullptr;
-    for (size_t index = 0u; index < (*self).targetCount; ++index)
+    for (bytes index = 0u; index < (*self).targetCount; ++index)
         if (BuildTarget_getId((*self).targets[index]) == targetId)
             target = (*self).targets[index];
     const ProjectFile *file = nullptr;
-    for (size_t index = 0u; index < (*self).fileCount; ++index)
+    for (bytes index = 0u; index < (*self).fileCount; ++index)
         if (ProjectFile_getId((*self).files[index]) == fileId)
             file = (*self).files[index];
     if (target == nullptr || file == nullptr
@@ -205,15 +205,15 @@ bool LanguageProject_addSourceToTarget(LanguageProject *self, uint64_t targetId,
     }
     return BuildTarget_addSourceFile(target, fileId);
 }
-bool LanguageProject_addTargetDependency(LanguageProject *self, uint64_t targetId,
-                                         uint64_t dependencyId) {
+bool LanguageProject_addTargetDependency(LanguageProject *self, u64 targetId,
+                                         u64 dependencyId) {
     if (self == nullptr) {
         THROW("LanguageProject: rejected target dependency without project");
         return false;
     }
     BuildTarget *target = nullptr;
     bool dependencyExists = false;
-    for (size_t index = 0u; index < (*self).targetCount; ++index) {
+    for (bytes index = 0u; index < (*self).targetCount; ++index) {
         BuildTarget *candidate = (*self).targets[index];
         if (BuildTarget_getId(candidate) == targetId)
             target = candidate;
@@ -226,21 +226,21 @@ bool LanguageProject_addTargetDependency(LanguageProject *self, uint64_t targetI
     }
     return BuildTarget_addDependency(target, dependencyId);
 }
-BuildTarget *LanguageProject_getTargetAt(const LanguageProject *self, size_t index) {
+BuildTarget *LanguageProject_getTargetAt(const LanguageProject *self, bytes index) {
     return self == nullptr || index >= (*self).targetCount ? nullptr : (*self).targets[index];
 }
 ProjectConfiguration *LanguageProject_getConfiguration(LanguageProject *self) {
     return self == nullptr ? nullptr : (*self).configuration;
 }
-uint64_t LanguageProject_getId(const LanguageProject *self) {
+u64 LanguageProject_getId(const LanguageProject *self) {
     return self == nullptr ? 0u : (*self).id;
 }
 const char *LanguageProject_getRootPath(const LanguageProject *self) {
     return self == nullptr ? nullptr : (*self).rootPath;
 }
-size_t LanguageProject_getFileCount(const LanguageProject *self) {
+bytes LanguageProject_getFileCount(const LanguageProject *self) {
     return self == nullptr ? 0u : (*self).fileCount;
 }
-size_t LanguageProject_getTargetCount(const LanguageProject *self) {
+bytes LanguageProject_getTargetCount(const LanguageProject *self) {
     return self == nullptr ? 0u : (*self).targetCount;
 }

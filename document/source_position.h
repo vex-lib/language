@@ -6,12 +6,12 @@
 
 typedef struct SourcePosition {
     bool valid;
-    size_t line;
-    size_t character;
+    bytes line;
+    bytes character;
 } SourcePosition;
 
 SourcePosition SourcePosition_0(void);
-SourcePosition SourcePosition_3(bool valid, size_t line, size_t character);
+SourcePosition SourcePosition_3(bool valid, bytes line, bytes character);
 SourcePosition SourcePosition_zero(void);
 
 #endif

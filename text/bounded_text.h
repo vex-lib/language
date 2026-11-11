@@ -19,7 +19,7 @@
 
 typedef struct BoundedText {
     char text[BOUNDED_TEXT_CAPACITY]; // NUL-terminated stored bytes
-    size_t length;                    // stored byte count, excluding the NUL
+    bytes length;                    // stored byte count, excluding the NUL
     bool truncated;                   // the source did not fit
 } BoundedText;
 
@@ -27,7 +27,7 @@ typedef struct BoundedText {
 // flagged, never silent. A null source or zero length yields the empty value.
 BoundedText BoundedText_0(void);
 BoundedText BoundedText_1(const char *text);
-BoundedText BoundedText_2(const char *text, size_t length);
+BoundedText BoundedText_2(const char *text, bytes length);
 // Dispatch BoundedText(), BoundedText(text), or BoundedText(text, length).
 #define BoundedText(...) BOUNDED_TEXT_SELECT(_ __VA_OPT__(,) __VA_ARGS__, BoundedText_2, BoundedText_1, BoundedText_0)(__VA_ARGS__)
 #define BOUNDED_TEXT_SELECT(_0, _1, _2, NAME, ...) NAME
@@ -38,7 +38,7 @@ BoundedText BoundedText_format(const char *format, ...);
 
 // Symmetric accessors. Null getters return the empty value/false.
 const char *BoundedText_getText(const BoundedText *self);
-size_t BoundedText_getLength(const BoundedText *self);
+bytes BoundedText_getLength(const BoundedText *self);
 bool BoundedText_isTruncated(const BoundedText *self);
 bool BoundedText_equals(const BoundedText *self, const char *text);
 

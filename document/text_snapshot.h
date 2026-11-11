@@ -7,8 +7,8 @@
 
 typedef struct TextSnapshot TextSnapshot;
 
-TextSnapshot *TextSnapshot_4(uint32_t documentId, uint64_t revision,
-                            const char *bytes, size_t length);
+TextSnapshot *TextSnapshot_4(u32 documentId, u64 revision,
+                            const char *bytes, bytes length);
 #define TextSnapshot_0 TextSnapshot_invalid_arity
 #define TextSnapshot_1 TextSnapshot_invalid_arity
 #define TextSnapshot_2 TextSnapshot_invalid_arity
@@ -24,10 +24,10 @@ TextSnapshot *TextSnapshot_4(uint32_t documentId, uint64_t revision,
 void TextSnapshot_free(TextSnapshot *self);
 bool TextSnapshot_retain(TextSnapshot *self);
 void TextSnapshot_release(TextSnapshot *self);
-uint32_t TextSnapshot_getDocumentId(const TextSnapshot *self);
-uint64_t TextSnapshot_getRevision(const TextSnapshot *self);
+u32 TextSnapshot_getDocumentId(const TextSnapshot *self);
+u64 TextSnapshot_getRevision(const TextSnapshot *self);
 const char *TextSnapshot_getBytes(const TextSnapshot *self);
-size_t TextSnapshot_getLength(const TextSnapshot *self);
-uint64_t TextSnapshot_getReferenceCount(const TextSnapshot *self);
+bytes TextSnapshot_getLength(const TextSnapshot *self);
+u64 TextSnapshot_getReferenceCount(const TextSnapshot *self);
 
 #endif

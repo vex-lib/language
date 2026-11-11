@@ -13,12 +13,12 @@ LanguageEngine *LanguageEngine_1(const LanguageRegistry *registry);
 LanguageEngine *LanguageEngine_zero(void);
 void LanguageEngine_free(LanguageEngine *self);
 bool LanguageEngine_open(LanguageEngine *self, const char *languageId,
-                         uint64_t compilationContextId, TextSnapshot *snapshot);
+                         u64 compilationContextId, TextSnapshot *snapshot);
 LanguageLexResult LanguageEngine_next(LanguageEngine *self);
 void LanguageEngine_close(LanguageEngine *self);
 const char *LanguageEngine_getLanguageId(const LanguageEngine *self);
-uint32_t LanguageEngine_getDocumentId(const LanguageEngine *self);
-uint64_t LanguageEngine_getDocumentRevision(const LanguageEngine *self);
-uint64_t LanguageEngine_getCompilationContextId(const LanguageEngine *self);
+u32 LanguageEngine_getDocumentId(const LanguageEngine *self);
+u64 LanguageEngine_getDocumentRevision(const LanguageEngine *self);
+u64 LanguageEngine_getCompilationContextId(const LanguageEngine *self);
 
 #endif

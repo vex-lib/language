@@ -14,7 +14,7 @@ void LanguageRegistry_free(LanguageRegistry *self);
 bool LanguageRegistry_register(LanguageRegistry *self, const LanguageAdapter *adapter);
 const LanguageAdapter *LanguageRegistry_find(const LanguageRegistry *self,
                                               const char *languageId);
-size_t LanguageRegistry_getCount(const LanguageRegistry *self);
-uint64_t LanguageRegistry_getExhaustionCount(const LanguageRegistry *self);
+bytes LanguageRegistry_getCount(const LanguageRegistry *self);
+u64 LanguageRegistry_getExhaustionCount(const LanguageRegistry *self);
 
 #endif

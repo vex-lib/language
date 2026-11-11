@@ -17,15 +17,15 @@
  * are accepted only for an empty snapshot; refcount is single-thread confined. */
 
 struct TextSnapshot {
-    uint32_t documentId;
-    uint64_t revision;
+    u32 documentId;
+    u64 revision;
     char *bytes;
-    size_t length;
-    uint64_t referenceCount;
+    bytes length;
+    u64 referenceCount;
 };
 
-TextSnapshot *TextSnapshot_4(uint32_t documentId, uint64_t revision,
-                             const char *bytes, size_t length) {
+TextSnapshot *TextSnapshot_4(u32 documentId, u64 revision,
+                             const char *bytes, bytes length) {
     if (documentId == 0u || revision == 0u || (bytes == nullptr && length != 0u)
         || length == SIZE_MAX) {
         THROW("TextSnapshot: rejected invalid identity or byte span");
@@ -76,18 +76,18 @@ bool TextSnapshot_retain(TextSnapshot *self) {
     ++(*self).referenceCount;
     return true;
 }
-uint32_t TextSnapshot_getDocumentId(const TextSnapshot *self) {
+u32 TextSnapshot_getDocumentId(const TextSnapshot *self) {
     return self == nullptr ? 0u : (*self).documentId;
 }
-uint64_t TextSnapshot_getRevision(const TextSnapshot *self) {
+u64 TextSnapshot_getRevision(const TextSnapshot *self) {
     return self == nullptr ? 0u : (*self).revision;
 }
 const char *TextSnapshot_getBytes(const TextSnapshot *self) {
     return self == nullptr ? nullptr : (*self).bytes;
 }
-size_t TextSnapshot_getLength(const TextSnapshot *self) {
+bytes TextSnapshot_getLength(const TextSnapshot *self) {
     return self == nullptr ? 0u : (*self).length;
 }
-uint64_t TextSnapshot_getReferenceCount(const TextSnapshot *self) {
+u64 TextSnapshot_getReferenceCount(const TextSnapshot *self) {
     return self == nullptr ? 0u : (*self).referenceCount;
 }

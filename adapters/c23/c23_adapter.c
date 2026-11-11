@@ -14,7 +14,7 @@
  * FUNCTION REGISTRY: C23Adapter_adapter returns the borrowed static table.
  * CONTRACT: one adapter instance serves strict C23 tokens only. */
 
-static void *openC23(uint32_t documentId, const char *source, size_t length) {
+static void *openC23(u32 documentId, const char *source, bytes length) {
     return C23Lexer_3(documentId, source, length);
 }
 

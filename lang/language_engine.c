@@ -22,7 +22,7 @@ struct LanguageEngine {
     const LanguageAdapter *adapter;
     void *session;
     TextSnapshot *snapshot;
-    uint64_t compilationContextId;
+    u64 compilationContextId;
 };
 
 LanguageEngine *LanguageEngine_1(const LanguageRegistry *registry) {
@@ -56,7 +56,7 @@ void LanguageEngine_free(LanguageEngine *self) {
     }
 }
 bool LanguageEngine_open(LanguageEngine *self, const char *languageId,
-                         uint64_t compilationContextId, TextSnapshot *snapshot) {
+                         u64 compilationContextId, TextSnapshot *snapshot) {
     if (self == nullptr || languageId == nullptr || snapshot == nullptr
         || compilationContextId == 0u
         || TextSnapshot_getDocumentId(snapshot) == 0u
@@ -98,14 +98,14 @@ const char *LanguageEngine_getLanguageId(const LanguageEngine *self) {
     return self == nullptr || (*self).adapter == nullptr ? nullptr
         : LanguageAdapter_getLanguageId((*self).adapter);
 }
-uint32_t LanguageEngine_getDocumentId(const LanguageEngine *self) {
+u32 LanguageEngine_getDocumentId(const LanguageEngine *self) {
     return self == nullptr || (*self).snapshot == nullptr
         ? 0u : TextSnapshot_getDocumentId((*self).snapshot);
 }
-uint64_t LanguageEngine_getDocumentRevision(const LanguageEngine *self) {
+u64 LanguageEngine_getDocumentRevision(const LanguageEngine *self) {
     return self == nullptr || (*self).snapshot == nullptr
         ? 0u : TextSnapshot_getRevision((*self).snapshot);
 }
-uint64_t LanguageEngine_getCompilationContextId(const LanguageEngine *self) {
+u64 LanguageEngine_getCompilationContextId(const LanguageEngine *self) {
     return self == nullptr ? 0u : (*self).compilationContextId;
 }

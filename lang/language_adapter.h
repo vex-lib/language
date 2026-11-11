@@ -11,15 +11,15 @@
  * alone: the same .c/.h file may be compiled under different language modes. */
 typedef struct LanguageAdapter {
     const char *languageId;
-    void *(*open)(uint32_t documentId, const char *source, size_t length);
+    void *(*open)(u32 documentId, const char *source, bytes length);
     LanguageLexResult (*next)(void *session);
     void (*close)(void *session);
 } LanguageAdapter;
 
 bool LanguageAdapter_isValid(const LanguageAdapter *self);
 const char *LanguageAdapter_getLanguageId(const LanguageAdapter *self);
-void *LanguageAdapter_open(const LanguageAdapter *self, uint32_t documentId,
-                           const char *source, size_t length);
+void *LanguageAdapter_open(const LanguageAdapter *self, u32 documentId,
+                           const char *source, bytes length);
 LanguageLexResult LanguageAdapter_next(const LanguageAdapter *self, void *session);
 void LanguageAdapter_close(const LanguageAdapter *self, void *session);
 

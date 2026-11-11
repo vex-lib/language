@@ -25,8 +25,8 @@ const char *LanguageAdapter_getLanguageId(const LanguageAdapter *self) {
     return LanguageAdapter_isValid(self) ? (*self).languageId : nullptr;
 }
 
-void *LanguageAdapter_open(const LanguageAdapter *self, uint32_t documentId,
-                           const char *source, size_t length) {
+void *LanguageAdapter_open(const LanguageAdapter *self, u32 documentId,
+                           const char *source, bytes length) {
     if (!LanguageAdapter_isValid(self) || documentId == 0u
         || (source == nullptr && length != 0u)) {
         THROW("language adapter rejected invalid open request");

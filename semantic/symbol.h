@@ -19,8 +19,8 @@ typedef enum SymbolKind {
 // One identity-bearing declaration. name and its bytes are borrowed; the
 // project index must retain them while readers use this record.
 typedef struct Symbol {
-    uint64_t id;                    // index-assigned identity within an epoch
-    uint64_t scopeId;               // declaring scope identity
+    u64 id;                    // index-assigned identity within an epoch
+    u64 scopeId;               // declaring scope identity
     SymbolKind kind;                // function/class/variable/macro/etc.
     const char *name;               // borrowed source-independent spelling
     SourceRange declarationRange;   // declaration location, not a use site
@@ -29,8 +29,8 @@ typedef struct Symbol {
 // Construct empty, identity-only, or complete symbol values. These store the
 // name pointer without copying and do not validate id/scope/range relationships.
 Symbol Symbol_0(void);
-Symbol Symbol_1(uint64_t id);
-Symbol Symbol_5(uint64_t id, uint64_t scopeId, SymbolKind kind, const char *name, SourceRange declarationRange);
+Symbol Symbol_1(u64 id);
+Symbol Symbol_5(u64 id, u64 scopeId, SymbolKind kind, const char *name, SourceRange declarationRange);
 // Dispatch Symbol(), Symbol(id), or the five-field constructor; other arities
 // reject at compile time.
 #define Symbol(...) SYMBOL_SELECT(_ __VA_OPT__(,) __VA_ARGS__, Symbol_5, Symbol_invalid_arity, Symbol_invalid_arity, Symbol_invalid_arity, Symbol_1, Symbol_0)(__VA_ARGS__)
@@ -38,10 +38,10 @@ Symbol Symbol_5(uint64_t id, uint64_t scopeId, SymbolKind kind, const char *name
 // Return the all-zero identity and provide symmetric field accessors. Null
 // getters return safe defaults; null setters do nothing.
 Symbol Symbol_zero(void);
-uint64_t Symbol_getId(const Symbol *self);
-void Symbol_setId(Symbol *self, uint64_t value);
-uint64_t Symbol_getScopeId(const Symbol *self);
-void Symbol_setScopeId(Symbol *self, uint64_t value);
+u64 Symbol_getId(const Symbol *self);
+void Symbol_setId(Symbol *self, u64 value);
+u64 Symbol_getScopeId(const Symbol *self);
+void Symbol_setScopeId(Symbol *self, u64 value);
 SymbolKind Symbol_getKind(const Symbol *self);
 void Symbol_setKind(Symbol *self, SymbolKind value);
 const char *Symbol_getName(const Symbol *self);

@@ -24,7 +24,7 @@ struct ProjectConfiguration {
 static char *copyId(const char *languageId) {
     if (languageId == nullptr)
         return nullptr;
-    size_t length = strlen(languageId);
+    bytes length = strlen(languageId);
     if (length == 0u)
         return nullptr;
     char *copy = malloc(length + 1u);

@@ -29,10 +29,10 @@
  * STRUCT FIELDS (Mirroring style/text_style.h)
  * ----------------------------------------------------------------------------
  *   TextStyle {
- *     uint32_t fg;                     // packed 0xRRGGBBAA; DEFAULT inherits
- *     uint32_t bg;                     // packed 0xRRGGBBAA; DEFAULT inherits
- *     uint32_t decorationColor;        // packed; DEFAULT inherits
- *     uint16_t flags;                  // BOLD/ITALIC/DIM/REVERSE/BLINK/HIDDEN
+ *     u32 fg;                     // packed 0xRRGGBBAA; DEFAULT inherits
+ *     u32 bg;                     // packed 0xRRGGBBAA; DEFAULT inherits
+ *     u32 decorationColor;        // packed; DEFAULT inherits
+ *     u16 flags;                  // BOLD/ITALIC/DIM/REVERSE/BLINK/HIDDEN
  *     TextStyleDecoration decoration;  // NONE/underline variants/strike
  *   }
  *
@@ -58,7 +58,7 @@ static const char *decorationName(TextStyleDecoration decoration) {
     switch (decoration) {
         case TEXT_DECORATION_NONE: return "none";
         case TEXT_DECORATION_UNDERLINE: return "underline";
-        case TEXT_DECORATION_DOUBLE_UNDERLINE: return "double-underline";
+        case TEXT_DECORATION_f64_UNDERLINE: return "d64-underline";
         case TEXT_DECORATION_CURLY_UNDERLINE: return "curly-underline";
         case TEXT_DECORATION_DOTTED_UNDERLINE: return "dotted-underline";
         case TEXT_DECORATION_DASHED_UNDERLINE: return "dashed-underline";
@@ -70,12 +70,12 @@ static const char *decorationName(TextStyleDecoration decoration) {
 TextStyle TextStyle_0(void) { return (TextStyle) {0}; }
 TextStyle TextStyle_zero(void) { return TextStyle_0(); }
 
-TextStyle TextStyle_2(uint32_t fg, uint32_t bg) {
+TextStyle TextStyle_2(u32 fg, u32 bg) {
     return (TextStyle) {.fg = fg, .bg = bg};
 }
 
-TextStyle TextStyle_5(uint32_t fg, uint32_t bg, uint32_t decorationColor,
-                      uint16_t flags, TextStyleDecoration decoration) {
+TextStyle TextStyle_5(u32 fg, u32 bg, u32 decorationColor,
+                      u16 flags, TextStyleDecoration decoration) {
     return (TextStyle) {
         .fg = fg,
         .bg = bg,
@@ -85,31 +85,31 @@ TextStyle TextStyle_5(uint32_t fg, uint32_t bg, uint32_t decorationColor,
     };
 }
 
-uint32_t TextStyle_getForeground(const TextStyle *self) {
+u32 TextStyle_getForeground(const TextStyle *self) {
     return self == nullptr ? TEXT_STYLE_COLOR_DEFAULT : (*self).fg;
 }
-void TextStyle_setForeground(TextStyle *self, uint32_t value) {
+void TextStyle_setForeground(TextStyle *self, u32 value) {
     if (self != nullptr)
         (*self).fg = value;
 }
-uint32_t TextStyle_getBackground(const TextStyle *self) {
+u32 TextStyle_getBackground(const TextStyle *self) {
     return self == nullptr ? TEXT_STYLE_COLOR_DEFAULT : (*self).bg;
 }
-void TextStyle_setBackground(TextStyle *self, uint32_t value) {
+void TextStyle_setBackground(TextStyle *self, u32 value) {
     if (self != nullptr)
         (*self).bg = value;
 }
-uint32_t TextStyle_getDecorationColor(const TextStyle *self) {
+u32 TextStyle_getDecorationColor(const TextStyle *self) {
     return self == nullptr ? TEXT_STYLE_COLOR_DEFAULT : (*self).decorationColor;
 }
-void TextStyle_setDecorationColor(TextStyle *self, uint32_t value) {
+void TextStyle_setDecorationColor(TextStyle *self, u32 value) {
     if (self != nullptr)
         (*self).decorationColor = value;
 }
-uint16_t TextStyle_getFlags(const TextStyle *self) {
+u16 TextStyle_getFlags(const TextStyle *self) {
     return self == nullptr ? 0u : (*self).flags;
 }
-void TextStyle_setFlags(TextStyle *self, uint16_t value) {
+void TextStyle_setFlags(TextStyle *self, u16 value) {
     if (self != nullptr)
         (*self).flags = value;
 }
@@ -121,7 +121,7 @@ void TextStyle_setDecoration(TextStyle *self, TextStyleDecoration value) {
         (*self).decoration = value;
 }
 
-bool TextStyle_hasFlag(const TextStyle *self, uint16_t flag) {
+bool TextStyle_hasFlag(const TextStyle *self, u16 flag) {
     if (self == nullptr || flag == 0u)
         return false;
     return ((*self).flags & flag) == flag;
@@ -135,7 +135,7 @@ TextStyle TextStyle_overlay(TextStyle base, TextStyle over) {
         (*((&result))).bg = (*((&over))).bg;
     if ((*((&over))).decorationColor != TEXT_STYLE_COLOR_DEFAULT)
         (*((&result))).decorationColor = (*((&over))).decorationColor;
-    (*((&result))).flags = (uint16_t) ((*((&base))).flags | (*((&over))).flags);
+    (*((&result))).flags = (u16) ((*((&base))).flags | (*((&over))).flags);
     if ((*((&over))).decoration != TEXT_DECORATION_NONE)
         (*((&result))).decoration = (*((&over))).decoration;
     return result;

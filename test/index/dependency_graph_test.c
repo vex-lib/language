@@ -18,10 +18,10 @@ int main(void) {
     assert(graph != nullptr && DependencyGraph_getProjectId(graph) == 71u);
     assert(DependencyGraph_getDependencyCount(nullptr, 1u) == 0u);
     assert(DependencyGraph_getDependentCount(graph, 4u) == 0u);
-    uint64_t firstDeps[] = {2u, 3u};
-    uint64_t secondDeps[] = {4u};
-    uint64_t thirdDeps[] = {4u};
-    uint64_t fourthDeps[] = {1u};
+    u64 firstDeps[] = {2u, 3u};
+    u64 secondDeps[] = {4u};
+    u64 thirdDeps[] = {4u};
+    u64 fourthDeps[] = {1u};
     assert(DependencyGraph_setDependencies(graph, 1u, firstDeps, 2u));
     assert(DependencyGraph_setDependencies(graph, 2u, secondDeps, 1u));
     assert(DependencyGraph_setDependencies(graph, 3u, thirdDeps, 1u));
@@ -38,10 +38,10 @@ int main(void) {
     assert(DependencyGraph_isAffectedBy(graph, 2u, 2u));
     assert(!DependencyGraph_isAffectedBy(graph, 1u, 99u));
 
-    uint64_t duplicateDeps[] = {2u, 2u};
+    u64 duplicateDeps[] = {2u, 2u};
     assert(!DependencyGraph_setDependencies(graph, 1u, duplicateDeps, 2u));
     assert(DependencyGraph_getDependencyCount(graph, 1u) == 2u);
-    uint64_t unknownDeps[] = {99u};
+    u64 unknownDeps[] = {99u};
     assert(!DependencyGraph_setDependencies(graph, 1u, unknownDeps, 1u));
     assert(DependencyGraph_getDependencyAt(graph, 1u, 1u) == 3u);
     assert(!DependencyGraph_setDependencies(graph, 1u, nullptr, 1u));

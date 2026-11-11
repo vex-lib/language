@@ -23,7 +23,7 @@
  * CLASS: StyleKeyRegistry (style/style_key_registry.c)
  * STRUCT FIELDS (Mirroring style/style_key_registry.h)
  *   const StyleKeyEntry *adapterEntries // borrowed rows, nullable
- *   size_t adapterCount                 // rows in adapterEntries
+ *   bytes adapterCount                 // rows in adapterEntries
  *
  * SLOT RECORD (owned by StyleKeyRegistry)
  *   StyleKeyEntry
@@ -77,7 +77,7 @@ static bool validPrefix(const char *name) {
     if (name == nullptr || name[0] == '\0')
         return false;
     bool dot = false;
-    for (size_t i = 0u; name[i] != '\0'; ++i) {
+    for (bytes i = 0u; name[i] != '\0'; ++i) {
         char c = name[i];
         if (c == '.') { dot = true; break; }
         if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '-'))
@@ -88,15 +88,15 @@ static bool validPrefix(const char *name) {
 
 StyleKeyRegistry StyleKeyRegistry_0(void) { return (StyleKeyRegistry) {0}; }
 StyleKeyRegistry StyleKeyRegistry_zero(void) { return StyleKeyRegistry_0(); }
-StyleKeyRegistry StyleKeyRegistry_2(const StyleKeyEntry *entries, size_t count) {
+StyleKeyRegistry StyleKeyRegistry_2(const StyleKeyEntry *entries, bytes count) {
     return (StyleKeyRegistry) {.adapterEntries = entries, .adapterCount = count};
 }
 
-size_t StyleKeyRegistry_coreCount(void) { return sizeof CORE_KEYS / sizeof CORE_KEYS[0]; }
-size_t StyleKeyRegistry_count(const StyleKeyRegistry *self) {
+bytes StyleKeyRegistry_coreCount(void) { return sizeof CORE_KEYS / sizeof CORE_KEYS[0]; }
+bytes StyleKeyRegistry_count(const StyleKeyRegistry *self) {
     return self == nullptr ? 0u : StyleKeyRegistry_coreCount() + (*self).adapterCount;
 }
-const char *StyleKeyRegistry_name(const StyleKeyRegistry *self, size_t index) {
+const char *StyleKeyRegistry_name(const StyleKeyRegistry *self, bytes index) {
     if (self == nullptr) return nullptr;
     if (index < StyleKeyRegistry_coreCount()) return CORE_KEYS[index];
     index -= StyleKeyRegistry_coreCount();
@@ -106,13 +106,13 @@ const char *StyleKeyRegistry_name(const StyleKeyRegistry *self, size_t index) {
 
 bool StyleKeyRegistry_isCore(const StyleKeyRegistry *self, const char *name) {
     (void) self;
-    for (size_t i = 0u; i < StyleKeyRegistry_coreCount(); ++i)
+    for (bytes i = 0u; i < StyleKeyRegistry_coreCount(); ++i)
         if (equal(CORE_KEYS[i], name)) return true;
     return false;
 }
 bool StyleKeyRegistry_isAdapter(const StyleKeyRegistry *self, const char *name) {
     if (self == nullptr || (*self).adapterEntries == nullptr) return false;
-    for (size_t i = 0u; i < (*self).adapterCount; ++i)
+    for (bytes i = 0u; i < (*self).adapterCount; ++i)
         if (equal((*self).adapterEntries[i].name, name)) return true;
     return false;
 }
@@ -120,14 +120,14 @@ const char *StyleKeyRegistry_fallback(const StyleKeyRegistry *self, const char *
     if (self == nullptr || name == nullptr) return nullptr;
     if (StyleKeyRegistry_isCore(self, name)) return equal(name, "text") ? nullptr : "text";
     if ((*self).adapterEntries != nullptr)
-        for (size_t i = 0u; i < (*self).adapterCount; ++i)
+        for (bytes i = 0u; i < (*self).adapterCount; ++i)
             if (equal((*self).adapterEntries[i].name, name)) return (*self).adapterEntries[i].fallback;
     return nullptr;
 }
 const char *StyleKeyRegistry_resolve(const StyleKeyRegistry *self, const char *name) {
     if (self == nullptr || name == nullptr) return nullptr;
     const char *current = name;
-    for (size_t step = 0u; step <= StyleKeyRegistry_count(self); ++step) {
+    for (bytes step = 0u; step <= StyleKeyRegistry_count(self); ++step) {
         if (StyleKeyRegistry_isCore(self, current)) return current;
         current = StyleKeyRegistry_fallback(self, current);
         if (current == nullptr) return nullptr;
@@ -138,14 +138,14 @@ const char *StyleKeyRegistry_resolve(const StyleKeyRegistry *self, const char *n
 StyleKeyIssue StyleKeyRegistry_check(const StyleKeyRegistry *self) {
     if (self == nullptr) return STYLE_KEY_ISSUE_ENTRY_NULL;
     if ((*self).adapterCount > 0u && (*self).adapterEntries == nullptr) return STYLE_KEY_ISSUE_ENTRY_NULL;
-    for (size_t i = 0u; i < (*self).adapterCount; ++i) {
+    for (bytes i = 0u; i < (*self).adapterCount; ++i) {
         const StyleKeyEntry *entry = &(*self).adapterEntries[i];
         if ((*entry).name == nullptr || (*entry).name[0] == '\0') return STYLE_KEY_ISSUE_NAME_EMPTY;
         if (!validPrefix((*entry).name)) return STYLE_KEY_ISSUE_PREFIX_INVALID;
         if (StyleKeyRegistry_isCore(self, (*entry).name)) return STYLE_KEY_ISSUE_COLLIDES_CORE;
         if ((*entry).fallback == nullptr || (*entry).fallback[0] == '\0') return STYLE_KEY_ISSUE_FALLBACK_EMPTY;
         if (!StyleKeyRegistry_isCore(self, (*entry).fallback)) return STYLE_KEY_ISSUE_FALLBACK_NOT_CORE;
-        for (size_t j = 0u; j < i; ++j)
+        for (bytes j = 0u; j < i; ++j)
             if (equal((*entry).name, (*self).adapterEntries[j].name)) return STYLE_KEY_ISSUE_DUPLICATE;
     }
     return STYLE_KEY_ISSUE_NONE;

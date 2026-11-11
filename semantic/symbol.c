@@ -31,8 +31,8 @@
  * STRUCT FIELDS (Mirroring semantic/symbol.h):
  * ----------------------------------------------------------------------------
  *   Symbol {
- *     uint64_t id;                    // stable identity within an index epoch
- *     uint64_t scopeId;               // declaring scope; policy owned elsewhere
+ *     u64 id;                    // stable identity within an index epoch
+ *     u64 scopeId;               // declaring scope; policy owned elsewhere
  *     SymbolKind kind;                // function/class/variable/macro/etc.
  *     const char *name;               // borrowed spelling; never freed here
  *     SourceRange declarationRange;   // where the declaration is written
@@ -51,9 +51,9 @@
  * Constructors:
  *   Symbol Symbol_0(void)
  *     Construct an all-zero symbol.
- *   Symbol Symbol_1(uint64_t id)
+ *   Symbol Symbol_1(u64 id)
  *     Construct an identity-only symbol; all other fields remain zero/null.
- *   Symbol Symbol_5(uint64_t id, uint64_t scopeId, SymbolKind kind,
+ *   Symbol Symbol_5(u64 id, u64 scopeId, SymbolKind kind,
  *                   const char *name, SourceRange declarationRange)
  *     Construct the complete record without validating or copying borrowed data.
  *   Symbol Symbol_zero(void)
@@ -61,8 +61,8 @@
  *   Symbol(...) dispatches the supported zero-, one-, and five-argument forms.
  *
  * Setters:
- *   void Symbol_setId(Symbol *self, uint64_t value)
- *   void Symbol_setScopeId(Symbol *self, uint64_t value)
+ *   void Symbol_setId(Symbol *self, u64 value)
+ *   void Symbol_setScopeId(Symbol *self, u64 value)
  *   void Symbol_setKind(Symbol *self, SymbolKind value)
  *   void Symbol_setName(Symbol *self, const char *value)
  *   void Symbol_setDeclarationRange(Symbol *self, SourceRange value)
@@ -70,8 +70,8 @@
  *     must keep it alive while the Symbol is consumed.
  *
  * Getters:
- *   uint64_t Symbol_getId(const Symbol *self)
- *   uint64_t Symbol_getScopeId(const Symbol *self)
+ *   u64 Symbol_getId(const Symbol *self)
+ *   u64 Symbol_getScopeId(const Symbol *self)
  *   SymbolKind Symbol_getKind(const Symbol *self)
  *   const char *Symbol_getName(const Symbol *self)
  *   SourceRange Symbol_getDeclarationRange(const Symbol *self)
@@ -84,15 +84,15 @@
  * ============================================================================
  */
 Symbol Symbol_0(void) { return (Symbol) {0}; }
-Symbol Symbol_1(uint64_t id) { return (Symbol) {.id = id}; }
-Symbol Symbol_5(uint64_t id, uint64_t scopeId, SymbolKind kind, const char *name, SourceRange declarationRange) {
+Symbol Symbol_1(u64 id) { return (Symbol) {.id = id}; }
+Symbol Symbol_5(u64 id, u64 scopeId, SymbolKind kind, const char *name, SourceRange declarationRange) {
     return (Symbol) {.id = id, .scopeId = scopeId, .kind = kind, .name = name, .declarationRange = declarationRange};
 }
 Symbol Symbol_zero(void) { return Symbol_0(); }
-uint64_t Symbol_getId(const Symbol *self) { return self == nullptr ? 0 : (*self).id; }
-void Symbol_setId(Symbol *self, uint64_t value) { if (self != nullptr) (*self).id = value; }
-uint64_t Symbol_getScopeId(const Symbol *self) { return self == nullptr ? 0 : (*self).scopeId; }
-void Symbol_setScopeId(Symbol *self, uint64_t value) { if (self != nullptr) (*self).scopeId = value; }
+u64 Symbol_getId(const Symbol *self) { return self == nullptr ? 0 : (*self).id; }
+void Symbol_setId(Symbol *self, u64 value) { if (self != nullptr) (*self).id = value; }
+u64 Symbol_getScopeId(const Symbol *self) { return self == nullptr ? 0 : (*self).scopeId; }
+void Symbol_setScopeId(Symbol *self, u64 value) { if (self != nullptr) (*self).scopeId = value; }
 SymbolKind Symbol_getKind(const Symbol *self) { return self == nullptr ? SYMBOL_KIND_UNKNOWN : (*self).kind; }
 void Symbol_setKind(Symbol *self, SymbolKind value) { if (self != nullptr) (*self).kind = value; }
 const char *Symbol_getName(const Symbol *self) { return self == nullptr ? nullptr : (*self).name; }

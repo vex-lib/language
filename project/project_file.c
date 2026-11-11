@@ -18,7 +18,7 @@
  * non-text or language-less files start unsupported; state changes are validated. */
 
 struct ProjectFile {
-    uint64_t id;
+    u64 id;
     char *relativePath;
     ProjectFileKind kind;
     char *languageId;
@@ -33,7 +33,7 @@ static bool pathIsSafeRelative(const char *path) {
     for (const char *cursor = path;; ++cursor) {
         if (*cursor != '/' && *cursor != '\0')
             continue;
-        size_t length = (size_t) (cursor - part);
+        bytes length = (bytes) (cursor - part);
         if (length == 0u || (length == 1u && part[0] == '.')
             || (length == 2u && part[0] == '.' && part[1] == '.'))
             return false;
@@ -44,14 +44,14 @@ static bool pathIsSafeRelative(const char *path) {
 }
 
 static char *copyString(const char *text) {
-    size_t length = strlen(text);
+    bytes length = strlen(text);
     char *copy = malloc(length + 1u);
     if (copy != nullptr)
         memcpy(copy, text, length + 1u);
     return copy;
 }
 
-ProjectFile *ProjectFile_4(uint64_t fileId, const char *relativePath,
+ProjectFile *ProjectFile_4(u64 fileId, const char *relativePath,
                            ProjectFileKind kind, const char *languageId) {
     if (fileId == 0u || !pathIsSafeRelative(relativePath)
         || kind < PROJECT_FILE_KIND_TEXT || kind > PROJECT_FILE_KIND_ASSET
@@ -89,7 +89,7 @@ void ProjectFile_free(ProjectFile *self) {
         free(self);
     }
 }
-uint64_t ProjectFile_getId(const ProjectFile *self) { return self == nullptr ? 0u : (*self).id; }
+u64 ProjectFile_getId(const ProjectFile *self) { return self == nullptr ? 0u : (*self).id; }
 const char *ProjectFile_getRelativePath(const ProjectFile *self) {
     return self == nullptr ? nullptr : (*self).relativePath;
 }

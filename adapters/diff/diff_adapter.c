@@ -51,8 +51,8 @@
  * FUNCTION REGISTRY:
  * ----------------------------------------------------------------------------
  * Public module operation:
- *   bool DiffAdapter_classifyLine(bool *inHunk, uint32_t documentId,
- *       uint64_t lineStartByte, const char *line, size_t lineLength,
+ *   bool DiffAdapter_classifyLine(bool *inHunk, u32 documentId,
+ *       u64 lineStartByte, const char *line, bytes lineLength,
  *       Token *outToken)
  *     Classify a recognized unified-diff line and publish its token/state.
  *     Returns false for invalid arguments, offset overflow, embedded NUL, empty
@@ -60,8 +60,8 @@
  *     reports through THROW. Success does not allocate or retain the line.
  *
  * Private static helper:
- *   bool startsWith(const char *line, size_t length, const char *prefix,
- *       size_t prefixLength)
+ *   bool startsWith(const char *line, bytes length, const char *prefix,
+ *       bytes prefixLength)
  *     Bounded byte-prefix test; never reads beyond the caller's span.
  *
  * CONTRACT: synchronous cold parsing, one caller serializes each stream. This
@@ -72,23 +72,23 @@
  * ============================================================================
  */
 
-static bool startsWith(const char *line, size_t length, const char *prefix,
-                       size_t prefixLength) {
+static bool startsWith(const char *line, bytes length, const char *prefix,
+                       bytes prefixLength) {
     return length >= prefixLength && memcmp(line, prefix, prefixLength) == 0;
 }
 
-bool DiffAdapter_classifyLine(bool *inHunk, uint32_t documentId,
-                              uint64_t lineStartByte, const char *line,
-                              size_t lineLength, Token *outToken) {
+bool DiffAdapter_classifyLine(bool *inHunk, u32 documentId,
+                              u64 lineStartByte, const char *line,
+                              bytes lineLength, Token *outToken) {
     if (inHunk == nullptr || line == nullptr || outToken == nullptr ||
         documentId == 0 || lineLength == 0 ||
-        (uint64_t) lineLength > UINT64_MAX - lineStartByte ||
+        (u64) lineLength > UINT64_MAX - lineStartByte ||
         memchr(line, '\0', lineLength) != nullptr) {
         THROW("diff adapter: invalid line span, identity, state, or output");
         return false;
     }
 
-    size_t visibleLength = lineLength;
+    bytes visibleLength = lineLength;
     if (line[visibleLength - 1] == '\r')
         --visibleLength;
     if (visibleLength == 0) {

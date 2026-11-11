@@ -18,7 +18,7 @@ typedef enum C23LexerProfile {
 } C23LexerProfile;
 
 C23Lexer *C23Lexer_0(void);
-C23Lexer *C23Lexer_3(uint32_t documentId, const char *source, size_t length);
+C23Lexer *C23Lexer_3(u32 documentId, const char *source, bytes length);
 #define C23Lexer_1 C23Lexer_invalid_arity
 #define C23Lexer_2 C23Lexer_invalid_arity
 #define C23Lexer_4 C23Lexer_invalid_arity
@@ -36,15 +36,15 @@ void C23Lexer_free(C23Lexer *self);
 // Borrows immutable bytes until the next successful setSource or free. A nonzero
 // document identity is required; nullptr is allowed only with length zero.
 // Rejection reports a cold THROW and preserves the prior snapshot/cursor/profile.
-bool C23Lexer_setSource(C23Lexer *self, uint32_t documentId,
-                        const char *source, size_t length);
+bool C23Lexer_setSource(C23Lexer *self, u32 documentId,
+                        const char *source, bytes length);
 // Profile changes affect future tokenization and reject unsupported values,
 // preserving the current profile. New snapshots retain the selected profile.
 bool C23Lexer_setProfile(C23Lexer *self, C23LexerProfile profile);
-uint32_t C23Lexer_getDocumentId(const C23Lexer *self);
+u32 C23Lexer_getDocumentId(const C23Lexer *self);
 const char *C23Lexer_getSource(const C23Lexer *self);
-size_t C23Lexer_getLength(const C23Lexer *self);
-size_t C23Lexer_getOffset(const C23Lexer *self);
+bytes C23Lexer_getLength(const C23Lexer *self);
+bytes C23Lexer_getOffset(const C23Lexer *self);
 C23LexerProfile C23Lexer_getProfile(const C23Lexer *self);
 bool C23Lexer_isDone(const C23Lexer *self);
 // Returns one fully initialized half-open byte span, or a no-span zero value at

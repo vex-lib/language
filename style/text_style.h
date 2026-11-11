@@ -32,7 +32,7 @@
 typedef enum TextStyleDecoration {
     TEXT_DECORATION_NONE = 0,
     TEXT_DECORATION_UNDERLINE,
-    TEXT_DECORATION_DOUBLE_UNDERLINE,
+    TEXT_DECORATION_f64_UNDERLINE,
     TEXT_DECORATION_CURLY_UNDERLINE,   // the warning squiggle
     TEXT_DECORATION_DOTTED_UNDERLINE,
     TEXT_DECORATION_DASHED_UNDERLINE,
@@ -40,18 +40,18 @@ typedef enum TextStyleDecoration {
 } TextStyleDecoration;
 
 typedef struct TextStyle {
-    uint32_t fg;               // 0xRRGGBBAA, DEFAULT means inherit
-    uint32_t bg;               // 0xRRGGBBAA, DEFAULT means inherit
-    uint32_t decorationColor;  // DEFAULT means inherit (usually the resolved fg)
-    uint16_t flags;            // TEXT_STYLE_* bits
+    u32 fg;               // 0xRRGGBBAA, DEFAULT means inherit
+    u32 bg;               // 0xRRGGBBAA, DEFAULT means inherit
+    u32 decorationColor;  // DEFAULT means inherit (usually the resolved fg)
+    u16 flags;            // TEXT_STYLE_* bits
     TextStyleDecoration decoration; // what is drawn under/through the text
 } TextStyle;
 
 // Construct empty, colour-only, or the complete style. Other arities reject.
 TextStyle TextStyle_0(void);
-TextStyle TextStyle_2(uint32_t fg, uint32_t bg);
-TextStyle TextStyle_5(uint32_t fg, uint32_t bg, uint32_t decorationColor,
-                      uint16_t flags, TextStyleDecoration decoration);
+TextStyle TextStyle_2(u32 fg, u32 bg);
+TextStyle TextStyle_5(u32 fg, u32 bg, u32 decorationColor,
+                      u16 flags, TextStyleDecoration decoration);
 #define TextStyle(...) TEXT_STYLE_SELECT(_ __VA_OPT__(,) __VA_ARGS__, TextStyle_5, TextStyle_invalid_arity, TextStyle_invalid_arity, TextStyle_2, TextStyle_invalid_arity, TextStyle_0)(__VA_ARGS__)
 #define TEXT_STYLE_SELECT(_0, _1, _2, _3, _4, _5, NAME, ...) NAME
 // Return the all-default (inherit everything) value.
@@ -59,19 +59,19 @@ TextStyle TextStyle_zero(void);
 
 // Symmetric field accessors. A null self is safe: getters return the default,
 // setters do nothing.
-uint32_t TextStyle_getForeground(const TextStyle *self);
-void TextStyle_setForeground(TextStyle *self, uint32_t value);
-uint32_t TextStyle_getBackground(const TextStyle *self);
-void TextStyle_setBackground(TextStyle *self, uint32_t value);
-uint32_t TextStyle_getDecorationColor(const TextStyle *self);
-void TextStyle_setDecorationColor(TextStyle *self, uint32_t value);
-uint16_t TextStyle_getFlags(const TextStyle *self);
-void TextStyle_setFlags(TextStyle *self, uint16_t value);
+u32 TextStyle_getForeground(const TextStyle *self);
+void TextStyle_setForeground(TextStyle *self, u32 value);
+u32 TextStyle_getBackground(const TextStyle *self);
+void TextStyle_setBackground(TextStyle *self, u32 value);
+u32 TextStyle_getDecorationColor(const TextStyle *self);
+void TextStyle_setDecorationColor(TextStyle *self, u32 value);
+u16 TextStyle_getFlags(const TextStyle *self);
+void TextStyle_setFlags(TextStyle *self, u16 value);
 TextStyleDecoration TextStyle_getDecoration(const TextStyle *self);
 void TextStyle_setDecoration(TextStyle *self, TextStyleDecoration value);
 
 // True when every bit of `flag` is set.
-bool TextStyle_hasFlag(const TextStyle *self, uint16_t flag);
+bool TextStyle_hasFlag(const TextStyle *self, u16 flag);
 
 // Compose `over` on top of `base`: a set colour replaces, an inheriting colour
 // keeps the base, flags union, and a decoration replaces only when it is not

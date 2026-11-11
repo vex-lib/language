@@ -16,7 +16,7 @@ typedef enum ReferenceRole {
 // One occurrence that may refer to a Symbol. A nonzero target id and resolved
 // flag are supplied by a resolver; this record does not prove target liveness.
 typedef struct Reference {
-    uint64_t targetSymbolId; // zero in the unresolved/empty form
+    u64 targetSymbolId; // zero in the unresolved/empty form
     SourceRange range;       // bytes occupied by this use
     ReferenceRole role;      // read/write/call/type/address/control flow
     bool resolved;           // result asserted by the producer/resolver
@@ -25,8 +25,8 @@ typedef struct Reference {
 // Construct empty, target-id-only, or complete reference values. Construction
 // is value-only and does not resolve names or check the target id.
 Reference Reference_0(void);
-Reference Reference_1(uint64_t targetSymbolId);
-Reference Reference_4(uint64_t targetSymbolId, SourceRange range, ReferenceRole role, bool resolved);
+Reference Reference_1(u64 targetSymbolId);
+Reference Reference_4(u64 targetSymbolId, SourceRange range, ReferenceRole role, bool resolved);
 // Dispatch Reference(), Reference(targetSymbolId), or the four-field form;
 // other arities reject at compile time.
 #define Reference(...) REFERENCE_SELECT(_ __VA_OPT__(,) __VA_ARGS__, Reference_4, Reference_invalid_arity, Reference_invalid_arity, Reference_1, Reference_0)(__VA_ARGS__)
@@ -34,8 +34,8 @@ Reference Reference_4(uint64_t targetSymbolId, SourceRange range, ReferenceRole 
 // Return the empty identity and provide symmetric field accessors. Null
 // getters return safe defaults; null setters do nothing.
 Reference Reference_zero(void);
-uint64_t Reference_getTargetSymbolId(const Reference *self);
-void Reference_setTargetSymbolId(Reference *self, uint64_t value);
+u64 Reference_getTargetSymbolId(const Reference *self);
+void Reference_setTargetSymbolId(Reference *self, u64 value);
 SourceRange Reference_getRange(const Reference *self);
 void Reference_setRange(Reference *self, SourceRange value);
 ReferenceRole Reference_getRole(const Reference *self);

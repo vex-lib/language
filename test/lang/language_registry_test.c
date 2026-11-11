@@ -19,7 +19,7 @@ int main(void) {
     assert(registry != nullptr);
     LanguageAdapter copies[32];
     char ids[32][8];
-    for (size_t index = 0u; index < 32u; ++index) {
+    for (bytes index = 0u; index < 32u; ++index) {
         copies[index] = *adapter;
         (void) snprintf(ids[index], sizeof ids[index], "lang%zu", index);
         copies[index].languageId = ids[index];

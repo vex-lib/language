@@ -18,31 +18,31 @@
  * file contribution; unresolved refs use target id zero. */
 
 struct FileAnalysis {
-    uint64_t fileId;
-    uint32_t documentId;
-    uint64_t documentRevision;
-    uint64_t compilationContextId;
+    u64 fileId;
+    u32 documentId;
+    u64 documentRevision;
+    u64 compilationContextId;
     Symbol *symbols;
-    size_t symbolCount;
-    size_t symbolCapacity;
+    bytes symbolCount;
+    bytes symbolCapacity;
     Reference *references;
-    size_t referenceCount;
-    size_t referenceCapacity;
+    bytes referenceCount;
+    bytes referenceCapacity;
 };
 
 static char *copyName(const char *name) {
-    size_t length = strlen(name);
+    bytes length = strlen(name);
     char *copy = malloc(length + 1u);
     if (copy != nullptr)
         memcpy(copy, name, length + 1u);
     return copy;
 }
 
-static void *reserve(void *items, size_t *capacity, size_t count,
-                     size_t itemSize, const char *kind) {
+static void *reserve(void *items, bytes *capacity, bytes count,
+                     bytes itemSize, const char *kind) {
     if (count < *capacity)
         return items;
-    size_t next = *capacity == 0u ? 8u : *capacity * 2u;
+    bytes next = *capacity == 0u ? 8u : *capacity * 2u;
     if (next < *capacity || next > SIZE_MAX / itemSize) {
         THROW("FileAnalysis: %s capacity overflow", kind);
         return nullptr;
@@ -56,9 +56,9 @@ static void *reserve(void *items, size_t *capacity, size_t count,
     return grown;
 }
 
-FileAnalysis *FileAnalysis_4(uint64_t fileId, uint32_t documentId,
-                             uint64_t documentRevision,
-                             uint64_t compilationContextId) {
+FileAnalysis *FileAnalysis_4(u64 fileId, u32 documentId,
+                             u64 documentRevision,
+                             u64 compilationContextId) {
     if (fileId == 0u || documentId == 0u || documentRevision == 0u
         || compilationContextId == 0u) {
         THROW("FileAnalysis: rejected zero file, document, revision or context identity");
@@ -79,7 +79,7 @@ FileAnalysis *FileAnalysis_4(uint64_t fileId, uint32_t documentId,
 void FileAnalysis_free(FileAnalysis *self) {
     if (self == nullptr)
         return;
-    for (size_t index = 0u; index < (*self).symbolCount; ++index)
+    for (bytes index = 0u; index < (*self).symbolCount; ++index)
         free((void*) (*self).symbols[index].name);
     free((*self).symbols);
     (*self).symbols = nullptr;
@@ -96,7 +96,7 @@ bool FileAnalysis_addSymbol(FileAnalysis *self, Symbol symbol) {
         THROW("FileAnalysis: rejected invalid declaration identity or range");
         return false;
     }
-    for (size_t index = 0u; index < (*self).symbolCount; ++index)
+    for (bytes index = 0u; index < (*self).symbolCount; ++index)
         if ((*self).symbols[index].id == symbol.id) {
             THROW("FileAnalysis: duplicate symbol id in one file contribution");
             return false;
@@ -138,24 +138,24 @@ bool FileAnalysis_addReference(FileAnalysis *self, Reference reference) {
     ++(*self).referenceCount;
     return true;
 }
-uint64_t FileAnalysis_getFileId(const FileAnalysis *self) { return self == nullptr ? 0u : (*self).fileId; }
-uint32_t FileAnalysis_getDocumentId(const FileAnalysis *self) { return self == nullptr ? 0u : (*self).documentId; }
-uint64_t FileAnalysis_getDocumentRevision(const FileAnalysis *self) {
+u64 FileAnalysis_getFileId(const FileAnalysis *self) { return self == nullptr ? 0u : (*self).fileId; }
+u32 FileAnalysis_getDocumentId(const FileAnalysis *self) { return self == nullptr ? 0u : (*self).documentId; }
+u64 FileAnalysis_getDocumentRevision(const FileAnalysis *self) {
     return self == nullptr ? 0u : (*self).documentRevision;
 }
-uint64_t FileAnalysis_getCompilationContextId(const FileAnalysis *self) {
+u64 FileAnalysis_getCompilationContextId(const FileAnalysis *self) {
     return self == nullptr ? 0u : (*self).compilationContextId;
 }
-size_t FileAnalysis_getSymbolCount(const FileAnalysis *self) {
+bytes FileAnalysis_getSymbolCount(const FileAnalysis *self) {
     return self == nullptr ? 0u : (*self).symbolCount;
 }
-Symbol FileAnalysis_getSymbolAt(const FileAnalysis *self, size_t index) {
+Symbol FileAnalysis_getSymbolAt(const FileAnalysis *self, bytes index) {
     return self == nullptr || index >= (*self).symbolCount ? Symbol_zero() : (*self).symbols[index];
 }
-size_t FileAnalysis_getReferenceCount(const FileAnalysis *self) {
+bytes FileAnalysis_getReferenceCount(const FileAnalysis *self) {
     return self == nullptr ? 0u : (*self).referenceCount;
 }
-Reference FileAnalysis_getReferenceAt(const FileAnalysis *self, size_t index) {
+Reference FileAnalysis_getReferenceAt(const FileAnalysis *self, bytes index) {
     return self == nullptr || index >= (*self).referenceCount
         ? Reference_zero() : (*self).references[index];
 }

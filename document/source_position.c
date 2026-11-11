@@ -12,7 +12,7 @@
  * CONTRACT: invalid construction canonicalizes coordinates to zero. */
 
 SourcePosition SourcePosition_0(void) { return (SourcePosition) {0}; }
-SourcePosition SourcePosition_3(bool valid, size_t line, size_t character) {
+SourcePosition SourcePosition_3(bool valid, bytes line, bytes character) {
     return valid ? (SourcePosition) {.valid = true, .line = line, .character = character}
                  : SourcePosition_0();
 }

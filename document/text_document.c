@@ -17,12 +17,12 @@
  * snapshot returned to a caller carries one retained reference. */
 
 struct TextDocument {
-    uint32_t documentId;
-    uint64_t revision;
+    u32 documentId;
+    u64 revision;
     TextSnapshot *current;
 };
 
-TextDocument *TextDocument_3(uint32_t documentId, const char *bytes, size_t length) {
+TextDocument *TextDocument_3(u32 documentId, const char *bytes, bytes length) {
     if (documentId == 0u) {
         THROW("TextDocument: rejected zero document identity");
         return nullptr;
@@ -50,7 +50,7 @@ void TextDocument_free(TextDocument *self) {
     }
 }
 
-bool TextDocument_update(TextDocument *self, const char *bytes, size_t length) {
+bool TextDocument_update(TextDocument *self, const char *bytes, bytes length) {
     if (self == nullptr || (bytes == nullptr && length != 0u)) {
         THROW("TextDocument: rejected invalid update bytes");
         return false;
@@ -76,9 +76,9 @@ TextSnapshot *TextDocument_snapshot(const TextDocument *self) {
         return nullptr;
     return (*self).current;
 }
-uint32_t TextDocument_getDocumentId(const TextDocument *self) {
+u32 TextDocument_getDocumentId(const TextDocument *self) {
     return self == nullptr ? 0u : (*self).documentId;
 }
-uint64_t TextDocument_getRevision(const TextDocument *self) {
+u64 TextDocument_getRevision(const TextDocument *self) {
     return self == nullptr ? 0u : (*self).revision;
 }

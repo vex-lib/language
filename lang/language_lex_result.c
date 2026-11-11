@@ -17,8 +17,8 @@ LanguageLexResult LanguageLexResult_2(bool hasSpan, SyntaxSpan span) {
                    : LanguageLexResult_0();
 }
 LanguageLexResult LanguageLexResult_4(bool hasSpan, SyntaxSpan span,
-                                      uint64_t documentRevision,
-                                      uint64_t compilationContextId) {
+                                      u64 documentRevision,
+                                      u64 compilationContextId) {
     return (LanguageLexResult) {
         .hasSpan = hasSpan,
         .span = hasSpan ? span : SyntaxSpan_zero(),
@@ -28,8 +28,8 @@ LanguageLexResult LanguageLexResult_4(bool hasSpan, SyntaxSpan span,
 }
 LanguageLexResult LanguageLexResult_zero(void) { return LanguageLexResult_0(); }
 LanguageLexResult LanguageLexResult_withContext(LanguageLexResult self,
-                                                 uint64_t documentRevision,
-                                                 uint64_t compilationContextId) {
+                                                 u64 documentRevision,
+                                                 u64 compilationContextId) {
     self.documentRevision = documentRevision;
     self.compilationContextId = compilationContextId;
     if (!self.hasSpan)

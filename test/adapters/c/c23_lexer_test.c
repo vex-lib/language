@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static C23LexStep take(C23Lexer *lexer, SyntaxRole role, size_t start, size_t end) {
+static C23LexStep take(C23Lexer *lexer, SyntaxRole role, bytes start, bytes end) {
     C23LexStep step = C23Lexer_next(lexer);
     SyntaxSpan span = step.span;
     SourceRange range = span.range;
@@ -27,24 +27,24 @@ static bool sourceWhitespace(unsigned char byte) {
         || byte == '\f' || byte == '\v';
 }
 
-static void assertCoverage(uint32_t documentId, const char *source, size_t length) {
+static void assertCoverage(u32 documentId, const char *source, bytes length) {
     C23Lexer *lexer = C23Lexer(documentId, source, length);
     assert(lexer != nullptr);
-    size_t coveredThrough = 0u;
+    bytes coveredThrough = 0u;
     C23LexStep step = C23Lexer_next(lexer);
     while (step.hasSpan) {
         SyntaxSpan span = step.span;
         SourceRange range = span.range;
         assert(range.documentId == documentId);
         assert(range.startByte >= coveredThrough);
-        for (size_t byte = coveredThrough; byte < range.startByte; ++byte)
+        for (bytes byte = coveredThrough; byte < range.startByte; ++byte)
             assert(sourceWhitespace((unsigned char) source[byte]));
         assert(range.startByte < range.endByte);
         assert(range.endByte <= length);
         coveredThrough = range.endByte;
         step = C23Lexer_next(lexer);
     }
-    for (size_t byte = coveredThrough; byte < length; ++byte)
+    for (bytes byte = coveredThrough; byte < length; ++byte)
         assert(sourceWhitespace((unsigned char) source[byte]));
     C23Lexer_free(lexer);
 }
@@ -62,8 +62,8 @@ int main(void) {
     assert(C23Lexer_isDone(nullptr));
     const char *keywords[] = {
         "alignas", "alignof", "auto", "bool", "break", "case", "char", "char8_t",
-        "const", "constexpr", "continue", "default", "do", "double", "else", "enum",
-        "extern", "false", "float", "for", "goto", "if", "inline", "int", "long",
+        "const", "constexpr", "continue", "default", "do", "d64", "else", "enum",
+        "extern", "false", "f32", "for", "goto", "if", "inline", "int", "long",
         "nullptr", "register", "restrict", "return", "short", "signed", "sizeof", "static",
         "static_assert", "struct", "switch", "thread_local", "true", "typedef", "typeof",
         "typeof_unqual", "union", "unsigned", "void", "volatile", "while", "_Alignas",
@@ -71,18 +71,18 @@ int main(void) {
         "_Decimal128", "_Generic", "_Imaginary", "_Noreturn", "_Static_assert", "_Thread_local"
     };
     char keywordSource[1024] = {0};
-    size_t keywordLength = 0u;
-    for (size_t index = 0u; index < sizeof keywords / sizeof keywords[0]; ++index) {
+    bytes keywordLength = 0u;
+    for (bytes index = 0u; index < sizeof keywords / sizeof keywords[0]; ++index) {
         if (index != 0u)
             keywordSource[keywordLength++] = ' ';
-        size_t wordLength = strlen(keywords[index]);
+        bytes wordLength = strlen(keywords[index]);
         memcpy(keywordSource + keywordLength, keywords[index], wordLength);
         keywordLength += wordLength;
     }
     C23Lexer *lexer = C23Lexer(16u, keywordSource, keywordLength);
-    size_t keywordOffset = 0u;
-    for (size_t index = 0u; index < sizeof keywords / sizeof keywords[0]; ++index) {
-        size_t wordLength = strlen(keywords[index]);
+    bytes keywordOffset = 0u;
+    for (bytes index = 0u; index < sizeof keywords / sizeof keywords[0]; ++index) {
+        bytes wordLength = strlen(keywords[index]);
         take(lexer, SYNTAX_ROLE_KEYWORD, keywordOffset, keywordOffset + wordLength);
         keywordOffset += wordLength + 1u;
     }
@@ -156,19 +156,19 @@ int main(void) {
         "%", "<", ">", "^", "|", "?", ":", ";", "=", ",", "#"
     };
     char punctuatorSource[512] = {0};
-    size_t punctuatorLength = 0u;
-    size_t punctuatorOffsets[sizeof punctuators / sizeof punctuators[0]] = {0};
-    for (size_t index = 0u; index < sizeof punctuators / sizeof punctuators[0]; ++index) {
+    bytes punctuatorLength = 0u;
+    bytes punctuatorOffsets[sizeof punctuators / sizeof punctuators[0]] = {0};
+    for (bytes index = 0u; index < sizeof punctuators / sizeof punctuators[0]; ++index) {
         if (index != 0u)
             punctuatorSource[punctuatorLength++] = ' ';
         punctuatorOffsets[index] = punctuatorLength;
-        size_t tokenLength = strlen(punctuators[index]);
+        bytes tokenLength = strlen(punctuators[index]);
         memcpy(punctuatorSource + punctuatorLength, punctuators[index], tokenLength);
         punctuatorLength += tokenLength;
     }
     lexer = C23Lexer(27u, punctuatorSource, punctuatorLength);
-    for (size_t index = 0u; index < sizeof punctuators / sizeof punctuators[0]; ++index) {
-        size_t tokenLength = strlen(punctuators[index]);
+    for (bytes index = 0u; index < sizeof punctuators / sizeof punctuators[0]; ++index) {
+        bytes tokenLength = strlen(punctuators[index]);
         C23LexStep step = C23Lexer_next(lexer);
         SyntaxSpan span = step.span;
         SourceRange range = span.range;
@@ -352,13 +352,13 @@ int main(void) {
         (const char*) nulEscapedInString,
         (const char*) nulInCharacter
     };
-    const size_t coverageLengths[] = {
+    const bytes coverageLengths[] = {
         strlen(coverageSamples[0]), strlen(coverageSamples[1]), strlen(coverageSamples[2]),
         strlen(coverageSamples[3]), sizeof nulInString, sizeof nulEscapedInString,
         sizeof nulInCharacter
     };
-    for (size_t index = 0u; index < sizeof coverageSamples / sizeof coverageSamples[0]; ++index)
-        assertCoverage((uint32_t) (40u + index), coverageSamples[index], coverageLengths[index]);
+    for (bytes index = 0u; index < sizeof coverageSamples / sizeof coverageSamples[0]; ++index)
+        assertCoverage((u32) (40u + index), coverageSamples[index], coverageLengths[index]);
 
     assert(!C23Lexer_setSource(nullptr, 1u, "x", 1u));
     assert(!C23Lexer_setProfile(nullptr, C23_LEXER_PROFILE_STRICT_C23));

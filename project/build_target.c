@@ -18,38 +18,38 @@
  * previous state on rejection; options are opaque data, never executed here. */
 
 struct BuildTarget {
-    uint64_t id;
+    u64 id;
     char *name;
     char *languageId;
-    uint64_t *sourceFileIds;
-    size_t sourceCount;
-    size_t sourceCapacity;
-    uint64_t *dependencyIds;
-    size_t dependencyCount;
-    size_t dependencyCapacity;
+    u64 *sourceFileIds;
+    bytes sourceCount;
+    bytes sourceCapacity;
+    u64 *dependencyIds;
+    bytes dependencyCount;
+    bytes dependencyCapacity;
     char **compilerOptions;
-    size_t compilerOptionCount;
-    size_t compilerOptionCapacity;
+    bytes compilerOptionCount;
+    bytes compilerOptionCapacity;
 };
 
 static char *copyText(const char *text) {
-    size_t length = strlen(text);
+    bytes length = strlen(text);
     char *copy = malloc(length + 1u);
     if (copy != nullptr)
         memcpy(copy, text, length + 1u);
     return copy;
 }
 
-static bool reserveIds(uint64_t **items, size_t *capacity, size_t count,
+static bool reserveIds(u64 **items, bytes *capacity, bytes count,
                        const char *owner) {
     if (count < *capacity)
         return true;
-    size_t next = *capacity == 0u ? 8u : *capacity * 2u;
-    if (next < *capacity || next > SIZE_MAX / sizeof(uint64_t)) {
+    bytes next = *capacity == 0u ? 8u : *capacity * 2u;
+    if (next < *capacity || next > SIZE_MAX / sizeof(u64)) {
         THROW("BuildTarget: %s vector capacity overflow", owner);
         return false;
     }
-    uint64_t *grown = realloc(*items, next * sizeof(uint64_t));
+    u64 *grown = realloc(*items, next * sizeof(u64));
     if (grown == nullptr) {
         THROW("BuildTarget: allocation failed for %s capacity %zu", owner, next);
         return false;
@@ -59,13 +59,13 @@ static bool reserveIds(uint64_t **items, size_t *capacity, size_t count,
     return true;
 }
 
-static bool appendId(uint64_t **items, size_t *count, size_t *capacity,
-                     uint64_t id, const char *owner) {
+static bool appendId(u64 **items, bytes *count, bytes *capacity,
+                     u64 id, const char *owner) {
     if (id == 0u) {
         THROW("BuildTarget: rejected zero %s identity", owner);
         return false;
     }
-    for (size_t index = 0u; index < *count; ++index)
+    for (bytes index = 0u; index < *count; ++index)
         if ((*items)[index] == id) {
             THROW("BuildTarget: duplicate %s identity", owner);
             return false;
@@ -77,7 +77,7 @@ static bool appendId(uint64_t **items, size_t *count, size_t *capacity,
     return true;
 }
 
-BuildTarget *BuildTarget_3(uint64_t targetId, const char *name,
+BuildTarget *BuildTarget_3(u64 targetId, const char *name,
                            const char *languageId) {
     if (targetId == 0u || name == nullptr || name[0] == '\0'
         || languageId == nullptr || languageId[0] == '\0') {
@@ -105,7 +105,7 @@ BuildTarget *BuildTarget_3(uint64_t targetId, const char *name,
 void BuildTarget_free(BuildTarget *self) {
     if (self == nullptr)
         return;
-    for (size_t index = 0u; index < (*self).compilerOptionCount; ++index)
+    for (bytes index = 0u; index < (*self).compilerOptionCount; ++index)
         free((*self).compilerOptions[index]);
     free((*self).compilerOptions);
     (*self).compilerOptions = nullptr;
@@ -120,7 +120,7 @@ void BuildTarget_free(BuildTarget *self) {
     free(self);
 }
 
-bool BuildTarget_addSourceFile(BuildTarget *self, uint64_t fileId) {
+bool BuildTarget_addSourceFile(BuildTarget *self, u64 fileId) {
     if (self == nullptr) {
         THROW("BuildTarget: rejected null source owner");
         return false;
@@ -128,7 +128,7 @@ bool BuildTarget_addSourceFile(BuildTarget *self, uint64_t fileId) {
     return appendId(&(*self).sourceFileIds, &(*self).sourceCount,
                     &(*self).sourceCapacity, fileId, "source file");
 }
-bool BuildTarget_addDependency(BuildTarget *self, uint64_t targetId) {
+bool BuildTarget_addDependency(BuildTarget *self, u64 targetId) {
     if (self == nullptr) {
         THROW("BuildTarget: rejected null dependency owner");
         return false;
@@ -141,9 +141,9 @@ bool BuildTarget_addCompilerOption(BuildTarget *self, const char *option) {
         THROW("BuildTarget: rejected null or empty compiler option");
         return false;
     }
-    size_t capacity = (*self).compilerOptionCapacity;
+    bytes capacity = (*self).compilerOptionCapacity;
     if ((*self).compilerOptionCount == capacity) {
-        size_t next = capacity == 0u ? 8u : capacity * 2u;
+        bytes next = capacity == 0u ? 8u : capacity * 2u;
         if (next < capacity || next > SIZE_MAX / sizeof(char*)) {
             THROW("BuildTarget: compiler-option capacity overflow");
             return false;
@@ -165,27 +165,27 @@ bool BuildTarget_addCompilerOption(BuildTarget *self, const char *option) {
     ++(*self).compilerOptionCount;
     return true;
 }
-uint64_t BuildTarget_getId(const BuildTarget *self) { return self == nullptr ? 0u : (*self).id; }
+u64 BuildTarget_getId(const BuildTarget *self) { return self == nullptr ? 0u : (*self).id; }
 const char *BuildTarget_getName(const BuildTarget *self) { return self == nullptr ? nullptr : (*self).name; }
 const char *BuildTarget_getLanguageId(const BuildTarget *self) {
     return self == nullptr ? nullptr : (*self).languageId;
 }
-size_t BuildTarget_getSourceCount(const BuildTarget *self) {
+bytes BuildTarget_getSourceCount(const BuildTarget *self) {
     return self == nullptr ? 0u : (*self).sourceCount;
 }
-uint64_t BuildTarget_getSourceAt(const BuildTarget *self, size_t index) {
+u64 BuildTarget_getSourceAt(const BuildTarget *self, bytes index) {
     return self == nullptr || index >= (*self).sourceCount ? 0u : (*self).sourceFileIds[index];
 }
-size_t BuildTarget_getDependencyCount(const BuildTarget *self) {
+bytes BuildTarget_getDependencyCount(const BuildTarget *self) {
     return self == nullptr ? 0u : (*self).dependencyCount;
 }
-uint64_t BuildTarget_getDependencyAt(const BuildTarget *self, size_t index) {
+u64 BuildTarget_getDependencyAt(const BuildTarget *self, bytes index) {
     return self == nullptr || index >= (*self).dependencyCount ? 0u : (*self).dependencyIds[index];
 }
-size_t BuildTarget_getCompilerOptionCount(const BuildTarget *self) {
+bytes BuildTarget_getCompilerOptionCount(const BuildTarget *self) {
     return self == nullptr ? 0u : (*self).compilerOptionCount;
 }
-const char *BuildTarget_getCompilerOptionAt(const BuildTarget *self, size_t index) {
+const char *BuildTarget_getCompilerOptionAt(const BuildTarget *self, bytes index) {
     return self == nullptr || index >= (*self).compilerOptionCount
         ? nullptr : (*self).compilerOptions[index];
 }

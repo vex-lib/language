@@ -8,7 +8,7 @@
 
 typedef struct TextDocument TextDocument;
 
-TextDocument *TextDocument_3(uint32_t documentId, const char *bytes, size_t length);
+TextDocument *TextDocument_3(u32 documentId, const char *bytes, bytes length);
 #define TextDocument_0 TextDocument_invalid_arity
 #define TextDocument_1 TextDocument_invalid_arity
 #define TextDocument_2 TextDocument_invalid_arity
@@ -21,9 +21,9 @@ TextDocument *TextDocument_3(uint32_t documentId, const char *bytes, size_t leng
 #define TextDocument(...) \
     TextDocument_CAT(TextDocument_, TextDocument_NARG(__VA_ARGS__))(__VA_ARGS__)
 void TextDocument_free(TextDocument *self);
-bool TextDocument_update(TextDocument *self, const char *bytes, size_t length);
+bool TextDocument_update(TextDocument *self, const char *bytes, bytes length);
 TextSnapshot *TextDocument_snapshot(const TextDocument *self);
-uint32_t TextDocument_getDocumentId(const TextDocument *self);
-uint64_t TextDocument_getRevision(const TextDocument *self);
+u32 TextDocument_getDocumentId(const TextDocument *self);
+u64 TextDocument_getRevision(const TextDocument *self);
 
 #endif

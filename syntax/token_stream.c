@@ -21,10 +21,10 @@
 
 struct TokenStream {
     TextSnapshot *snapshot;
-    uint64_t compilationContextId;
+    u64 compilationContextId;
     Token *tokens;
-    size_t count;
-    size_t capacity;
+    bytes count;
+    bytes capacity;
     bool complete;
 };
 
@@ -78,10 +78,10 @@ static TokenKind tokenKindForRole(SyntaxRole role) {
 }
 
 static bool append(TokenStream *self, LanguageLexResult result,
-                   uint64_t previousEnd) {
+                   u64 previousEnd) {
     SyntaxSpan span = result.span;
     SourceRange range = span.range;
-    uint64_t length = TextSnapshot_getLength((*self).snapshot);
+    u64 length = TextSnapshot_getLength((*self).snapshot);
     if (range.documentId != TextSnapshot_getDocumentId((*self).snapshot)
         || range.startByte < previousEnd || range.startByte >= range.endByte
         || range.endByte > length || span.role < SYNTAX_ROLE_NONE
@@ -90,7 +90,7 @@ static bool append(TokenStream *self, LanguageLexResult result,
         return false;
     }
     if ((*self).count == (*self).capacity) {
-        size_t next = (*self).capacity == 0u ? 16u : (*self).capacity * 2u;
+        bytes next = (*self).capacity == 0u ? 16u : (*self).capacity * 2u;
         if (next < (*self).capacity || next > SIZE_MAX / sizeof(Token)) {
             THROW("TokenStream: token capacity overflow");
             return false;
@@ -129,7 +129,7 @@ TokenStream *TokenStream_collect(LanguageEngine *engine, TextSnapshot *snapshot)
         return nullptr;
     }
     (*self).snapshot = snapshot;
-    uint64_t previousEnd = 0u;
+    u64 previousEnd = 0u;
     for (;;) {
         LanguageLexResult result = LanguageEngine_next(engine);
         if (result.documentRevision != TextSnapshot_getRevision(snapshot)
@@ -165,19 +165,19 @@ void TokenStream_free(TokenStream *self) {
     free(self);
 }
 
-uint32_t TokenStream_getDocumentId(const TokenStream *self) {
+u32 TokenStream_getDocumentId(const TokenStream *self) {
     return self == nullptr ? 0u : TextSnapshot_getDocumentId((*self).snapshot);
 }
-uint64_t TokenStream_getDocumentRevision(const TokenStream *self) {
+u64 TokenStream_getDocumentRevision(const TokenStream *self) {
     return self == nullptr ? 0u : TextSnapshot_getRevision((*self).snapshot);
 }
-uint64_t TokenStream_getCompilationContextId(const TokenStream *self) {
+u64 TokenStream_getCompilationContextId(const TokenStream *self) {
     return self == nullptr ? 0u : (*self).compilationContextId;
 }
-size_t TokenStream_getCount(const TokenStream *self) {
+bytes TokenStream_getCount(const TokenStream *self) {
     return self == nullptr ? 0u : (*self).count;
 }
-Token TokenStream_getAt(const TokenStream *self, size_t index) {
+Token TokenStream_getAt(const TokenStream *self, bytes index) {
     return self == nullptr || index >= (*self).count ? Token_zero() : (*self).tokens[index];
 }
 bool TokenStream_isComplete(const TokenStream *self) {

@@ -29,16 +29,16 @@
  * ----------------------------------------------------------------------------
  *   BoundedText {
  *     char text[BOUNDED_TEXT_CAPACITY]; // NUL-terminated stored bytes
- *     size_t length;                    // stored byte count, excluding NUL
+ *     bytes length;                    // stored byte count, excluding NUL
  *     bool truncated;                   // source did not fit
  *   }
  *
  * PRIVATE HELPERS
- *   static size_t copyBytes(char *dst, size_t capacity, const char *src,
- *                           size_t length)
+ *   static bytes copyBytes(char *dst, bytes capacity, const char *src,
+ *                           bytes length)
  *     Copy at most capacity-1 bytes, always NUL-terminate, return stored count.
- *   static size_t appendEscaped(char *dst, size_t capacity, size_t at,
- *                               const char *src, size_t length)
+ *   static bytes appendEscaped(char *dst, bytes capacity, bytes at,
+ *                               const char *src, bytes length)
  *     Append a quoted/escaped rendering, bounded.
  *
  * FUNCTION REGISTRY
@@ -52,19 +52,19 @@
  * ============================================================================
  */
 
-static size_t copyBytes(char *dst, size_t capacity, const char *src, size_t length) {
+static bytes copyBytes(char *dst, bytes capacity, const char *src, bytes length) {
     if (capacity == 0u)
         return 0u;
-    size_t stored = length < capacity - 1u ? length : capacity - 1u;
+    bytes stored = length < capacity - 1u ? length : capacity - 1u;
     if (stored > 0u && src != nullptr)
         memcpy(dst, src, stored);
     dst[stored] = '\0';
     return stored;
 }
 
-static size_t appendEscaped(char *dst, size_t capacity, size_t at,
-                            const char *src, size_t length) {
-    for (size_t i = 0u; i < length && at + 1u < capacity; ++i) {
+static bytes appendEscaped(char *dst, bytes capacity, bytes at,
+                            const char *src, bytes length) {
+    for (bytes i = 0u; i < length && at + 1u < capacity; ++i) {
         char c = src[i];
         const char *escape = nullptr;
         switch (c) {
@@ -76,7 +76,7 @@ static size_t appendEscaped(char *dst, size_t capacity, size_t at,
             default: break;
         }
         if (escape != nullptr) {
-            for (size_t j = 0u; escape[j] != '\0' && at + 1u < capacity; ++j)
+            for (bytes j = 0u; escape[j] != '\0' && at + 1u < capacity; ++j)
                 dst[at++] = escape[j];
         } else {
             dst[at++] = c;
@@ -95,7 +95,7 @@ BoundedText BoundedText_1(const char *text) {
     return BoundedText_2(text, strlen(text));
 }
 
-BoundedText BoundedText_2(const char *text, size_t length) {
+BoundedText BoundedText_2(const char *text, bytes length) {
     BoundedText self = {0};
     if (text == nullptr || length == 0u)
         return self;
@@ -117,11 +117,11 @@ BoundedText BoundedText_format(const char *format, ...) {
         (*((&self))).truncated = true;
         return self;
     }
-    if ((size_t) written >= BOUNDED_TEXT_CAPACITY) {
+    if ((bytes) written >= BOUNDED_TEXT_CAPACITY) {
         (*((&self))).length = BOUNDED_TEXT_CAPACITY - 1u;
         (*((&self))).truncated = true;
     } else {
-        (*((&self))).length = (size_t) written;
+        (*((&self))).length = (bytes) written;
     }
     return self;
 }
@@ -130,7 +130,7 @@ const char *BoundedText_getText(const BoundedText *self) {
     return self == nullptr ? "" : (*self).text;
 }
 
-size_t BoundedText_getLength(const BoundedText *self) {
+bytes BoundedText_getLength(const BoundedText *self) {
     return self == nullptr ? 0u : (*self).length;
 }
 
@@ -141,7 +141,7 @@ bool BoundedText_isTruncated(const BoundedText *self) {
 bool BoundedText_equals(const BoundedText *self, const char *text) {
     if (self == nullptr || text == nullptr)
         return false;
-    size_t length = strlen(text);
+    bytes length = strlen(text);
     return length == (*self).length && memcmp((*self).text, text, length) == 0;
 }
 
@@ -149,7 +149,7 @@ BoundedText BoundedText_toString(const BoundedText *self) {
     if (self == nullptr)
         return BoundedText_1("nullptr");
     char buffer[BOUNDED_TEXT_CAPACITY];
-    size_t at = 0u;
+    bytes at = 0u;
     if (at + 1u < sizeof buffer)
         buffer[at++] = '"';
     at = appendEscaped(buffer, sizeof buffer, at, (*self).text, (*self).length);

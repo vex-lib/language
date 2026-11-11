@@ -39,22 +39,22 @@ typedef enum StyleKeyIssue {
 
 typedef struct StyleKeyRegistry {
     const StyleKeyEntry *adapterEntries; // borrowed adapter rows, nullable
-    size_t adapterCount;                 // rows in adapterEntries
+    bytes adapterCount;                 // rows in adapterEntries
 } StyleKeyRegistry;
 
 // Construct the core-only registry or one with borrowed adapter rows.
 StyleKeyRegistry StyleKeyRegistry_0(void);
-StyleKeyRegistry StyleKeyRegistry_2(const StyleKeyEntry *entries, size_t count);
+StyleKeyRegistry StyleKeyRegistry_2(const StyleKeyEntry *entries, bytes count);
 #define StyleKeyRegistry(...) STYLE_KEY_REGISTRY_SELECT(_ __VA_OPT__(,) __VA_ARGS__, StyleKeyRegistry_2, StyleKeyRegistry_invalid_arity, StyleKeyRegistry_0)(__VA_ARGS__)
 #define STYLE_KEY_REGISTRY_SELECT(_0, _1, _2, NAME, ...) NAME
 // Return the core-only registry.
 StyleKeyRegistry StyleKeyRegistry_zero(void);
 
 // Number of core keys the shared vocabulary defines.
-size_t StyleKeyRegistry_coreCount(void);
+bytes StyleKeyRegistry_coreCount(void);
 // Core keys first, then adapter rows in registration order.
-size_t StyleKeyRegistry_count(const StyleKeyRegistry *self);
-const char *StyleKeyRegistry_name(const StyleKeyRegistry *self, size_t index);
+bytes StyleKeyRegistry_count(const StyleKeyRegistry *self);
+const char *StyleKeyRegistry_name(const StyleKeyRegistry *self, bytes index);
 
 // The declared fallback of one key (one hop), or nullptr when unknown.
 const char *StyleKeyRegistry_fallback(const StyleKeyRegistry *self, const char *name);

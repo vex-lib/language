@@ -13,8 +13,8 @@
 // On rejection, both inHunk and outToken are preserved and a diagnostic is
 // emitted through THROW. This adapter classifies patch structure only; it does
 // not tokenize the program text carried by added/deleted lines.
-bool DiffAdapter_classifyLine(bool *inHunk, uint32_t documentId,
-                              uint64_t lineStartByte, const char *line,
-                              size_t lineLength, Token *outToken);
+bool DiffAdapter_classifyLine(bool *inHunk, u32 documentId,
+                              u64 lineStartByte, const char *line,
+                              bytes lineLength, Token *outToken);
 
 #endif

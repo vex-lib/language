@@ -18,10 +18,10 @@
  * unique; the table grows geometrically; rejected registration preserves it. */
 
 struct LanguageRegistry {
-    size_t count;
-    size_t capacity;
+    bytes count;
+    bytes capacity;
     const LanguageAdapter **adapters;
-    uint64_t exhaustionCount;
+    u64 exhaustionCount;
     bool exhaustionReported;
 };
 
@@ -46,14 +46,14 @@ bool LanguageRegistry_register(LanguageRegistry *self, const LanguageAdapter *ad
         return false;
     }
     const char *id = LanguageAdapter_getLanguageId(adapter);
-    for (size_t index = 0u; index < (*self).count; ++index) {
+    for (bytes index = 0u; index < (*self).count; ++index) {
         if (strcmp(LanguageAdapter_getLanguageId((*self).adapters[index]), id) == 0) {
             THROW("LanguageRegistry: duplicate language id");
             return false;
         }
     }
     if ((*self).count == (*self).capacity) {
-        size_t capacity = (*self).capacity == 0u ? 4u : (*self).capacity * 2u;
+        bytes capacity = (*self).capacity == 0u ? 4u : (*self).capacity * 2u;
         if (capacity < (*self).capacity || capacity > SIZE_MAX / sizeof(LanguageAdapter*)) {
             if ((*self).exhaustionCount != UINT64_MAX)
                 ++(*self).exhaustionCount;
@@ -88,14 +88,14 @@ const LanguageAdapter *LanguageRegistry_find(const LanguageRegistry *self,
                                              const char *languageId) {
     if (self == nullptr || languageId == nullptr)
         return nullptr;
-    for (size_t index = 0u; index < (*self).count; ++index)
+    for (bytes index = 0u; index < (*self).count; ++index)
         if (strcmp(LanguageAdapter_getLanguageId((*self).adapters[index]), languageId) == 0)
             return (*self).adapters[index];
     return nullptr;
 }
-size_t LanguageRegistry_getCount(const LanguageRegistry *self) {
+bytes LanguageRegistry_getCount(const LanguageRegistry *self) {
     return self == nullptr ? 0u : (*self).count;
 }
-uint64_t LanguageRegistry_getExhaustionCount(const LanguageRegistry *self) {
+u64 LanguageRegistry_getExhaustionCount(const LanguageRegistry *self) {
     return self == nullptr ? 0u : (*self).exhaustionCount;
 }

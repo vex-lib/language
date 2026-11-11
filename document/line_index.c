@@ -20,17 +20,17 @@
 
 struct LineIndex {
     TextSnapshot *snapshot;
-    size_t *lineStarts;
-    size_t lineCount;
+    bytes *lineStarts;
+    bytes lineCount;
 };
 
 typedef struct ScalarStep {
     bool valid;
-    size_t byteCount;
-    size_t utf16Units;
+    bytes byteCount;
+    bytes utf16Units;
 } ScalarStep;
 
-static ScalarStep decodeScalar(const unsigned char *bytes, size_t length, size_t at) {
+static ScalarStep decodeScalar(const unsigned char *bytes, bytes length, bytes at) {
     unsigned char lead = bytes[at];
     if (lead < 0x80u)
         return (ScalarStep) {.valid = true, .byteCount = 1u, .utf16Units = 1u};
@@ -66,13 +66,13 @@ static ScalarStep decodeScalar(const unsigned char *bytes, size_t length, size_t
 LineIndex *LineIndex_1(TextSnapshot *snapshot) {
     if (snapshot == nullptr || !TextSnapshot_retain(snapshot))
         return nullptr;
-    size_t length = TextSnapshot_getLength(snapshot);
+    bytes length = TextSnapshot_getLength(snapshot);
     const char *bytes = TextSnapshot_getBytes(snapshot);
-    size_t lineCount = 1u;
-    for (size_t index = 0u; index < length; ++index)
+    bytes lineCount = 1u;
+    for (bytes index = 0u; index < length; ++index)
         if (bytes[index] == '\n')
             ++lineCount;
-    if (lineCount > SIZE_MAX / sizeof(size_t)) {
+    if (lineCount > SIZE_MAX / sizeof(bytes)) {
         THROW("LineIndex: line-start table size overflow");
         TextSnapshot_free(snapshot);
         return nullptr;
@@ -83,7 +83,7 @@ LineIndex *LineIndex_1(TextSnapshot *snapshot) {
         TextSnapshot_free(snapshot);
         return nullptr;
     }
-    (*self).lineStarts = malloc(lineCount * sizeof(size_t));
+    (*self).lineStarts = malloc(lineCount * sizeof(bytes));
     if ((*self).lineStarts == nullptr) {
         THROW("LineIndex: allocation failed for %zu line starts", lineCount);
         TextSnapshot_free(snapshot);
@@ -93,8 +93,8 @@ LineIndex *LineIndex_1(TextSnapshot *snapshot) {
     (*self).snapshot = snapshot;
     (*self).lineCount = lineCount;
     (*self).lineStarts[0] = 0u;
-    size_t next = 1u;
-    for (size_t index = 0u; index < length; ++index)
+    bytes next = 1u;
+    for (bytes index = 0u; index < length; ++index)
         if (bytes[index] == '\n')
             (*self).lineStarts[next++] = index + 1u;
     return self;
@@ -111,7 +111,7 @@ void LineIndex_free(LineIndex *self) {
     }
 }
 
-SourcePosition LineIndex_positionAtByte(const LineIndex *self, size_t byteOffset,
+SourcePosition LineIndex_positionAtByte(const LineIndex *self, bytes byteOffset,
                                          PositionEncoding encoding) {
     if (self == nullptr || encoding < POSITION_ENCODING_UTF8
         || encoding > POSITION_ENCODING_UTF32
@@ -120,25 +120,25 @@ SourcePosition LineIndex_positionAtByte(const LineIndex *self, size_t byteOffset
         return SourcePosition_zero();
     }
     const char *source = TextSnapshot_getBytes((*self).snapshot);
-    size_t length = TextSnapshot_getLength((*self).snapshot);
-    size_t low = 0u;
-    size_t high = (*self).lineCount;
+    bytes length = TextSnapshot_getLength((*self).snapshot);
+    bytes low = 0u;
+    bytes high = (*self).lineCount;
     while (low + 1u < high) {
-        size_t middle = low + (high - low) / 2u;
+        bytes middle = low + (high - low) / 2u;
         if ((*self).lineStarts[middle] <= byteOffset)
             low = middle;
         else
             high = middle;
     }
-    size_t lineStart = (*self).lineStarts[low];
-    size_t lineEnd = low + 1u < (*self).lineCount
+    bytes lineStart = (*self).lineStarts[low];
+    bytes lineEnd = low + 1u < (*self).lineCount
         ? (*self).lineStarts[low + 1u] - 1u : length;
     if (lineEnd > lineStart && source[lineEnd - 1u] == '\r')
         --lineEnd;
-    size_t target = byteOffset > lineEnd ? lineEnd : byteOffset;
-    size_t offset = lineStart;
-    size_t utf16 = 0u;
-    size_t utf32 = 0u;
+    bytes target = byteOffset > lineEnd ? lineEnd : byteOffset;
+    bytes offset = lineStart;
+    bytes utf16 = 0u;
+    bytes utf32 = 0u;
     while (offset < target) {
         ScalarStep scalar = decodeScalar((const unsigned char *) source, lineEnd, offset);
         if (!scalar.valid || scalar.byteCount > target - offset) {
@@ -153,17 +153,17 @@ SourcePosition LineIndex_positionAtByte(const LineIndex *self, size_t byteOffset
         THROW("LineIndex: byte offset splits a UTF-8 scalar");
         return SourcePosition_zero();
     }
-    size_t character = encoding == POSITION_ENCODING_UTF8 ? target - lineStart
+    bytes character = encoding == POSITION_ENCODING_UTF8 ? target - lineStart
         : encoding == POSITION_ENCODING_UTF16 ? utf16 : utf32;
     return SourcePosition_3(true, low, character);
 }
 
-size_t LineIndex_getLineCount(const LineIndex *self) {
+bytes LineIndex_getLineCount(const LineIndex *self) {
     return self == nullptr ? 0u : (*self).lineCount;
 }
-uint32_t LineIndex_getDocumentId(const LineIndex *self) {
+u32 LineIndex_getDocumentId(const LineIndex *self) {
     return self == nullptr ? 0u : TextSnapshot_getDocumentId((*self).snapshot);
 }
-uint64_t LineIndex_getRevision(const LineIndex *self) {
+u64 LineIndex_getRevision(const LineIndex *self) {
     return self == nullptr ? 0u : TextSnapshot_getRevision((*self).snapshot);
 }

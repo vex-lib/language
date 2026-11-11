@@ -14,11 +14,11 @@ typedef struct TokenStream TokenStream;
 // snapshot and rejects mismatched, overlapping or out-of-bounds spans.
 TokenStream *TokenStream_collect(LanguageEngine *engine, TextSnapshot *snapshot);
 void TokenStream_free(TokenStream *self);
-uint32_t TokenStream_getDocumentId(const TokenStream *self);
-uint64_t TokenStream_getDocumentRevision(const TokenStream *self);
-uint64_t TokenStream_getCompilationContextId(const TokenStream *self);
-size_t TokenStream_getCount(const TokenStream *self);
-Token TokenStream_getAt(const TokenStream *self, size_t index);
+u32 TokenStream_getDocumentId(const TokenStream *self);
+u64 TokenStream_getDocumentRevision(const TokenStream *self);
+u64 TokenStream_getCompilationContextId(const TokenStream *self);
+bytes TokenStream_getCount(const TokenStream *self);
+Token TokenStream_getAt(const TokenStream *self, bytes index);
 bool TokenStream_isComplete(const TokenStream *self);
 BoundedText TokenStream_toString(const TokenStream *self);
 BoundedText TokenStream_toStringStruct(const TokenStream *self);

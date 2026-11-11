@@ -30,17 +30,17 @@
  * ============================================================================
  * CLASS: C23Highlights (adapters/c/c23_highlights.c)
  * STRUCT FIELDS (Mirroring adapters/c/c23_highlights.h)
- *   uint32_t documentId          // identity shared by every produced span
- *   size_t count                 // number of ordered highlight spans
- *   size_t capacity              // allocated entry slots
+ *   u32 documentId          // identity shared by every produced span
+ *   bytes count                 // number of ordered highlight spans
+ *   bytes capacity              // allocated entry slots
  *   C23HighlightEntry *entries   // owned start/end/role records
  *   const char *source           // borrowed immutable source snapshot
- *   size_t sourceLength          // byte length of that snapshot
+ *   bytes sourceLength          // byte length of that snapshot
  *
  * PRIVATE HELPERS
- *   C23HighlightEntry { size_t start; size_t end; SyntaxRole role; }
+ *   C23HighlightEntry { bytes start; bytes end; SyntaxRole role; }
  *     // one ordered, non-overlapping presentation span
- *   C23Token { size_t start; size_t end; SyntaxRole role; }
+ *   C23Token { bytes start; bytes end; SyntaxRole role; }
  *     // one lexer token retained for neighbor-aware classification
  *
  * FUNCTION REGISTRY
@@ -73,41 +73,41 @@
  */
 
 typedef struct C23HighlightEntry {
-    size_t start;
-    size_t end;
+    bytes start;
+    bytes end;
     SyntaxRole role;
 } C23HighlightEntry;
 
 typedef struct C23Token {
-    size_t start;
-    size_t end;
+    bytes start;
+    bytes end;
     SyntaxRole role;
 } C23Token;
 
 struct C23Highlights {
-    uint32_t documentId;
-    size_t count;
-    size_t capacity;
+    u32 documentId;
+    bytes count;
+    bytes capacity;
     C23HighlightEntry *entries;
     const char *source;
-    size_t sourceLength;
+    bytes sourceLength;
 };
 
-static bool tokenIs(const C23Token *tokens, size_t count, size_t index, const char *text,
+static bool tokenIs(const C23Token *tokens, bytes count, bytes index, const char *text,
                     const char *source) {
     if (index >= count)
         return false;
-    size_t length = strlen(text);
+    bytes length = strlen(text);
     C23Token token = tokens[index];
     return token.end - token.start == length
         && memcmp(source + token.start, text, length) == 0;
 }
 
-static bool tokenStartsLine(const C23Token *tokens, size_t count, size_t index,
+static bool tokenStartsLine(const C23Token *tokens, bytes count, bytes index,
                             const char *source) {
     if (!tokenIs(tokens, count, index, "#", source))
         return false;
-    size_t at = tokens[index].start;
+    bytes at = tokens[index].start;
     while (at > 0u) {
         unsigned char byte = (unsigned char) source[at - 1u];
         if (byte == '\n' || byte == '\r')
@@ -121,7 +121,7 @@ static bool tokenStartsLine(const C23Token *tokens, size_t count, size_t index,
 
 static bool appendEntry(C23Highlights *self, C23HighlightEntry entry) {
     if ((*self).count == (*self).capacity) {
-        size_t next = (*self).capacity == 0u ? 64u : (*self).capacity * 2u;
+        bytes next = (*self).capacity == 0u ? 64u : (*self).capacity * 2u;
         if (next < (*self).capacity || next > SIZE_MAX / sizeof *(*self).entries)
             return false;
         C23HighlightEntry *grown = realloc((*self).entries,
@@ -136,10 +136,10 @@ static bool appendEntry(C23Highlights *self, C23HighlightEntry entry) {
     return true;
 }
 
-static bool appendToken(C23Token **tokens, size_t *count, size_t *capacity,
+static bool appendToken(C23Token **tokens, bytes *count, bytes *capacity,
                         C23Token token) {
     if (*count == *capacity) {
-        size_t next = *capacity == 0u ? 64u : *capacity * 2u;
+        bytes next = *capacity == 0u ? 64u : *capacity * 2u;
         if (next < *capacity || next > SIZE_MAX / sizeof **tokens)
             return false;
         C23Token *grown = realloc(*tokens, next * sizeof **tokens);
@@ -152,19 +152,19 @@ static bool appendToken(C23Token **tokens, size_t *count, size_t *capacity,
     return true;
 }
 
-static bool tokenizeC23(uint32_t documentId, const char *source, size_t length,
-                        C23Token **tokens, size_t *count) {
+static bool tokenizeC23(u32 documentId, const char *source, bytes length,
+                        C23Token **tokens, bytes *count) {
     C23Lexer *lexer = C23Lexer(documentId, source, length);
     if (lexer == nullptr)
         return false;
-    size_t capacity = 0u;
+    bytes capacity = 0u;
     C23LexStep step = C23Lexer_next(lexer);
     while (step.hasSpan) {
         SyntaxSpan span = step.span;
         SourceRange range = span.range;
         C23Token token = {
-            .start = (size_t) range.startByte,
-            .end = (size_t) range.endByte,
+            .start = (bytes) range.startByte,
+            .end = (bytes) range.endByte,
             .role = span.role
         };
         if (!appendToken(tokens, count, &capacity, token)) {
@@ -177,7 +177,7 @@ static bool tokenizeC23(uint32_t documentId, const char *source, size_t length,
     return true;
 }
 
-static size_t previousSignificant(const C23Token *tokens, size_t index) {
+static bytes previousSignificant(const C23Token *tokens, bytes index) {
     while (index > 0u) {
         --index;
         if (tokens[index].role != SYNTAX_ROLE_COMMENT
@@ -187,15 +187,15 @@ static size_t previousSignificant(const C23Token *tokens, size_t index) {
     return SIZE_MAX;
 }
 
-static bool previousIsDirectiveHash(const C23Token *tokens, size_t count, size_t index,
+static bool previousIsDirectiveHash(const C23Token *tokens, bytes count, bytes index,
                                     const char *source) {
-    size_t previous = previousSignificant(tokens, index);
+    bytes previous = previousSignificant(tokens, index);
     return previous != SIZE_MAX
         && tokenStartsLine(tokens, count, previous, source);
 }
 
-static size_t nextSignificant(const C23Token *tokens, size_t count, size_t index) {
-    size_t next = index + 1u;
+static bytes nextSignificant(const C23Token *tokens, bytes count, bytes index) {
+    bytes next = index + 1u;
     while (next < count) {
         if (tokens[next].role != SYNTAX_ROLE_COMMENT
             && tokens[next].role != SYNTAX_ROLE_DOC_COMMENT)
@@ -205,8 +205,8 @@ static size_t nextSignificant(const C23Token *tokens, size_t count, size_t index
     return SIZE_MAX;
 }
 
-static bool containsNewline(const char *source, size_t start, size_t end) {
-    for (size_t at = start; at < end; ++at) {
+static bool containsNewline(const char *source, bytes start, bytes end) {
+    for (bytes at = start; at < end; ++at) {
         if (source[at] == '\n' || source[at] == '\r')
             return true;
     }
@@ -216,15 +216,15 @@ static bool containsNewline(const char *source, size_t start, size_t end) {
 // A header-name after #include is one lexical unit even though the token stream
 // splits <locale.h> into punctuation and identifiers. Return the closing '>'
 // index and the opening '<' index only when the whole name stays on one line.
-static size_t includeHeaderEnd(const C23Token *tokens, size_t count, size_t includeIndex,
-                               const char *source, size_t *openIndex) {
-    size_t open = includeIndex + 1u;
+static bytes includeHeaderEnd(const C23Token *tokens, bytes count, bytes includeIndex,
+                               const char *source, bytes *openIndex) {
+    bytes open = includeIndex + 1u;
     if (open >= count || !tokenIs(tokens, count, open, "<", source))
         return SIZE_MAX;
     if (containsNewline(source, tokens[includeIndex].end, tokens[open].start))
         return SIZE_MAX;
-    size_t previousEnd = tokens[open].end;
-    for (size_t index = open + 1u; index < count; ++index) {
+    bytes previousEnd = tokens[open].end;
+    for (bytes index = open + 1u; index < count; ++index) {
         if (containsNewline(source, previousEnd, tokens[index].start))
             return SIZE_MAX;
         if (tokenIs(tokens, count, index, ">", source)) {
@@ -238,7 +238,7 @@ static size_t includeHeaderEnd(const C23Token *tokens, size_t count, size_t incl
 
 static bool identifierAllCaps(const char *source, C23Token token) {
     bool letter = false;
-    for (size_t at = token.start; at < token.end; ++at) {
+    for (bytes at = token.start; at < token.end; ++at) {
         unsigned char byte = (unsigned char) source[at];
         if (byte >= 'A' && byte <= 'Z')
             letter = true;
@@ -249,7 +249,7 @@ static bool identifierAllCaps(const char *source, C23Token token) {
 }
 
 static bool identifierEndsTypeSuffix(const char *source, C23Token token) {
-    size_t length = token.end - token.start;
+    bytes length = token.end - token.start;
     return length >= 2u && source[token.end - 2u] == '_' && source[token.end - 1u] == 't';
 }
 
@@ -259,7 +259,7 @@ static bool identifierStartsUpper(const char *source, C23Token token) {
 }
 
 static bool identifierHasLower(const char *source, C23Token token) {
-    for (size_t at = token.start; at < token.end; ++at) {
+    for (bytes at = token.start; at < token.end; ++at) {
         unsigned char byte = (unsigned char) source[at];
         if (byte >= 'a' && byte <= 'z')
             return true;
@@ -267,23 +267,23 @@ static bool identifierHasLower(const char *source, C23Token token) {
     return false;
 }
 
-static bool previousIsTagWord(const C23Token *tokens, size_t tokenCount, size_t index,
+static bool previousIsTagWord(const C23Token *tokens, bytes tokenCount, bytes index,
                               const char *source) {
-    size_t previous = previousSignificant(tokens, index);
+    bytes previous = previousSignificant(tokens, index);
     return previous != SIZE_MAX
         && (tokenIs(tokens, tokenCount, previous, "struct", source)
             || tokenIs(tokens, tokenCount, previous, "union", source)
             || tokenIs(tokens, tokenCount, previous, "enum", source));
 }
 
-static SyntaxRole classifyIdentifier(const C23Token *tokens, size_t count, size_t index,
+static SyntaxRole classifyIdentifier(const C23Token *tokens, bytes count, bytes index,
                                      const char *source) {
     C23Token token = tokens[index];
     if (identifierAllCaps(source, token))
         return SYNTAX_ROLE_MACRO;
     if (previousIsDirectiveHash(tokens, count, index, source))
         return SYNTAX_ROLE_MACRO;
-    size_t previous = previousSignificant(tokens, index);
+    bytes previous = previousSignificant(tokens, index);
     bool member = previous != SIZE_MAX
         && (tokenIs(tokens, count, previous, ".", source)
             || tokenIs(tokens, count, previous, "->", source));
@@ -293,7 +293,7 @@ static SyntaxRole classifyIdentifier(const C23Token *tokens, size_t count, size_
         return SYNTAX_ROLE_TYPE;
     if (identifierEndsTypeSuffix(source, token))
         return SYNTAX_ROLE_TYPE;
-    size_t next = nextSignificant(tokens, count, index);
+    bytes next = nextSignificant(tokens, count, index);
     if (next != SIZE_MAX && tokenIs(tokens, count, next, "(", source))
         return SYNTAX_ROLE_FUNCTION;
     if (identifierStartsUpper(source, token) && identifierHasLower(source, token))
@@ -308,7 +308,7 @@ C23Highlights *C23Highlights_0(void) {
     return self;
 }
 
-C23Highlights *C23Highlights_3(uint32_t documentId, const char *source, size_t length) {
+C23Highlights *C23Highlights_3(u32 documentId, const char *source, bytes length) {
     if (documentId == 0u || (source == nullptr && length != 0u)) {
         THROW("C23Highlights rejected source admission for %zu bytes", length);
         return nullptr;
@@ -320,9 +320,9 @@ C23Highlights *C23Highlights_3(uint32_t documentId, const char *source, size_t l
     (*self).source = source == nullptr ? "" : source;
     (*self).sourceLength = length;
     C23Token *tokens = nullptr;
-    size_t tokenCount = 0u;
+    bytes tokenCount = 0u;
     bool success = tokenizeC23(documentId, (*self).source, length, &tokens, &tokenCount);
-    for (size_t index = 0u; success && index < tokenCount; ++index) {
+    for (bytes index = 0u; success && index < tokenCount; ++index) {
         C23Token token = tokens[index];
         SyntaxRole role = token.role == SYNTAX_ROLE_IDENTIFIER
             ? classifyIdentifier(tokens, tokenCount, index, (*self).source)
@@ -339,8 +339,8 @@ C23Highlights *C23Highlights_3(uint32_t documentId, const char *source, size_t l
         if (token.role == SYNTAX_ROLE_IDENTIFIER
             && tokenIs(tokens, tokenCount, index, "include", (*self).source)
             && previousIsDirectiveHash(tokens, tokenCount, index, (*self).source)) {
-            size_t open = SIZE_MAX;
-            size_t close = includeHeaderEnd(tokens, tokenCount, index, (*self).source, &open);
+            bytes open = SIZE_MAX;
+            bytes close = includeHeaderEnd(tokens, tokenCount, index, (*self).source, &open);
             if (close != SIZE_MAX) {
                 C23HighlightEntry header = {
                     .start = tokens[open].start,
@@ -374,39 +374,39 @@ void C23Highlights_free(C23Highlights *self) {
     free(self);
 }
 
-size_t C23Highlights_getCount(const C23Highlights *self) {
+bytes C23Highlights_getCount(const C23Highlights *self) {
     return self == nullptr ? 0u : (*self).count;
 }
 
-uint32_t C23Highlights_getDocumentId(const C23Highlights *self) {
+u32 C23Highlights_getDocumentId(const C23Highlights *self) {
     return self == nullptr ? 0u : (*self).documentId;
 }
 
-size_t C23Highlights_getStart(const C23Highlights *self, size_t index) {
+bytes C23Highlights_getStart(const C23Highlights *self, bytes index) {
     if (self == nullptr || index >= (*self).count)
         return 0u;
     return (*self).entries[index].start;
 }
 
-size_t C23Highlights_getEnd(const C23Highlights *self, size_t index) {
+bytes C23Highlights_getEnd(const C23Highlights *self, bytes index) {
     if (self == nullptr || index >= (*self).count)
         return 0u;
     return (*self).entries[index].end;
 }
 
-SyntaxRole C23Highlights_getRole(const C23Highlights *self, size_t index) {
+SyntaxRole C23Highlights_getRole(const C23Highlights *self, bytes index) {
     if (self == nullptr || index >= (*self).count)
         return SYNTAX_ROLE_NONE;
     return (*self).entries[index].role;
 }
 
-SyntaxRole C23Highlights_roleAt(const C23Highlights *self, size_t byte) {
+SyntaxRole C23Highlights_roleAt(const C23Highlights *self, bytes byte) {
     if (self == nullptr)
         return SYNTAX_ROLE_NONE;
-    size_t low = 0u;
-    size_t high = (*self).count;
+    bytes low = 0u;
+    bytes high = (*self).count;
     while (low < high) {
-        size_t middle = low + (high - low) / 2u;
+        bytes middle = low + (high - low) / 2u;
         C23HighlightEntry entry = (*self).entries[middle];
         if (byte < entry.start)
             high = middle;

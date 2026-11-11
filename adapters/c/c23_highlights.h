@@ -22,7 +22,7 @@ typedef struct C23Highlights C23Highlights;
 // header already comes from the lexer as a string). It is not a parser,
 // preprocessor or symbol resolver, and it never changes source bytes.
 C23Highlights *C23Highlights_0(void);
-C23Highlights *C23Highlights_3(uint32_t documentId, const char *source, size_t length);
+C23Highlights *C23Highlights_3(u32 documentId, const char *source, bytes length);
 #define C23Highlights_1 C23Highlights_invalid_arity
 #define C23Highlights_2 C23Highlights_invalid_arity
 #define C23Highlights_4 C23Highlights_invalid_arity
@@ -35,14 +35,14 @@ C23Highlights *C23Highlights_3(uint32_t documentId, const char *source, size_t l
     C23_HIGHLIGHTS_CAT(C23Highlights_, C23_HIGHLIGHTS_NARG(__VA_ARGS__))(__VA_ARGS__)
 C23Highlights *C23Highlights_zero(void);
 void C23Highlights_free(C23Highlights *self);
-size_t C23Highlights_getCount(const C23Highlights *self);
-uint32_t C23Highlights_getDocumentId(const C23Highlights *self);
+bytes C23Highlights_getCount(const C23Highlights *self);
+u32 C23Highlights_getDocumentId(const C23Highlights *self);
 // Spans are ordered and non-overlapping. Out-of-range queries return safe zero
 // values; roleAt returns SYNTAX_ROLE_NONE for whitespace or an unknown byte.
-size_t C23Highlights_getStart(const C23Highlights *self, size_t index);
-size_t C23Highlights_getEnd(const C23Highlights *self, size_t index);
-SyntaxRole C23Highlights_getRole(const C23Highlights *self, size_t index);
-SyntaxRole C23Highlights_roleAt(const C23Highlights *self, size_t byte);
+bytes C23Highlights_getStart(const C23Highlights *self, bytes index);
+bytes C23Highlights_getEnd(const C23Highlights *self, bytes index);
+SyntaxRole C23Highlights_getRole(const C23Highlights *self, bytes index);
+SyntaxRole C23Highlights_roleAt(const C23Highlights *self, bytes byte);
 BoundedText C23Highlights_toString(const C23Highlights *self);
 BoundedText C23Highlights_toStringStruct(const C23Highlights *self);
 

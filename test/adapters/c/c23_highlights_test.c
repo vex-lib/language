@@ -8,7 +8,7 @@
 static SyntaxRole roleOf(C23Highlights *highlights, const char *source, const char *needle) {
     const char *found = strstr(source, needle);
     assert(found != nullptr);
-    return C23Highlights_roleAt(highlights, (size_t) (found - source));
+    return C23Highlights_roleAt(highlights, (bytes) (found - source));
 }
 
 static void testClassification(void) {
@@ -18,14 +18,14 @@ static void testClassification(void) {
         "#define STR(x) #x\n"
         "/** doc */\n"
         "int add(int left, int right); // regular\n"
-        "typedef uint8_t Byte;\n"
+        "typedef u8 Byte;\n"
         "THROW(\"boom\");\n"
         "Console_log(message);\n"
         "value.field = 1;\n"
         "int lower = left < right;\n";
     char original[sizeof source];
     memcpy(original, source, sizeof source);
-    size_t length = sizeof source - 1u;
+    bytes length = sizeof source - 1u;
     C23Highlights *highlights = C23Highlights(1u, source, length);
     assert(highlights != nullptr);
     assert(C23Highlights_getDocumentId(highlights) == 1u);
@@ -39,29 +39,29 @@ static void testClassification(void) {
     assert(roleOf(highlights, source, "annotation/debug.h") == SYNTAX_ROLE_STRING);
     const char *headerClose = strstr(source, "h>");
     assert(headerClose != nullptr);
-    assert(C23Highlights_roleAt(highlights, (size_t) (headerClose - source))
+    assert(C23Highlights_roleAt(highlights, (bytes) (headerClose - source))
            == SYNTAX_ROLE_STRING);
     assert(roleOf(highlights, source, "< right") == SYNTAX_ROLE_OPERATOR);
     const char *stringize = strstr(source, "#x");
     assert(stringize != nullptr);
-    assert(C23Highlights_roleAt(highlights, (size_t) (stringize - source))
+    assert(C23Highlights_roleAt(highlights, (bytes) (stringize - source))
            == SYNTAX_ROLE_PUNCTUATION);
     assert(roleOf(highlights, source, "/** doc */") == SYNTAX_ROLE_DOC_COMMENT);
     assert(roleOf(highlights, source, "// regular") == SYNTAX_ROLE_COMMENT);
     assert(roleOf(highlights, source, "int add") == SYNTAX_ROLE_KEYWORD);
     assert(roleOf(highlights, source, "add(") == SYNTAX_ROLE_FUNCTION);
     assert(roleOf(highlights, source, "left") == SYNTAX_ROLE_VARIABLE);
-    assert(roleOf(highlights, source, "uint8_t") == SYNTAX_ROLE_TYPE);
+    assert(roleOf(highlights, source, "u8") == SYNTAX_ROLE_TYPE);
     assert(roleOf(highlights, source, "Byte") == SYNTAX_ROLE_TYPE);
     assert(roleOf(highlights, source, "THROW") == SYNTAX_ROLE_MACRO);
     assert(roleOf(highlights, source, "Console_log") == SYNTAX_ROLE_FUNCTION);
     assert(roleOf(highlights, source, "message") == SYNTAX_ROLE_VARIABLE);
     assert(roleOf(highlights, source, "value") == SYNTAX_ROLE_VARIABLE);
     assert(roleOf(highlights, source, "field") == SYNTAX_ROLE_MEMBER);
-    size_t previousEnd = 0u;
-    for (size_t index = 0u; index < C23Highlights_getCount(highlights); ++index) {
-        size_t start = C23Highlights_getStart(highlights, index);
-        size_t end = C23Highlights_getEnd(highlights, index);
+    bytes previousEnd = 0u;
+    for (bytes index = 0u; index < C23Highlights_getCount(highlights); ++index) {
+        bytes start = C23Highlights_getStart(highlights, index);
+        bytes end = C23Highlights_getEnd(highlights, index);
         assert(start >= previousEnd);
         assert(end > start);
         assert(end <= length);
@@ -69,7 +69,7 @@ static void testClassification(void) {
         previousEnd = end;
     }
     // Every non-whitespace byte belongs to exactly one ordered span.
-    for (size_t at = 0u; at < length; ++at) {
+    for (bytes at = 0u; at < length; ++at) {
         unsigned char byte = (unsigned char) source[at];
         bool whitespace = byte == ' ' || byte == '\t' || byte == '\r' || byte == '\n';
         assert(whitespace || C23Highlights_roleAt(highlights, at) != SYNTAX_ROLE_NONE);

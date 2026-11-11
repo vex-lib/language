@@ -20,10 +20,10 @@ typedef enum ProjectFileAnalysisStatus {
     PROJECT_FILE_ANALYSIS_UNSUPPORTED
 } ProjectFileAnalysisStatus;
 
-ProjectFile *ProjectFile_4(uint64_t fileId, const char *relativePath,
+ProjectFile *ProjectFile_4(u64 fileId, const char *relativePath,
                            ProjectFileKind kind, const char *languageId);
 void ProjectFile_free(ProjectFile *self);
-uint64_t ProjectFile_getId(const ProjectFile *self);
+u64 ProjectFile_getId(const ProjectFile *self);
 const char *ProjectFile_getRelativePath(const ProjectFile *self);
 ProjectFileKind ProjectFile_getKind(const ProjectFile *self);
 const char *ProjectFile_getLanguageId(const ProjectFile *self);

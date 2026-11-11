@@ -5,7 +5,7 @@
 
 static int fakeSession;
 
-static void *openBad(uint32_t documentId, const char *bytes, size_t length) {
+static void *openBad(u32 documentId, const char *bytes, bytes length) {
     (void) documentId;
     (void) bytes;
     (void) length;

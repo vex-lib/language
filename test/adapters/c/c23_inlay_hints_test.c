@@ -22,10 +22,10 @@ int main(void) {
     const char *outerSecond = strstr(source, "add(2");
     const char *nestedFirst = outerSecond + strlen("add(");
     const char *nestedSecond = strstr(source, "2, 3") + strlen("2, ");
-    assert(C23InlayHints_getOffset(hints, 0u) == (size_t) (first - source));
-    assert(C23InlayHints_getOffset(hints, 1u) == (size_t) (outerSecond - source));
-    assert(C23InlayHints_getOffset(hints, 2u) == (size_t) (nestedFirst - source));
-    assert(C23InlayHints_getOffset(hints, 3u) == (size_t) (nestedSecond - source));
+    assert(C23InlayHints_getOffset(hints, 0u) == (bytes) (first - source));
+    assert(C23InlayHints_getOffset(hints, 1u) == (bytes) (outerSecond - source));
+    assert(C23InlayHints_getOffset(hints, 2u) == (bytes) (nestedFirst - source));
+    assert(C23InlayHints_getOffset(hints, 3u) == (bytes) (nestedSecond - source));
     assert(strcmp(C23InlayHints_getLabel(hints, 0u), "left:") == 0);
     assert(strcmp(C23InlayHints_getLabel(hints, 1u), "right:") == 0);
     assert(strcmp(C23InlayHints_getLabel(hints, 2u), "left:") == 0);
@@ -45,19 +45,19 @@ int main(void) {
     const char *definitionParameter = strstr(duplicateDeclaration, "int f(int a) {")
         + strlen("int f(int ");
     const char *callArgument = strstr(duplicateDeclaration, "f(1)") + strlen("f(");
-    assert(C23InlayHints_getOffset(hints, 0u) == (size_t) (callArgument - duplicateDeclaration));
-    assert(C23InlayHints_getOffset(hints, 0u) != (size_t) (definitionParameter - duplicateDeclaration));
+    assert(C23InlayHints_getOffset(hints, 0u) == (bytes) (callArgument - duplicateDeclaration));
+    assert(C23InlayHints_getOffset(hints, 0u) != (bytes) (definitionParameter - duplicateDeclaration));
     assert(strcmp(C23InlayHints_getLabel(hints, 0u), "a:") == 0);
     C23InlayHints_free(hints);
 
     const char unsupportedDeclarators[][96] = {
         "int f(int a[N]); int g(void) { return f(1); }",
-        "int f(void (*cb)(size_t)); int g(void) { return f(0); }",
+        "int f(void (*cb)(bytes)); int g(void) { return f(0); }",
         "int f(struct Foo); int g(void) { return f(0); }",
         "int f(int a[3]); int g(void) { return f(1); }"
     };
-    for (size_t index = 0u; index < sizeof unsupportedDeclarators / sizeof unsupportedDeclarators[0]; ++index) {
-        hints = C23InlayHints((uint32_t) (82u + index), unsupportedDeclarators[index],
+    for (bytes index = 0u; index < sizeof unsupportedDeclarators / sizeof unsupportedDeclarators[0]; ++index) {
+        hints = C23InlayHints((u32) (82u + index), unsupportedDeclarators[index],
                               strlen(unsupportedDeclarators[index]));
         assert(hints != nullptr);
         assert(C23InlayHints_getCount(hints) == 0u);
@@ -82,7 +82,7 @@ int main(void) {
     assert(hints != nullptr);
     assert(C23InlayHints_getCount(hints) == 1u);
     const char *validCall = strstr(unsupportedDefinition, "f(1)") + strlen("f(");
-    assert(C23InlayHints_getOffset(hints, 0u) == (size_t) (validCall - unsupportedDefinition));
+    assert(C23InlayHints_getOffset(hints, 0u) == (bytes) (validCall - unsupportedDefinition));
     C23InlayHints_free(hints);
 
     const char emptySource[] = "";

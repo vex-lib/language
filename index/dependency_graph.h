@@ -12,22 +12,22 @@ typedef struct DependencyGraph DependencyGraph;
 // from a file to files it depends on; replacing one file's edges is atomic.
 DependencyGraph *DependencyGraph_1(const LanguageProject *project);
 void DependencyGraph_free(DependencyGraph *self);
-bool DependencyGraph_setDependencies(DependencyGraph *self, uint64_t fileId,
-                                     const uint64_t *dependencyFileIds,
-                                     size_t dependencyCount);
-size_t DependencyGraph_getDependencyCount(const DependencyGraph *self,
-                                          uint64_t fileId);
-uint64_t DependencyGraph_getDependencyAt(const DependencyGraph *self,
-                                         uint64_t fileId, size_t index);
-size_t DependencyGraph_getDependentCount(const DependencyGraph *self,
-                                         uint64_t fileId);
-uint64_t DependencyGraph_getDependentAt(const DependencyGraph *self,
-                                        uint64_t fileId, size_t index);
+bool DependencyGraph_setDependencies(DependencyGraph *self, u64 fileId,
+                                     const u64 *dependencyFileIds,
+                                     bytes dependencyCount);
+bytes DependencyGraph_getDependencyCount(const DependencyGraph *self,
+                                          u64 fileId);
+u64 DependencyGraph_getDependencyAt(const DependencyGraph *self,
+                                         u64 fileId, bytes index);
+bytes DependencyGraph_getDependentCount(const DependencyGraph *self,
+                                         u64 fileId);
+u64 DependencyGraph_getDependentAt(const DependencyGraph *self,
+                                        u64 fileId, bytes index);
 // True when candidate directly or transitively depends on changedFileId.
 // A file is considered affected by itself, including in an empty graph.
 bool DependencyGraph_isAffectedBy(const DependencyGraph *self,
-                                  uint64_t candidateFileId,
-                                  uint64_t changedFileId);
-uint64_t DependencyGraph_getProjectId(const DependencyGraph *self);
+                                  u64 candidateFileId,
+                                  u64 changedFileId);
+u64 DependencyGraph_getProjectId(const DependencyGraph *self);
 
 #endif
