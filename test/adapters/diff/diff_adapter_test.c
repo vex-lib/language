@@ -2,7 +2,7 @@
 #include "adapters/diff/diff_adapter.h"
 #include <assert.h>
 
-int main() {
+i32 main() {
     bool inHunk = false;
     Token token = Token(TOKEN_KIND_COMMENT);
     assert(DiffAdapter_classifyLine(&inHunk, 3, 0, "diff --git a/a.c b.sh/a.c", 22, &token));

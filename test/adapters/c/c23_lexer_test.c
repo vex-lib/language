@@ -12,8 +12,8 @@ static C23LexStep take(C23Lexer *lexer, SyntaxRole role, bytes start, bytes end)
                          || range.endByte != end))
         fprintf(stderr, "expected role %s [%zu,%zu), got %s [%llu,%llu)\n",
                 SyntaxRole_name(role), start, end, SyntaxRole_name(span.role),
-                (unsigned long long) range.startByte,
-                (unsigned long long) range.endByte);
+                (u64) range.startByte,
+                (u64) range.endByte);
     assert(step.hasSpan);
     assert(span.role == role);
     assert(range.documentId == C23Lexer_getDocumentId(lexer));
@@ -23,7 +23,7 @@ static C23LexStep take(C23Lexer *lexer, SyntaxRole role, bytes start, bytes end)
     return step;
 }
 
-static bool sourceWhitespace(unsigned char byte) {
+static bool sourceWhitespace(u8 byte) {
     return byte == ' ' || byte == '\t' || byte == '\r' || byte == '\n'
         || byte == '\f' || byte == '\v';
 }
@@ -39,18 +39,18 @@ static fn assertCoverage(u32 documentId, const char *source, bytes length) {
         assert(range.documentId == documentId);
         assert(range.startByte >= coveredThrough);
         for (bytes byte = coveredThrough; byte < range.startByte; ++byte)
-            assert(sourceWhitespace((unsigned char) source[byte]));
+            assert(sourceWhitespace((u8) source[byte]));
         assert(range.startByte < range.endByte);
         assert(range.endByte <= length);
         coveredThrough = range.endByte;
         step = C23Lexer_next(lexer);
     }
     for (bytes byte = coveredThrough; byte < length; ++byte)
-        assert(sourceWhitespace((unsigned char) source[byte]));
+        assert(sourceWhitespace((u8) source[byte]));
     C23Lexer_free(lexer);
 }
 
-int main() {
+i32 main() {
     _Static_assert(SYNTAX_ROLE_INVALID == 41, "existing syntax role ordinals stay stable");
     _Static_assert(SYNTAX_ROLE_IDENTIFIER == 42, "identifier is appended after existing roles");
     assert(strcmp(SyntaxRole_name(SYNTAX_ROLE_IDENTIFIER), "identifier") == 0);
@@ -193,7 +193,7 @@ int main() {
     assert(!C23Lexer_next(lexer).hasSpan);
     C23Lexer_free(lexer);
 
-    const unsigned char malformed[] = {0xE1u, 0x80u, 'x', 0u, 'y'};
+    const u8 malformed[] = {0xE1u, 0x80u, 'x', 0u, 'y'};
     lexer = C23Lexer(18u, (const char*) malformed, sizeof malformed);
     take(lexer, SYNTAX_ROLE_INVALID, 0u, 2u);
     take(lexer, SYNTAX_ROLE_IDENTIFIER, 2u, 3u);
@@ -222,27 +222,27 @@ int main() {
     assert(strstr(valueProjection.text, "document=26") != nullptr);
     C23Lexer_free(lexer);
 
-    const unsigned char nulInString[] = {'"', 'a', 0u, 'b', '"'};
+    const u8 nulInString[] = {'"', 'a', 0u, 'b', '"'};
     lexer = C23Lexer(35u, (const char*) nulInString, sizeof nulInString);
     take(lexer, SYNTAX_ROLE_INVALID, 0u, 3u);
     take(lexer, SYNTAX_ROLE_IDENTIFIER, 3u, 4u);
     take(lexer, SYNTAX_ROLE_INVALID, 4u, 5u);
     C23Lexer_free(lexer);
 
-    const unsigned char nulEscapedInString[] = {'"', 'a', '\\', 0u, 'b', '"'};
+    const u8 nulEscapedInString[] = {'"', 'a', '\\', 0u, 'b', '"'};
     lexer = C23Lexer(36u, (const char*) nulEscapedInString, sizeof nulEscapedInString);
     take(lexer, SYNTAX_ROLE_INVALID, 0u, 4u);
     take(lexer, SYNTAX_ROLE_IDENTIFIER, 4u, 5u);
     take(lexer, SYNTAX_ROLE_INVALID, 5u, 6u);
     C23Lexer_free(lexer);
 
-    const unsigned char nulInCharacter[] = {'\'', 'a', 0u, '\''};
+    const u8 nulInCharacter[] = {'\'', 'a', 0u, '\''};
     lexer = C23Lexer(37u, (const char*) nulInCharacter, sizeof nulInCharacter);
     take(lexer, SYNTAX_ROLE_INVALID, 0u, 3u);
     take(lexer, SYNTAX_ROLE_INVALID, 3u, 4u);
     C23Lexer_free(lexer);
 
-    const unsigned char maximalSubparts[] = {
+    const u8 maximalSubparts[] = {
         0xE0u, 0x80u, 0x80u, 0xF1u, 0x80u, 'x'
     };
     lexer = C23Lexer(29u, (const char*) maximalSubparts, sizeof maximalSubparts);
@@ -253,7 +253,7 @@ int main() {
     take(lexer, SYNTAX_ROLE_IDENTIFIER, 5u, 6u);
     C23Lexer_free(lexer);
 
-    const unsigned char commentBytes[] = {'/', '*', 'a', 0xE1u, 0x80u, 'x', '*', '/', 'z'};
+    const u8 commentBytes[] = {'/', '*', 'a', 0xE1u, 0x80u, 'x', '*', '/', 'z'};
     lexer = C23Lexer(24u, (const char*) commentBytes, sizeof commentBytes);
     take(lexer, SYNTAX_ROLE_COMMENT, 0u, 3u);
     take(lexer, SYNTAX_ROLE_INVALID, 3u, 5u);
@@ -261,7 +261,7 @@ int main() {
     take(lexer, SYNTAX_ROLE_IDENTIFIER, 8u, 9u);
     C23Lexer_free(lexer);
 
-    const unsigned char stringBytes[] = {'"', 'a', 0xE1u, 0x80u, 'b', '"'};
+    const u8 stringBytes[] = {'"', 'a', 0xE1u, 0x80u, 'b', '"'};
     lexer = C23Lexer(25u, (const char*) stringBytes, sizeof stringBytes);
     take(lexer, SYNTAX_ROLE_STRING, 0u, 2u);
     take(lexer, SYNTAX_ROLE_INVALID, 2u, 4u);

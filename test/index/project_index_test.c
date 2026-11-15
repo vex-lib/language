@@ -9,7 +9,7 @@ static Symbol makeFunction(u64 id, u32 documentId, bytes start, bytes end,
                     SourceRange_3(documentId, start, end));
 }
 
-int main() {
+i32 main() {
     LanguageProject *project = LanguageProject_2(6u, "/work/project");
     assert(project != nullptr);
     assert(LanguageProject_addFile(project, "include/api.h", PROJECT_FILE_KIND_TEXT, "c23") != nullptr);

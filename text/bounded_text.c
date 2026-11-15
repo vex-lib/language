@@ -110,7 +110,7 @@ BoundedText BoundedText_format(const char *format, ...) {
         return self;
     va_list arguments;
     va_start(arguments, format);
-    int written = vsnprintf((*((&self))).text, BOUNDED_TEXT_CAPACITY, format, arguments);
+    i32 written = vsnprintf((*((&self))).text, BOUNDED_TEXT_CAPACITY, format, arguments);
     va_end(arguments);
     if (written < 0) {
         (*((&self))).text[0] = '\0';

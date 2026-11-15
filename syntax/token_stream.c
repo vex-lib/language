@@ -186,13 +186,13 @@ BoundedText TokenStream_toString(const TokenStream *self) {
     return self == nullptr ? BoundedText_zero()
         : BoundedText_format("TokenStream(document=%u, revision=%llu, tokens=%zu)",
             TokenStream_getDocumentId(self),
-            (unsigned long long) TokenStream_getDocumentRevision(self), (*self).count);
+            (u64) TokenStream_getDocumentRevision(self), (*self).count);
 }
 BoundedText TokenStream_toStringStruct(const TokenStream *self) {
     return self == nullptr ? BoundedText_zero()
         : BoundedText_format("TokenStream{documentId=%u, revision=%llu, context=%llu, count=%zu, complete=%s}",
             TokenStream_getDocumentId(self),
-            (unsigned long long) TokenStream_getDocumentRevision(self),
-            (unsigned long long) (*self).compilationContextId, (*self).count,
+            (u64) TokenStream_getDocumentRevision(self),
+            (u64) (*self).compilationContextId, (*self).count,
             (*self).complete ? "true" : "false");
 }

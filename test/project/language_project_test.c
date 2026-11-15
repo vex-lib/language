@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
-int main() {
+i32 main() {
     LanguageProject *project = LanguageProject_2(90u, "/work/sample");
     assert(project != nullptr);
     assert(LanguageProject_getId(project) == 90u);

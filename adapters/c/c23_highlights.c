@@ -108,7 +108,7 @@ static bool tokenStartsLine(const C23Token *tokens, bytes count, bytes index,
         return false;
     bytes at = tokens[index].start;
     while (at > 0u) {
-        unsigned char byte = (unsigned char) source[at - 1u];
+        u8 byte = (u8) source[at - 1u];
         if (byte == '\n' || byte == '\r')
             break;
         if (byte != ' ' && byte != '\t' && byte != '\f' && byte != '\v')
@@ -238,7 +238,7 @@ static bytes includeHeaderEnd(const C23Token *tokens, bytes count, bytes include
 static bool identifierAllCaps(const char *source, C23Token token) {
     bool letter = false;
     for (bytes at = token.start; at < token.end; ++at) {
-        unsigned char byte = (unsigned char) source[at];
+        u8 byte = (u8) source[at];
         if (byte >= 'A' && byte <= 'Z')
             letter = true;
         else if ((byte < '0' || byte > '9') && byte != '_')
@@ -253,13 +253,13 @@ static bool identifierEndsTypeSuffix(const char *source, C23Token token) {
 }
 
 static bool identifierStartsUpper(const char *source, C23Token token) {
-    unsigned char first = (unsigned char) source[token.start];
+    u8 first = (u8) source[token.start];
     return first >= 'A' && first <= 'Z';
 }
 
 static bool identifierHasLower(const char *source, C23Token token) {
     for (bytes at = token.start; at < token.end; ++at) {
-        unsigned char byte = (unsigned char) source[at];
+        u8 byte = (u8) source[at];
         if (byte >= 'a' && byte <= 'z')
             return true;
     }

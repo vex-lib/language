@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
-int main() {
+i32 main() {
     char source[] = {'a', '\0', 'b'};
     TextSnapshot *snapshot = TextSnapshot(8u, 2u, source, sizeof source);
     assert(snapshot != nullptr);

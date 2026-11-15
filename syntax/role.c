@@ -64,17 +64,17 @@ static const char *ROLE_KEYS[] = {
 };
 
 const char *SyntaxRole_name(SyntaxRole role) {
-    if ((unsigned) role >= sizeof ROLE_NAMES / sizeof ROLE_NAMES[0])
+    if ((u32) role >= sizeof ROLE_NAMES / sizeof ROLE_NAMES[0])
         return "invalid";
     return ROLE_NAMES[role];
 }
 
 const char *SyntaxRole_styleKey(SyntaxRole role) {
-    if ((unsigned) role >= sizeof ROLE_KEYS / sizeof ROLE_KEYS[0])
+    if ((u32) role >= sizeof ROLE_KEYS / sizeof ROLE_KEYS[0])
         return "invalid";
     return ROLE_KEYS[role];
 }
 
 bool SyntaxRole_isValid(SyntaxRole role) {
-    return role != SYNTAX_ROLE_NONE && (unsigned) role < sizeof ROLE_NAMES / sizeof ROLE_NAMES[0];
+    return role != SYNTAX_ROLE_NONE && (u32) role < sizeof ROLE_NAMES / sizeof ROLE_NAMES[0];
 }

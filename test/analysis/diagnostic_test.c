@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
-int main() {
+i32 main() {
     Diagnostic empty = Diagnostic();
     assert(empty.severity == DIAGNOSTIC_SEVERITY_HINT);
     assert(empty.code == DIAGNOSTIC_CODE_NONE);

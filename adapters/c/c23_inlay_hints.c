@@ -263,7 +263,7 @@ static bool collectSignatures(C23InlayHints *self, const C23Token *tokens,
             continue;
         bytes paramStart = *parameterCount;
         bytes segment = open + 1u;
-        unsigned parenDepth = 0u;
+        u32 parenDepth = 0u;
         bool valid = true;
         for (bytes index = segment; index <= close; ++index) {
             bool boundary = index == close

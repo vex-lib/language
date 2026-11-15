@@ -51,10 +51,10 @@ Diagnostic Diagnostic_4(SourceRange range, DiagnosticSeverity severity, Diagnost
     return (Diagnostic) {.range = range, .severity = severity, .code = code, .message = message};
 }
 const char *DiagnosticSeverity_name(DiagnosticSeverity value) {
-    return (unsigned) value < sizeof SEVERITIES / sizeof SEVERITIES[0] ? SEVERITIES[value] : "unknown";
+    return (u32) value < sizeof SEVERITIES / sizeof SEVERITIES[0] ? SEVERITIES[value] : "unknown";
 }
 const char *DiagnosticCode_name(DiagnosticCode value) {
-    return (unsigned) value < sizeof CODES / sizeof CODES[0] ? CODES[value] : "unknown";
+    return (u32) value < sizeof CODES / sizeof CODES[0] ? CODES[value] : "unknown";
 }
 BoundedText Diagnostic_toString(const Diagnostic *self) {
     if (self == nullptr) return BoundedText_1("nullptr");
@@ -66,6 +66,6 @@ BoundedText Diagnostic_toStringStruct(const Diagnostic *self) {
     SourceRange range = (*self).range;
     return BoundedText_format("Diagnostic { severity=%s, code=%s, range=%u:%llu-%llu }",
         DiagnosticSeverity_name((*self).severity), DiagnosticCode_name((*self).code),
-        range.documentId, (unsigned long long) range.startByte,
-        (unsigned long long) range.endByte);
+        range.documentId, (u64) range.startByte,
+        (u64) range.endByte);
 }

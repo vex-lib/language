@@ -2,7 +2,7 @@
 #include "document/source_range.h"
 #include <assert.h>
 
-int main() {
+i32 main() {
     SourceRange empty = SourceRange();
     SourceRange zero = SourceRange_zero();
     assert(!SourceRange_isValid(&empty));

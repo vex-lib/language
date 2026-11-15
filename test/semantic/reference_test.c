@@ -2,7 +2,7 @@
 #include "semantic/reference.h"
 #include <assert.h>
 
-int main() {
+i32 main() {
     Reference unresolved = Reference();
     Reference zero = Reference_zero();
     assert(!Reference_isResolved(&unresolved));

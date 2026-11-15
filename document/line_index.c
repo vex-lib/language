@@ -28,8 +28,8 @@ typedef struct ScalarStep {
     bytes utf16Units;
 } ScalarStep;
 
-static ScalarStep decodeScalar(const unsigned char *data, bytes length, bytes at) {
-    unsigned char lead = data[at];
+static ScalarStep decodeScalar(const u8 *data, bytes length, bytes at) {
+    u8 lead = data[at];
     if (lead < 0x80u)
         return (ScalarStep) {.valid = true, .byteCount = 1u, .utf16Units = 1u};
     if (lead >= 0xC2u && lead <= 0xDFu) {
@@ -38,8 +38,8 @@ static ScalarStep decodeScalar(const unsigned char *data, bytes length, bytes at
         return (ScalarStep) {0};
     }
     if (lead >= 0xE0u && lead <= 0xEFu && at + 2u < length) {
-        unsigned char second = data[at + 1u];
-        unsigned char third = data[at + 2u];
+        u8 second = data[at + 1u];
+        u8 third = data[at + 2u];
         bool valid = second >= 0x80u && second <= 0xBFu
             && third >= 0x80u && third <= 0xBFu
             && !(lead == 0xE0u && second < 0xA0u)
@@ -49,7 +49,7 @@ static ScalarStep decodeScalar(const unsigned char *data, bytes length, bytes at
         return (ScalarStep) {0};
     }
     if (lead >= 0xF0u && lead <= 0xF4u && at + 3u < length) {
-        unsigned char second = data[at + 1u];
+        u8 second = data[at + 1u];
         bool valid = second >= 0x80u && second <= 0xBFu
             && data[at + 2u] >= 0x80u && data[at + 2u] <= 0xBFu
             && data[at + 3u] >= 0x80u && data[at + 3u] <= 0xBFu
@@ -138,7 +138,7 @@ SourcePosition LineIndex_positionAtByte(const LineIndex *self, bytes byteOffset,
     bytes utf16 = 0u;
     bytes utf32 = 0u;
     while (offset < target) {
-        ScalarStep scalar = decodeScalar((const unsigned char *) source, lineEnd, offset);
+        ScalarStep scalar = decodeScalar((const u8 *) source, lineEnd, offset);
         if (!scalar.valid || scalar.byteCount > target - offset) {
             THROW("LineIndex: byte offset is not a valid UTF-8 scalar boundary");
             return SourcePosition_zero();

@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <string.h>
 
-int main() {
+i32 main() {
     const LanguageAdapter *adapter = C23Adapter_adapter();
     assert(LanguageAdapter_isValid(adapter));
     assert(strcmp(LanguageAdapter_getLanguageId(adapter), "c23") == 0);

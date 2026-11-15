@@ -2,7 +2,7 @@
 #include "adapters/c/c23_lex_step.h"
 #include <assert.h>
 
-int main() {
+i32 main() {
     C23LexStep empty = C23LexStep();
     assert(!empty.hasSpan);
     SyntaxSpan emptySpan = empty.span;

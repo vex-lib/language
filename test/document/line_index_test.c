@@ -2,7 +2,7 @@
 #include "document/line_index.h"
 #include <assert.h>
 
-int main() {
+i32 main() {
     const char text[] = "a😀\r\nβ";
     TextSnapshot *snapshot = TextSnapshot(31u, 4u, text, sizeof text - 1u);
     assert(snapshot != nullptr);

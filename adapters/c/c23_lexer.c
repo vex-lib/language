@@ -91,20 +91,20 @@ enum {
     C23_LEXER_MODE_CHARACTER
 };
 
-static bool identifierStart(unsigned char byte) {
+static bool identifierStart(u8 byte) {
     return (byte >= 'A' && byte <= 'Z') || (byte >= 'a' && byte <= 'z') || byte == '_';
 }
 
-static bool identifierContinue(unsigned char byte) {
+static bool identifierContinue(u8 byte) {
     return identifierStart(byte) || (byte >= '0' && byte <= '9');
 }
 
-static bool continuation(unsigned char byte) {
+static bool continuation(u8 byte) {
     return byte >= 0x80u && byte <= 0xBFu;
 }
 
-static bytes utf8SubpartLength(const unsigned char *data, bytes length, bytes offset) {
-    unsigned char lead = data[offset];
+static bytes utf8SubpartLength(const u8 *data, bytes length, bytes offset) {
+    u8 lead = data[offset];
     if (lead < 0x80u)
         return 1u;
     if (lead >= 0xC2u && lead <= 0xDFu) {
@@ -113,7 +113,7 @@ static bytes utf8SubpartLength(const unsigned char *data, bytes length, bytes of
     }
     if (lead >= 0xE0u && lead <= 0xEFu) {
         if (offset + 1u >= length) return 1u;
-        unsigned char second = data[offset + 1u];
+        u8 second = data[offset + 1u];
         bool secondValid = continuation(second)
             && !(lead == 0xE0u && second < 0xA0u)
             && !(lead == 0xEDu && second > 0x9Fu);
@@ -123,7 +123,7 @@ static bytes utf8SubpartLength(const unsigned char *data, bytes length, bytes of
     }
     if (lead >= 0xF0u && lead <= 0xF4u) {
         if (offset + 1u >= length) return 1u;
-        unsigned char second = data[offset + 1u];
+        u8 second = data[offset + 1u];
         bool secondValid = continuation(second)
             && !(lead == 0xF0u && second < 0x90u)
             && !(lead == 0xF4u && second > 0x8Fu);
@@ -146,7 +146,7 @@ typedef struct QuotePrefixResult {
     char quote;
 } QuotePrefixResult;
 
-static Utf8ScalarResult validUtf8Scalar(const unsigned char *data, bytes length,
+static Utf8ScalarResult validUtf8Scalar(const u8 *data, bytes length,
                                         bytes offset) {
     bytes span = utf8SubpartLength(data, length, offset);
     bool valid = data[offset] >= 0xC2u && data[offset] <= 0xF4u
@@ -185,7 +185,7 @@ static SyntaxRole keywordRole(const char *word, bytes length) {
 
 static bytes skipWhitespace(const C23Lexer *self, bytes offset) {
     while (offset < (*self).length) {
-        unsigned char byte = (unsigned char) (*self).source[offset];
+        u8 byte = (u8) (*self).source[offset];
         if (byte != ' ' && byte != '\t' && byte != '\r' && byte != '\n'
             && byte != '\f' && byte != '\v')
             break;
@@ -197,13 +197,13 @@ static bytes skipWhitespace(const C23Lexer *self, bytes offset) {
 static bytes numberEnd(const char *source, bytes length, bytes start) {
     bytes offset = start;
     while (offset < length) {
-        unsigned char byte = (unsigned char) source[offset];
+        u8 byte = (u8) source[offset];
         if (identifierContinue(byte) || byte == '.' ) {
             ++offset;
             continue;
         }
         if (byte == '\'' && offset + 1u < length
-            && (identifierStart((unsigned char) source[offset + 1u])
+            && (identifierStart((u8) source[offset + 1u])
                 || (source[offset + 1u] >= '0' && source[offset + 1u] <= '9'))) {
             offset += 2u;
             continue;
@@ -289,7 +289,7 @@ static C23LexStep scanComment(C23Lexer *self, bytes start) {
     bool blockComment = (*self).mode == C23_LEXER_MODE_BLOCK_COMMENT;
     bytes end = (*self).offset > start ? (*self).offset : start;
     while (end < (*self).length) {
-        unsigned char byte = (unsigned char) source[end];
+        u8 byte = (u8) source[end];
         if ((*self).mode == C23_LEXER_MODE_LINE_COMMENT && (byte == '\n' || byte == '\r')) {
             (*self).mode = C23_LEXER_MODE_NORMAL;
             (*self).offset = end;
@@ -307,7 +307,7 @@ static C23LexStep scanComment(C23Lexer *self, bytes start) {
                 (*self).docComment ? SYNTAX_ROLE_DOC_COMMENT : SYNTAX_ROLE_COMMENT, nullptr));
         }
         if (byte >= 0x80u) {
-            Utf8ScalarResult scalar = validUtf8Scalar((const unsigned char *) source,
+            Utf8ScalarResult scalar = validUtf8Scalar((const u8 *) source,
                                                        (*self).length, end);
             if (!scalar.valid) {
                 if (end != start) {
@@ -350,7 +350,7 @@ static C23LexStep scanQuotedPart(C23Lexer *self, bytes start, bool opening) {
         end = prefix.quoteAt + 1u;
     }
     while (end < (*self).length) {
-        unsigned char byte = (unsigned char) source[end];
+        u8 byte = (u8) source[end];
         if (byte == 0u) {
             (*self).mode = C23_LEXER_MODE_NORMAL;
             (*self).quote = 0;
@@ -368,7 +368,7 @@ static C23LexStep scanQuotedPart(C23Lexer *self, bytes start, bool opening) {
                 (*self).mode = C23_LEXER_MODE_NORMAL;
                 return invalidSpan(self, start, (*self).length);
             }
-            unsigned char escaped = (unsigned char) source[end + 1u];
+            u8 escaped = (u8) source[end + 1u];
             if (escaped == '\n' || escaped == '\r') {
                 (*self).mode = C23_LEXER_MODE_NORMAL;
                 (*self).quote = 0;
@@ -381,7 +381,7 @@ static C23LexStep scanQuotedPart(C23Lexer *self, bytes start, bool opening) {
             end += 2u;
             continue;
         }
-        if (byte == (unsigned char) (*self).quote) {
+        if (byte == (u8) (*self).quote) {
             ++end;
             (*self).mode = C23_LEXER_MODE_NORMAL;
             (*self).offset = end;
@@ -389,7 +389,7 @@ static C23LexStep scanQuotedPart(C23Lexer *self, bytes start, bool opening) {
             return C23LexStep_2(true, makeSpan(self, start, end, role, nullptr));
         }
         if (byte >= 0x80u) {
-            Utf8ScalarResult scalar = validUtf8Scalar((const unsigned char *) source,
+            Utf8ScalarResult scalar = validUtf8Scalar((const u8 *) source,
                                                        (*self).length, end);
             if (!scalar.valid) {
                 if (end != start) {
@@ -454,7 +454,7 @@ bool C23Lexer_setSource(C23Lexer *self, u32 documentId,
 bool C23Lexer_setProfile(C23Lexer *self, C23LexerProfile profile) {
     if (self == nullptr || (profile != C23_LEXER_PROFILE_STRICT_C23
                             && profile != C23_LEXER_PROFILE_VEX_ANNOTATION)) {
-        THROW("C23Lexer rejected unsupported lexical profile %u", (unsigned) profile);
+        THROW("C23Lexer rejected unsupported lexical profile %u", (u32) profile);
         return false;
     }
     (*self).profile = profile;
@@ -505,13 +505,13 @@ C23LexStep C23Lexer_next(C23Lexer *self) {
     bytes end = start;
     SyntaxRole role = SYNTAX_ROLE_PUNCTUATION;
     const char *styleKey = nullptr;
-    unsigned char byte = (unsigned char) source[start];
+    u8 byte = (u8) source[start];
 
     if (byte == 0u) {
         end = start + 1u;
         role = SYNTAX_ROLE_INVALID;
     } else if (byte >= 0x80u) {
-        Utf8ScalarResult scalar = validUtf8Scalar((const unsigned char *) source,
+        Utf8ScalarResult scalar = validUtf8Scalar((const u8 *) source,
                                                    length, start);
         end = start + scalar.length;
         role = SYNTAX_ROLE_INVALID;
@@ -529,7 +529,7 @@ C23LexStep C23Lexer_next(C23Lexer *self) {
             return scanQuotedPart(self, start, true);
         } else if (identifierStart(byte)) {
             end = start + 1u;
-            while (end < length && identifierContinue((unsigned char) source[end]))
+            while (end < length && identifierContinue((u8) source[end]))
                 ++end;
             role = keywordRole(source + start, end - start);
         } else if ((byte >= '0' && byte <= '9')
@@ -540,7 +540,7 @@ C23LexStep C23Lexer_next(C23Lexer *self) {
         } else if ((*self).profile == C23_LEXER_PROFILE_VEX_ANNOTATION
                    && startsWith(source, length, start, ";;")
                    && start + 2u < length
-                   && identifierStart((unsigned char) source[start + 2u])) {
+                   && identifierStart((u8) source[start + 2u])) {
             bytes lineStart = start;
             while (lineStart > 0u && source[lineStart - 1u] != '\n' && source[lineStart - 1u] != '\r')
                 --lineStart;
@@ -582,8 +582,8 @@ BoundedText C23Lexer_toStringStruct(const C23Lexer *self) {
     if (self == nullptr) return BoundedText_1("nullptr");
     return BoundedText_format("C23Lexer { documentId=%u, source=%p, length=%zu, offset=%zu, profile=%u, stopped=%s, mode=%u, quote=%u, docComment=%s }",
                               (*self).documentId, (any) (*self).source, (*self).length,
-                              (*self).offset, (unsigned) (*self).profile,
-                              (*self).stopped ? "true" : "false", (unsigned) (*self).mode,
-                              (unsigned char) (*self).quote,
+                              (*self).offset, (u32) (*self).profile,
+                              (*self).stopped ? "true" : "false", (u32) (*self).mode,
+                              (u8) (*self).quote,
                               (*self).docComment ? "true" : "false");
 }

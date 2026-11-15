@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
-int main() {
+i32 main() {
     const char source[] =
         "int add(int left, int right);\n"
         "int main(void) { return add(1, add(2, 3)); }\n";

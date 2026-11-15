@@ -15,7 +15,7 @@
  * This record deliberately speaks byte offsets only. UTF-8 scalar boundaries,
  * line/column lookup, LSP UTF-8/UTF-16 position conversion, and document-version
  * validation belong to the document service and are not inferred here. Values
- * are copied by value and may be retained only as long as their document id and
+ * are copied by value and may be retained only as i64 as their document id and
  * revision are meaningful to the consumer.
  * ============================================================================
  */

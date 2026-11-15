@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <string.h>
 
-static int fakeSession;
+static i32 fakeSession;
 
 static any openBad(u32 documentId, const char *data, bytes length) {
     (discard) documentId;
@@ -22,7 +22,7 @@ static LanguageLexResult nextOutOfBounds(any session) {
 
 static fn closeBad(any session) { assert(session == &fakeSession); }
 
-int main() {
+i32 main() {
     const char source[] = "int value = 23; // declaration\n";
     TextSnapshot *snapshot = TextSnapshot(40u, 7u, source, sizeof source - 1u);
     assert(snapshot != nullptr);

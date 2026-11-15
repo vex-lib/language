@@ -51,7 +51,7 @@ BoundedText SyntaxSpan_toString(const SyntaxSpan *self) {
     if (self == nullptr) return BoundedText_1("nullptr");
     SourceRange range = (*self).range;
     return BoundedText_format("%s [%llu,%llu)", SyntaxRole_name((*self).role),
-        (unsigned long long) range.startByte, (unsigned long long) range.endByte);
+        (u64) range.startByte, (u64) range.endByte);
 }
 BoundedText SyntaxSpan_toStringStruct(const SyntaxSpan *self) {
     if (self == nullptr) return BoundedText_1("nullptr");

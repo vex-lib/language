@@ -72,7 +72,7 @@ static fn testClassification() {
     }
     // Every non-whitespace byte belongs to exactly one ordered span.
     for (bytes at = 0u; at < length; ++at) {
-        unsigned char byte = (unsigned char) source[at];
+        u8 byte = (u8) source[at];
         bool whitespace = byte == ' ' || byte == '\t' || byte == '\r' || byte == '\n';
         assert(whitespace || C23Highlights_roleAt(highlights, at) != SYNTAX_ROLE_NONE);
     }
@@ -108,7 +108,7 @@ static fn testAdmission() {
     assert(C23Highlights_roleAt(nullptr, 0u) == SYNTAX_ROLE_NONE);
 }
 
-int main() {
+i32 main() {
     testClassification();
     testAdmission();
     return 0;

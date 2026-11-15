@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <string.h>
 
-int main() {
+i32 main() {
     char source[] = "nullptr x";
 
     TextSnapshot *snapshot = TextSnapshot(3u, 17u, source, sizeof source - 1u);

@@ -2,7 +2,7 @@
 #include "token/token.h"
 #include <assert.h>
 
-int main() {
+i32 main() {
     Token empty = Token();
     Token zero = Token_zero();
     assert(Token_getKind(&empty) == TOKEN_KIND_UNKNOWN);

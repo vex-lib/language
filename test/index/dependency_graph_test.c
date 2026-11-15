@@ -2,7 +2,7 @@
 #include "index/dependency_graph.h"
 #include <assert.h>
 
-int main() {
+i32 main() {
     LanguageProject *project = LanguageProject_2(71u, "/work/graph");
     assert(project != nullptr);
     const ProjectFile *first = LanguageProject_addFile(

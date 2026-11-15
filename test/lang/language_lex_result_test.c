@@ -2,7 +2,7 @@
 #include "lang/language_lex_result.h"
 #include <assert.h>
 
-int main() {
+i32 main() {
     LanguageLexResult empty = LanguageLexResult_0();
 
     assert(!empty.hasSpan);

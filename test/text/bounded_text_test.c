@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
-int main() {
+i32 main() {
     BoundedText empty = BoundedText();
     assert(BoundedText_getLength(&empty) == 0u);
     BoundedText text = BoundedText("hello");

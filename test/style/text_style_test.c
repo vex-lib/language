@@ -2,7 +2,7 @@
 #include "style/text_style.h"
 #include <assert.h>
 
-int main() {
+i32 main() {
     TextStyle empty = TextStyle();
     assert(TextStyle_getForeground(&empty) == TEXT_STYLE_COLOR_DEFAULT);
     assert(TextStyle_getBackground(&empty) == TEXT_STYLE_COLOR_DEFAULT);

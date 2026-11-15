@@ -146,7 +146,7 @@ BoundedText TextStyle_toString(const TextStyle *self) {
         return BoundedText_1("nullptr");
     return BoundedText_format("TextStyle(fg=0x%08X, bg=0x%08X, deco=%s, decoColor=0x%08X, flags=0x%04X)",
                               (*self).fg, (*self).bg, decorationName((*self).decoration),
-                              (*self).decorationColor, (unsigned) (*self).flags);
+                              (*self).decorationColor, (u32) (*self).flags);
 }
 
 BoundedText TextStyle_toStringStruct(const TextStyle *self) {
@@ -154,5 +154,5 @@ BoundedText TextStyle_toStringStruct(const TextStyle *self) {
         return BoundedText_1("nullptr");
     return BoundedText_format("TextStyle { fg=0x%08X, bg=0x%08X, decorationColor=0x%08X, flags=0x%04X, decoration=%s }",
                               (*self).fg, (*self).bg, (*self).decorationColor,
-                              (unsigned) (*self).flags, decorationName((*self).decoration));
+                              (u32) (*self).flags, decorationName((*self).decoration));
 }

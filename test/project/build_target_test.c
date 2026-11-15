@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
-int main() {
+i32 main() {
     char name[] = "app";
     BuildTarget *target = BuildTarget_3(4u, name, "c23");
     assert(target != nullptr);

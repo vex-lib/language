@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <string.h>
 
-int main() {
+i32 main() {
     const char source[] = "nullptr typeof_unqual int value;";
 
     TextSnapshot *snapshot = TextSnapshot(42u, 6u, source, sizeof source - 1u);

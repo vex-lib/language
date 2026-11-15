@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
-int main() {
+i32 main() {
     ProjectConfiguration *configuration = ProjectConfiguration_0();
     assert(configuration != nullptr);
     assert(ProjectConfiguration_getLanguageId(configuration) == nullptr);

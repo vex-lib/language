@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-int main() {
+i32 main() {
     LanguageRegistry *registry = LanguageRegistry_0();
     assert(registry != nullptr && LanguageRegistry_getCount(registry) == 0u);
     const LanguageAdapter *adapter = C23Adapter_adapter();
