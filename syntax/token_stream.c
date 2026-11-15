@@ -1,6 +1,5 @@
+#include "vex.h"
 #include "syntax/token_stream.h"
-#include "annotation/annotation.h"
-#include "exception/throw.h"
 #include <stdlib.h>
 
 ;;DEFINITION

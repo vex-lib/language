@@ -1,9 +1,9 @@
 #ifndef LANGUAGE_DOCUMENT_LINE_INDEX_H
 #define LANGUAGE_DOCUMENT_LINE_INDEX_H
 
+#include "vex.h"
 #include "document/source_position.h"
 #include "document/text_snapshot.h"
-#include <stddef.h>
 
 typedef struct LineIndex LineIndex;
 

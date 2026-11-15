@@ -1,8 +1,8 @@
 #ifndef LANGUAGE_LANG_LANGUAGE_LEX_RESULT_H
 #define LANGUAGE_LANG_LANGUAGE_LEX_RESULT_H
 
+#include "vex.h"
 #include "analysis/syntax_span.h"
-#include <stdbool.h>
 
 typedef struct LanguageLexResult {
     bool hasSpan;

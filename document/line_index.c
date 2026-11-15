@@ -1,7 +1,5 @@
+#include "vex.h"
 #include "document/line_index.h"
-#include "annotation/annotation.h"
-#include "exception/throw.h"
-#include <stdint.h>
 #include <stdlib.h>
 
 ;;DEFINITION

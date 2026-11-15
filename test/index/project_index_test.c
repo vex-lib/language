@@ -1,3 +1,4 @@
+#include "vex.h"
 #include "index/project_index.h"
 #include <assert.h>
 #include <string.h>

@@ -1,5 +1,5 @@
+#include "vex.h"
 #include "text/bounded_text.h"
-#include "annotation/annotation.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>

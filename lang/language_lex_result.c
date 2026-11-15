@@ -1,5 +1,5 @@
+#include "vex.h"
 #include "lang/language_lex_result.h"
-#include "annotation/annotation.h"
 
 ;;DEFINITION
 /** LanguageLexResult is one pull-lexer result. End-of-input always carries a

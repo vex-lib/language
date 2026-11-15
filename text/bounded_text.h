@@ -1,8 +1,7 @@
 #ifndef LANGUAGE_TEXT_BOUNDED_TEXT_H
 #define LANGUAGE_TEXT_BOUNDED_TEXT_H
 
-#include <stdbool.h>
-#include <stddef.h>
+#include "vex.h"
 
 // text/bounded_text.h — a returned, bounded string VALUE.
 //

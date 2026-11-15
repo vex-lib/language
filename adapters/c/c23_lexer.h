@@ -1,9 +1,7 @@
 #ifndef LANGUAGE_ADAPTERS_C_C23_LEXER_H
 #define LANGUAGE_ADAPTERS_C_C23_LEXER_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include "vex.h"
 #include "adapters/c/c23_lex_step.h"
 #include "text/bounded_text.h"
 

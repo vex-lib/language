@@ -1,9 +1,7 @@
 #ifndef LANGUAGE_DOCUMENT_SOURCE_RANGE_H
 #define LANGUAGE_DOCUMENT_SOURCE_RANGE_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include "vex.h"
 
 // SourceRange is a document-relative half-open byte span. It carries no text
 // pointer and does not convert offsets to UTF-8 scalars, lines, or LSP columns.

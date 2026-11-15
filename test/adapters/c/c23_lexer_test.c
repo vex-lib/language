@@ -1,3 +1,4 @@
+#include "vex.h"
 #include "adapters/c/c23_lexer.h"
 #include <assert.h>
 #include <stdio.h>

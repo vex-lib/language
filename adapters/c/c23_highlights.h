@@ -1,9 +1,7 @@
 #ifndef LANGUAGE_ADAPTERS_C_C23_HIGHLIGHTS_H
 #define LANGUAGE_ADAPTERS_C_C23_HIGHLIGHTS_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include "vex.h"
 #include "analysis/syntax_span.h"
 #include "text/bounded_text.h"
 

@@ -1,5 +1,5 @@
+#include "vex.h"
 #include "document/source_range.h"
-#include "annotation/annotation.h"
 
 ;;DEFINITION
 /**

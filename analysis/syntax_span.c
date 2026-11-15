@@ -1,5 +1,5 @@
+#include "vex.h"
 #include "analysis/syntax_span.h"
-#include "annotation/annotation.h"
 
 ;;DEFINITION
 /**

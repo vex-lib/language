@@ -1,6 +1,5 @@
+#include "vex.h"
 #include "lang/language_adapter.h"
-#include "annotation/annotation.h"
-#include "exception/throw.h"
 
 ;;DEFINITION
 /** LanguageAdapter is a borrowed callback table for one grammar and language

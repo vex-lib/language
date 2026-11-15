@@ -1,6 +1,5 @@
+#include "vex.h"
 #include "adapters/diff/diff_adapter.h"
-#include "annotation/annotation.h"
-#include "exception/throw.h"
 #include <string.h>
 
 ;;DEFINITION

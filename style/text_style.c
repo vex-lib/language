@@ -1,5 +1,5 @@
+#include "vex.h"
 #include "style/text_style.h"
-#include "annotation/annotation.h"
 #include <string.h>
 
 ;;DEFINITION

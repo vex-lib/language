@@ -1,7 +1,7 @@
 #ifndef LANGUAGE_SYNTAX_ROLE_H
 #define LANGUAGE_SYNTAX_ROLE_H
 
-#include <stdbool.h>
+#include "vex.h"
 
 // syntax/role.h — the shared SYNTACTIC vocabulary.
 //

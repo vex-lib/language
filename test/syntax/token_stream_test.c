@@ -1,3 +1,4 @@
+#include "vex.h"
 #include "adapters/c23/c23_adapter.h"
 #include "syntax/token_stream.h"
 #include <assert.h>

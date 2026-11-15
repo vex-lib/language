@@ -1,8 +1,7 @@
 #ifndef LANGUAGE_DOCUMENT_SOURCE_POSITION_H
 #define LANGUAGE_DOCUMENT_SOURCE_POSITION_H
 
-#include <stdbool.h>
-#include <stddef.h>
+#include "vex.h"
 
 typedef struct SourcePosition {
     bool valid;

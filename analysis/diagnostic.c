@@ -1,5 +1,5 @@
+#include "vex.h"
 #include "analysis/diagnostic.h"
-#include "annotation/annotation.h"
 
 ;;DEFINITION
 /**

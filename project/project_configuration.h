@@ -1,7 +1,7 @@
 #ifndef LANGUAGE_PROJECT_PROJECT_CONFIGURATION_H
 #define LANGUAGE_PROJECT_PROJECT_CONFIGURATION_H
 
-#include <stdbool.h>
+#include "vex.h"
 
 typedef struct ProjectConfiguration ProjectConfiguration;
 

@@ -1,9 +1,8 @@
 #ifndef LANGUAGE_TOKEN_TOKEN_H
 #define LANGUAGE_TOKEN_TOKEN_H
 
+#include "vex.h"
 #include "document/source_range.h"
-#include <stdbool.h>
-#include <stdint.h>
 
 // Shared coarse lexical categories. Adapters may retain finer private classes;
 // these values do not encode semantic identity or presentation color.

@@ -1,6 +1,7 @@
 #ifndef LANGUAGE_ANALYSIS_SYNTAX_SPAN_H
 #define LANGUAGE_ANALYSIS_SYNTAX_SPAN_H
 
+#include "vex.h"
 #include "document/source_range.h"
 #include "syntax/role.h"
 #include "text/bounded_text.h"

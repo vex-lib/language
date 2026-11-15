@@ -1,6 +1,7 @@
 #ifndef LANGUAGE_ANALYSIS_DIAGNOSTIC_H
 #define LANGUAGE_ANALYSIS_DIAGNOSTIC_H
 
+#include "vex.h"
 #include "document/source_range.h"
 #include "text/bounded_text.h"
 

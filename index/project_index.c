@@ -1,6 +1,5 @@
+#include "vex.h"
 #include "index/project_index.h"
-#include "annotation/annotation.h"
-#include "exception/throw.h"
 #include <stdlib.h>
 #include <string.h>
 

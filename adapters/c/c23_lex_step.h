@@ -1,7 +1,7 @@
 #ifndef LANGUAGE_ADAPTERS_C_C23_LEX_STEP_H
 #define LANGUAGE_ADAPTERS_C_C23_LEX_STEP_H
 
-#include <stdbool.h>
+#include "vex.h"
 #include "analysis/syntax_span.h"
 #include "text/bounded_text.h"
 

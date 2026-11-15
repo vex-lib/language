@@ -1,9 +1,7 @@
 #ifndef LANGUAGE_ADAPTERS_C_C23_INLAY_HINTS_H
 #define LANGUAGE_ADAPTERS_C_C23_INLAY_HINTS_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include "vex.h"
 #include "text/bounded_text.h"
 
 typedef struct C23InlayHints C23InlayHints;

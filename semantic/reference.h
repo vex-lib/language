@@ -1,9 +1,8 @@
 #ifndef LANGUAGE_SEMANTIC_REFERENCE_H
 #define LANGUAGE_SEMANTIC_REFERENCE_H
 
+#include "vex.h"
 #include "document/source_range.h"
-#include <stdbool.h>
-#include <stdint.h>
 
 // Broad use-site roles shared across adapters. Exact language rules for each
 // role, overloads, macros, and control-flow constructs remain adapter-owned.

@@ -1,7 +1,6 @@
+#include "vex.h"
 #include "adapters/c/c23_inlay_hints.h"
 #include "adapters/c/c23_lexer.h"
-#include "annotation/annotation.h"
-#include "exception/throw.h"
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>

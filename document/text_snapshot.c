@@ -1,6 +1,5 @@
+#include "vex.h"
 #include "document/text_snapshot.h"
-#include "annotation/annotation.h"
-#include "exception/throw.h"
 #include <stdlib.h>
 #include <string.h>
 

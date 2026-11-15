@@ -1,9 +1,8 @@
 #ifndef LANGUAGE_SEMANTIC_SYMBOL_H
 #define LANGUAGE_SEMANTIC_SYMBOL_H
 
+#include "vex.h"
 #include "document/source_range.h"
-#include <stdbool.h>
-#include <stdint.h>
 
 // Language-neutral named declaration kinds. A language adapter maps its native
 // declarations into these categories; global-ness comes from the scope, not a

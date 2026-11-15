@@ -1,5 +1,5 @@
+#include "vex.h"
 #include "syntax/role.h"
-#include "annotation/annotation.h"
 
 ;;DEFINITION
 /**

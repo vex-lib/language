@@ -1,8 +1,7 @@
 #ifndef LANGUAGE_PROJECT_PROJECT_FILE_H
 #define LANGUAGE_PROJECT_PROJECT_FILE_H
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "vex.h"
 
 typedef struct ProjectFile ProjectFile;
 
