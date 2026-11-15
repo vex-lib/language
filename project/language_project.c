@@ -64,7 +64,7 @@ LanguageProject *LanguageProject_2(u64 projectId, const char *rootPath) {
     return self;
 }
 
-void LanguageProject_free(LanguageProject *self) {
+fn LanguageProject_free(LanguageProject *self) {
     if (self == nullptr)
         return;
     for (bytes index = 0u; index < (*self).fileCount; ++index)

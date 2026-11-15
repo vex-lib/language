@@ -1,7 +1,8 @@
+#include "vex.h"
 #include "index/dependency_graph.h"
 #include <assert.h>
 
-int main(void) {
+int main() {
     LanguageProject *project = LanguageProject_2(71u, "/work/graph");
     assert(project != nullptr);
     const ProjectFile *first = LanguageProject_addFile(

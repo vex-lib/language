@@ -25,7 +25,7 @@ const char *LanguageAdapter_getLanguageId(const LanguageAdapter *self) {
     return LanguageAdapter_isValid(self) ? (*self).languageId : nullptr;
 }
 
-void *LanguageAdapter_open(const LanguageAdapter *self, u32 documentId,
+any LanguageAdapter_open(const LanguageAdapter *self, u32 documentId,
                            const char *source, bytes length) {
     if (!LanguageAdapter_isValid(self) || documentId == 0u
         || (source == nullptr && length != 0u)) {
@@ -35,7 +35,7 @@ void *LanguageAdapter_open(const LanguageAdapter *self, u32 documentId,
     return (*self).open(documentId, source, length);
 }
 
-LanguageLexResult LanguageAdapter_next(const LanguageAdapter *self, void *session) {
+LanguageLexResult LanguageAdapter_next(const LanguageAdapter *self, any session) {
     if (!LanguageAdapter_isValid(self) || session == nullptr) {
         THROW("language adapter rejected invalid next request");
         return LanguageLexResult_zero();
@@ -43,7 +43,7 @@ LanguageLexResult LanguageAdapter_next(const LanguageAdapter *self, void *sessio
     return (*self).next(session);
 }
 
-void LanguageAdapter_close(const LanguageAdapter *self, void *session) {
+fn LanguageAdapter_close(const LanguageAdapter *self, any session) {
     if (session == nullptr)
         return;
     if (!LanguageAdapter_isValid(self)) {

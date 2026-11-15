@@ -30,18 +30,18 @@ typedef struct ScalarStep {
     bytes utf16Units;
 } ScalarStep;
 
-static ScalarStep decodeScalar(const unsigned char *bytes, bytes length, bytes at) {
-    unsigned char lead = bytes[at];
+static ScalarStep decodeScalar(const unsigned char *data, bytes length, bytes at) {
+    unsigned char lead = data[at];
     if (lead < 0x80u)
         return (ScalarStep) {.valid = true, .byteCount = 1u, .utf16Units = 1u};
     if (lead >= 0xC2u && lead <= 0xDFu) {
-        if (at + 1u < length && bytes[at + 1u] >= 0x80u && bytes[at + 1u] <= 0xBFu)
+        if (at + 1u < length && data[at + 1u] >= 0x80u && data[at + 1u] <= 0xBFu)
             return (ScalarStep) {.valid = true, .byteCount = 2u, .utf16Units = 1u};
         return (ScalarStep) {0};
     }
     if (lead >= 0xE0u && lead <= 0xEFu && at + 2u < length) {
-        unsigned char second = bytes[at + 1u];
-        unsigned char third = bytes[at + 2u];
+        unsigned char second = data[at + 1u];
+        unsigned char third = data[at + 2u];
         bool valid = second >= 0x80u && second <= 0xBFu
             && third >= 0x80u && third <= 0xBFu
             && !(lead == 0xE0u && second < 0xA0u)
@@ -51,10 +51,10 @@ static ScalarStep decodeScalar(const unsigned char *bytes, bytes length, bytes a
         return (ScalarStep) {0};
     }
     if (lead >= 0xF0u && lead <= 0xF4u && at + 3u < length) {
-        unsigned char second = bytes[at + 1u];
+        unsigned char second = data[at + 1u];
         bool valid = second >= 0x80u && second <= 0xBFu
-            && bytes[at + 2u] >= 0x80u && bytes[at + 2u] <= 0xBFu
-            && bytes[at + 3u] >= 0x80u && bytes[at + 3u] <= 0xBFu
+            && data[at + 2u] >= 0x80u && data[at + 2u] <= 0xBFu
+            && data[at + 3u] >= 0x80u && data[at + 3u] <= 0xBFu
             && !(lead == 0xF0u && second < 0x90u)
             && !(lead == 0xF4u && second > 0x8Fu);
         if (valid)
@@ -67,10 +67,10 @@ LineIndex *LineIndex_1(TextSnapshot *snapshot) {
     if (snapshot == nullptr || !TextSnapshot_retain(snapshot))
         return nullptr;
     bytes length = TextSnapshot_getLength(snapshot);
-    const char *bytes = TextSnapshot_getBytes(snapshot);
+    const char *data = TextSnapshot_getBytes(snapshot);
     bytes lineCount = 1u;
     for (bytes index = 0u; index < length; ++index)
-        if (bytes[index] == '\n')
+        if (data[index] == '\n')
             ++lineCount;
     if (lineCount > SIZE_MAX / sizeof(bytes)) {
         THROW("LineIndex: line-start table size overflow");
@@ -95,13 +95,13 @@ LineIndex *LineIndex_1(TextSnapshot *snapshot) {
     (*self).lineStarts[0] = 0u;
     bytes next = 1u;
     for (bytes index = 0u; index < length; ++index)
-        if (bytes[index] == '\n')
+        if (data[index] == '\n')
             (*self).lineStarts[next++] = index + 1u;
     return self;
 }
 
-LineIndex *LineIndex_zero(void) { return nullptr; }
-void LineIndex_free(LineIndex *self) {
+LineIndex *LineIndex_zero() { return nullptr; }
+fn LineIndex_free(LineIndex *self) {
     if (self != nullptr) {
         TextSnapshot_free((*self).snapshot);
         (*self).snapshot = nullptr;

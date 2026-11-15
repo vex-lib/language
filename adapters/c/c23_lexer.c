@@ -52,9 +52,9 @@
  *   scanQuotedPart                     literal admission and continuation
  *   scanComment/invalidSpan            comment continuation and invalid range result
  * FUNCTION REGISTRY
- *   C23Lexer *C23Lexer_0(void), C23Lexer *C23Lexer_3(u32,const char*,bytes)
- *   C23Lexer *C23Lexer_zero(void)
- *   void C23Lexer_free(C23Lexer*)
+ *   C23Lexer *C23Lexer_0(), C23Lexer *C23Lexer_3(u32,const char*,bytes)
+ *   C23Lexer *C23Lexer_zero()
+ *   fn C23Lexer_free(C23Lexer*)
  *   bool C23Lexer_setSource(C23Lexer*,u32,const char*,bytes)
  *   bool C23Lexer_setProfile(C23Lexer*,C23LexerProfile)
  *   u32 C23Lexer_getDocumentId(const C23Lexer*)
@@ -104,33 +104,33 @@ static bool continuation(unsigned char byte) {
     return byte >= 0x80u && byte <= 0xBFu;
 }
 
-static bytes utf8SubpartLength(const unsigned char *bytes, bytes length, bytes offset) {
-    unsigned char lead = bytes[offset];
+static bytes utf8SubpartLength(const unsigned char *data, bytes length, bytes offset) {
+    unsigned char lead = data[offset];
     if (lead < 0x80u)
         return 1u;
     if (lead >= 0xC2u && lead <= 0xDFu) {
-        if (offset + 1u < length && continuation(bytes[offset + 1u])) return 2u;
+        if (offset + 1u < length && continuation(data[offset + 1u])) return 2u;
         return 1u;
     }
     if (lead >= 0xE0u && lead <= 0xEFu) {
         if (offset + 1u >= length) return 1u;
-        unsigned char second = bytes[offset + 1u];
+        unsigned char second = data[offset + 1u];
         bool secondValid = continuation(second)
             && !(lead == 0xE0u && second < 0xA0u)
             && !(lead == 0xEDu && second > 0x9Fu);
         if (!secondValid) return 1u;
-        if (offset + 2u < length && continuation(bytes[offset + 2u])) return 3u;
+        if (offset + 2u < length && continuation(data[offset + 2u])) return 3u;
         return 2u;
     }
     if (lead >= 0xF0u && lead <= 0xF4u) {
         if (offset + 1u >= length) return 1u;
-        unsigned char second = bytes[offset + 1u];
+        unsigned char second = data[offset + 1u];
         bool secondValid = continuation(second)
             && !(lead == 0xF0u && second < 0x90u)
             && !(lead == 0xF4u && second > 0x8Fu);
         if (!secondValid) return 1u;
-        if (offset + 2u >= length || !continuation(bytes[offset + 2u])) return 2u;
-        if (offset + 3u < length && continuation(bytes[offset + 3u])) return 4u;
+        if (offset + 2u >= length || !continuation(data[offset + 2u])) return 2u;
+        if (offset + 3u < length && continuation(data[offset + 3u])) return 4u;
         return 3u;
     }
     return 1u;
@@ -147,13 +147,13 @@ typedef struct QuotePrefixResult {
     char quote;
 } QuotePrefixResult;
 
-static Utf8ScalarResult validUtf8Scalar(const unsigned char *bytes, bytes length,
+static Utf8ScalarResult validUtf8Scalar(const unsigned char *data, bytes length,
                                         bytes offset) {
-    bytes span = utf8SubpartLength(bytes, length, offset);
-    bool valid = bytes[offset] >= 0xC2u && bytes[offset] <= 0xF4u
-        && ((bytes[offset] <= 0xDFu && span == 2u)
-            || (bytes[offset] <= 0xEFu && span == 3u)
-            || (bytes[offset] >= 0xF0u && span == 4u));
+    bytes span = utf8SubpartLength(data, length, offset);
+    bool valid = data[offset] >= 0xC2u && data[offset] <= 0xF4u
+        && ((data[offset] <= 0xDFu && span == 2u)
+            || (data[offset] <= 0xEFu && span == 3u)
+            || (data[offset] >= 0xF0u && span == 4u));
     return (Utf8ScalarResult) { .valid = valid, .length = span };
 }
 
@@ -409,7 +409,7 @@ static C23LexStep scanQuotedPart(C23Lexer *self, bytes start, bool opening) {
     return invalidSpan(self, start, (*self).length);
 }
 
-C23Lexer *C23Lexer_0(void) {
+C23Lexer *C23Lexer_0() {
     C23Lexer *self = calloc(1u, sizeof *self);
     if (self == nullptr)
         THROW("C23Lexer could not allocate empty lexer");
@@ -427,11 +427,11 @@ C23Lexer *C23Lexer_3(u32 documentId, const char *source, bytes length) {
     return self;
 }
 
-C23Lexer *C23Lexer_zero(void) {
+C23Lexer *C23Lexer_zero() {
     return C23Lexer_0();
 }
 
-void C23Lexer_free(C23Lexer *self) {
+fn C23Lexer_free(C23Lexer *self) {
     free(self);
 }
 
@@ -582,7 +582,7 @@ BoundedText C23Lexer_toString(const C23Lexer *self) {
 BoundedText C23Lexer_toStringStruct(const C23Lexer *self) {
     if (self == nullptr) return BoundedText_1("nullptr");
     return BoundedText_format("C23Lexer { documentId=%u, source=%p, length=%zu, offset=%zu, profile=%u, stopped=%s, mode=%u, quote=%u, docComment=%s }",
-                              (*self).documentId, (void*) (*self).source, (*self).length,
+                              (*self).documentId, (any) (*self).source, (*self).length,
                               (*self).offset, (unsigned) (*self).profile,
                               (*self).stopped ? "true" : "false", (unsigned) (*self).mode,
                               (unsigned char) (*self).quote,

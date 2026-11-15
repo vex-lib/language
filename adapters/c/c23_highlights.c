@@ -301,7 +301,7 @@ static SyntaxRole classifyIdentifier(const C23Token *tokens, bytes count, bytes 
     return SYNTAX_ROLE_VARIABLE;
 }
 
-C23Highlights *C23Highlights_0(void) {
+C23Highlights *C23Highlights_0() {
     C23Highlights *self = calloc(1u, sizeof *self);
     if (self == nullptr)
         THROW("C23Highlights allocation refused: request %zu bytes", sizeof *self);
@@ -365,9 +365,9 @@ C23Highlights *C23Highlights_3(u32 documentId, const char *source, bytes length)
     return self;
 }
 
-C23Highlights *C23Highlights_zero(void) { return C23Highlights_0(); }
+C23Highlights *C23Highlights_zero() { return C23Highlights_0(); }
 
-void C23Highlights_free(C23Highlights *self) {
+fn C23Highlights_free(C23Highlights *self) {
     if (self == nullptr)
         return;
     free((*self).entries);
@@ -429,6 +429,6 @@ BoundedText C23Highlights_toStringStruct(const C23Highlights *self) {
     if (self == nullptr)
         return BoundedText_1("nullptr");
     return BoundedText_format("C23Highlights { documentId=%u, count=%zu, capacity=%zu, entries=%p, source=%p, sourceLength=%zu }",
-        (*self).documentId, (*self).count, (*self).capacity, (void*) (*self).entries,
-        (const void*) (*self).source, (*self).sourceLength);
+        (*self).documentId, (*self).count, (*self).capacity, (any) (*self).entries,
+        (const_any) (*self).source, (*self).sourceLength);
 }

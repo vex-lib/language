@@ -17,7 +17,7 @@ typedef enum C23LexerProfile {
     C23_LEXER_PROFILE_VEX_ANNOTATION = 1
 } C23LexerProfile;
 
-C23Lexer *C23Lexer_0(void);
+C23Lexer *C23Lexer_0();
 C23Lexer *C23Lexer_3(u32 documentId, const char *source, bytes length);
 #define C23Lexer_1 C23Lexer_invalid_arity
 #define C23Lexer_2 C23Lexer_invalid_arity
@@ -31,8 +31,8 @@ C23Lexer *C23Lexer_3(u32 documentId, const char *source, bytes length);
     C23LEXER_NARG_INNER(_ __VA_OPT__(,) __VA_ARGS__, 6, 5, 4, 3, 2, 1, 0)
 #define C23Lexer(...) \
     C23LEXER_CAT(C23Lexer_, C23LEXER_NARG(__VA_ARGS__))(__VA_ARGS__)
-C23Lexer *C23Lexer_zero(void);
-void C23Lexer_free(C23Lexer *self);
+C23Lexer *C23Lexer_zero();
+fn C23Lexer_free(C23Lexer *self);
 // Borrows immutable bytes until the next successful setSource or free. A nonzero
 // document identity is required; nullptr is allowed only with length zero.
 // Rejection reports a cold THROW and preserves the prior snapshot/cursor/profile.

@@ -14,16 +14,16 @@
  *   bool hasSpan       true when this result carries one source span
  *   SyntaxSpan span    copied range/role/style-key value; zero when absent
  * FUNCTION REGISTRY
- *   C23LexStep C23LexStep_0(void)
+ *   C23LexStep C23LexStep_0()
  *   C23LexStep C23LexStep_2(bool,SyntaxSpan)
- *   C23LexStep C23LexStep_zero(void)
+ *   C23LexStep C23LexStep_zero()
  *   bool C23LexStep_hasSpan(const C23LexStep*)
  *   SyntaxSpan C23LexStep_getSpan(const C23LexStep*)
  *   BoundedText C23LexStep_toString/toStringStruct(const C23LexStep*)
  * CONTRACT: value-only, no borrowed destination; null getters return false/zero.
  * ============================================================================ */
 
-C23LexStep C23LexStep_0(void) {
+C23LexStep C23LexStep_0() {
     return (C23LexStep) {.hasSpan = false, .span = {0}};
 }
 
@@ -31,7 +31,7 @@ C23LexStep C23LexStep_2(bool hasSpan, SyntaxSpan span) {
     return (C23LexStep) {.hasSpan = hasSpan, .span = hasSpan ? span : (SyntaxSpan) {0}};
 }
 
-C23LexStep C23LexStep_zero(void) {
+C23LexStep C23LexStep_zero() {
     return C23LexStep_0();
 }
 

@@ -15,7 +15,7 @@ typedef struct SourceRange {
 
 // Construct the zero value, an empty range for one document, or a complete
 // half-open range. The complete constructor stores values without validation.
-SourceRange SourceRange_0(void);
+SourceRange SourceRange_0();
 SourceRange SourceRange_1(u32 documentId);
 SourceRange SourceRange_3(u32 documentId, u64 startByte, u64 endByte);
 // Dispatch the supported arities: SourceRange(), SourceRange(documentId), or
@@ -24,14 +24,14 @@ SourceRange SourceRange_3(u32 documentId, u64 startByte, u64 endByte);
 #define SOURCE_RANGE_SELECT(_0, _1, _2, _3, NAME, ...) NAME
 // Return the all-zero identity. Validity requires nonzero documentId and
 // startByte <= endByte; setters do not maintain this cross-field invariant.
-SourceRange SourceRange_zero(void);
+SourceRange SourceRange_zero();
 bool SourceRange_isValid(const SourceRange *self);
 // Symmetric field accessors. Null getters return zero; null setters do nothing.
 u32 SourceRange_getDocumentId(const SourceRange *self);
-void SourceRange_setDocumentId(SourceRange *self, u32 value);
+fn SourceRange_setDocumentId(SourceRange *self, u32 value);
 u64 SourceRange_getStartByte(const SourceRange *self);
-void SourceRange_setStartByte(SourceRange *self, u64 value);
+fn SourceRange_setStartByte(SourceRange *self, u64 value);
 u64 SourceRange_getEndByte(const SourceRange *self);
-void SourceRange_setEndByte(SourceRange *self, u64 value);
+fn SourceRange_setEndByte(SourceRange *self, u64 value);
 
 #endif

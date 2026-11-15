@@ -14,8 +14,8 @@ typedef enum PositionEncoding {
 } PositionEncoding;
 
 LineIndex *LineIndex_1(TextSnapshot *snapshot);
-LineIndex *LineIndex_zero(void);
-void LineIndex_free(LineIndex *self);
+LineIndex *LineIndex_zero();
+fn LineIndex_free(LineIndex *self);
 SourcePosition LineIndex_positionAtByte(const LineIndex *self, bytes byteOffset,
                                         PositionEncoding encoding);
 bytes LineIndex_getLineCount(const LineIndex *self);

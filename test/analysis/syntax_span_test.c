@@ -1,8 +1,9 @@
+#include "vex.h"
 #include "analysis/syntax_span.h"
 #include <assert.h>
 #include <string.h>
 
-int main(void) {
+int main() {
     SyntaxSpan span = SyntaxSpan(SourceRange(1u, 2u, 3u), SYNTAX_ROLE_DEREFERENCE, nullptr);
     assert(strcmp(SyntaxSpan_resolvedStyleKey(&span), "operator.deref") == 0);
     SyntaxSpan cspan = SyntaxSpan(SourceRange(1u, 2u, 3u), SYNTAX_ROLE_DEREFERENCE, "c.pointer");

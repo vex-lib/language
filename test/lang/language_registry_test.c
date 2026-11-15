@@ -1,9 +1,10 @@
+#include "vex.h"
 #include "adapters/c23/c23_adapter.h"
 #include "lang/language_registry.h"
 #include <assert.h>
 #include <stdio.h>
 
-int main(void) {
+int main() {
     LanguageRegistry *registry = LanguageRegistry_0();
     assert(registry != nullptr && LanguageRegistry_getCount(registry) == 0u);
     const LanguageAdapter *adapter = C23Adapter_adapter();
@@ -21,7 +22,7 @@ int main(void) {
     char ids[32][8];
     for (bytes index = 0u; index < 32u; ++index) {
         copies[index] = *adapter;
-        (void) snprintf(ids[index], sizeof ids[index], "lang%zu", index);
+        (discard) snprintf(ids[index], sizeof ids[index], "lang%zu", index);
         copies[index].languageId = ids[index];
         assert(LanguageRegistry_register(registry, &copies[index]));
     }

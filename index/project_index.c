@@ -79,7 +79,7 @@ ProjectIndex *ProjectIndex_1(const LanguageProject *project) {
     return self;
 }
 
-void ProjectIndex_free(ProjectIndex *self) {
+fn ProjectIndex_free(ProjectIndex *self) {
     if (self == nullptr)
         return;
     for (bytes index = 0u; index < (*self).analysisCount; ++index)

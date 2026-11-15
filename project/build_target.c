@@ -102,7 +102,7 @@ BuildTarget *BuildTarget_3(u64 targetId, const char *name,
     return self;
 }
 
-void BuildTarget_free(BuildTarget *self) {
+fn BuildTarget_free(BuildTarget *self) {
     if (self == nullptr)
         return;
     for (bytes index = 0u; index < (*self).compilerOptionCount; ++index)

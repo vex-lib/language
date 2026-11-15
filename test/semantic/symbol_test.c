@@ -1,8 +1,9 @@
+#include "vex.h"
 #include "semantic/symbol.h"
 #include <assert.h>
 #include <string.h>
 
-int main(void) {
+int main() {
     SourceRange range = SourceRange(2, 0, 3);
     Symbol zero = Symbol_zero();
     assert(Symbol_getId(&zero) == 0);

@@ -155,7 +155,7 @@ TokenStream *TokenStream_collect(LanguageEngine *engine, TextSnapshot *snapshot)
     }
 }
 
-void TokenStream_free(TokenStream *self) {
+fn TokenStream_free(TokenStream *self) {
     if (self == nullptr)
         return;
     TextSnapshot_release((*self).snapshot);

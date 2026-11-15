@@ -48,13 +48,13 @@ static bool replaceId(char **destination, const char *languageId) {
     return true;
 }
 
-ProjectConfiguration *ProjectConfiguration_0(void) {
+ProjectConfiguration *ProjectConfiguration_0() {
     ProjectConfiguration *self = calloc(1u, sizeof *self);
     if (self == nullptr)
         THROW("ProjectConfiguration: allocation failed");
     return self;
 }
-void ProjectConfiguration_free(ProjectConfiguration *self) {
+fn ProjectConfiguration_free(ProjectConfiguration *self) {
     if (self != nullptr) {
         free((*self).detectedLanguageId);
         (*self).detectedLanguageId = nullptr;
@@ -79,7 +79,7 @@ bool ProjectConfiguration_setUserLanguage(ProjectConfiguration *self,
     }
     return replaceId(&(*self).userLanguageId, languageId);
 }
-void ProjectConfiguration_clearUserLanguage(ProjectConfiguration *self) {
+fn ProjectConfiguration_clearUserLanguage(ProjectConfiguration *self) {
     if (self != nullptr) {
         free((*self).userLanguageId);
         (*self).userLanguageId = nullptr;

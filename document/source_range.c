@@ -40,14 +40,14 @@
  * FUNCTION REGISTRY:
  * ----------------------------------------------------------------------------
  * Constructors:
- *   SourceRange SourceRange_0(void)
+ *   SourceRange SourceRange_0()
  *     Construct the all-zero, unbound range.
  *   SourceRange SourceRange_1(u32 documentId)
  *     Construct a document-associated empty range at byte offset zero.
  *   SourceRange SourceRange_3(u32 documentId, u64 startByte,
  *                             u64 endByte)
  *     Construct a range value; it does not validate it.
- *   SourceRange SourceRange_zero(void)
+ *   SourceRange SourceRange_zero()
  *     Return the additive/empty identity, equivalent to SourceRange_0.
  *   SourceRange(...) selects the advertised zero-, one-, or three-argument form.
  *
@@ -56,9 +56,9 @@
  *     True only for a non-null range with nonzero document id and ordered ends.
  *
  * Setters:
- *   void SourceRange_setDocumentId(SourceRange *self, u32 value)
- *   void SourceRange_setStartByte(SourceRange *self, u64 value)
- *   void SourceRange_setEndByte(SourceRange *self, u64 value)
+ *   fn SourceRange_setDocumentId(SourceRange *self, u32 value)
+ *   fn SourceRange_setStartByte(SourceRange *self, u64 value)
+ *   fn SourceRange_setEndByte(SourceRange *self, u64 value)
  *     Replace the selected field. Setters are null-safe; cross-field validity
  *     is observed by SourceRange_isValid and is not maintained automatically.
  *
@@ -74,18 +74,18 @@
  * null setters do nothing. No allocation, IO, parsing, or UTF conversion occurs.
  * ============================================================================
  */
-SourceRange SourceRange_0(void) { return (SourceRange) {0}; }
+SourceRange SourceRange_0() { return (SourceRange) {0}; }
 SourceRange SourceRange_1(u32 documentId) { return (SourceRange) {.documentId = documentId}; }
 SourceRange SourceRange_3(u32 documentId, u64 startByte, u64 endByte) {
     return (SourceRange) {.documentId = documentId, .startByte = startByte, .endByte = endByte};
 }
-SourceRange SourceRange_zero(void) { return SourceRange_0(); }
+SourceRange SourceRange_zero() { return SourceRange_0(); }
 bool SourceRange_isValid(const SourceRange *self) {
     return self != nullptr && (*self).documentId != 0 && (*self).startByte <= (*self).endByte;
 }
 u32 SourceRange_getDocumentId(const SourceRange *self) { return self == nullptr ? 0 : (*self).documentId; }
-void SourceRange_setDocumentId(SourceRange *self, u32 value) { if (self != nullptr) (*self).documentId = value; }
+fn SourceRange_setDocumentId(SourceRange *self, u32 value) { if (self != nullptr) (*self).documentId = value; }
 u64 SourceRange_getStartByte(const SourceRange *self) { return self == nullptr ? 0 : (*self).startByte; }
-void SourceRange_setStartByte(SourceRange *self, u64 value) { if (self != nullptr) (*self).startByte = value; }
+fn SourceRange_setStartByte(SourceRange *self, u64 value) { if (self != nullptr) (*self).startByte = value; }
 u64 SourceRange_getEndByte(const SourceRange *self) { return self == nullptr ? 0 : (*self).endByte; }
-void SourceRange_setEndByte(SourceRange *self, u64 value) { if (self != nullptr) (*self).endByte = value; }
+fn SourceRange_setEndByte(SourceRange *self, u64 value) { if (self != nullptr) (*self).endByte = value; }

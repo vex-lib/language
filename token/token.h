@@ -23,19 +23,19 @@ typedef struct Token {
 } Token;
 
 // Construct an empty token, a kind-only token, or kind plus source range.
-Token Token_0(void);
+Token Token_0();
 Token Token_1(TokenKind kind);
 Token Token_2(TokenKind kind, SourceRange range);
 // Dispatch Token(), Token(kind), or Token(kind, range); other arities reject.
 #define Token(...) TOKEN_SELECT(_ __VA_OPT__(,) __VA_ARGS__, Token_2, Token_1, Token_0)(__VA_ARGS__)
 #define TOKEN_SELECT(_0, _1, _2, NAME, ...) NAME
 // Return the empty/unknown token identity.
-Token Token_zero(void);
+Token Token_zero();
 // Symmetric field accessors. Null getters return UNKNOWN/zero range; null
 // setters do nothing.
 TokenKind Token_getKind(const Token *self);
-void Token_setKind(Token *self, TokenKind value);
+fn Token_setKind(Token *self, TokenKind value);
 SourceRange Token_getRange(const Token *self);
-void Token_setRange(Token *self, SourceRange value);
+fn Token_setRange(Token *self, SourceRange value);
 
 #endif

@@ -440,7 +440,7 @@ static bool matchCalls(C23InlayHints *self, const C23Token *tokens,
     return true;
 }
 
-C23InlayHints *C23InlayHints_0(void) {
+C23InlayHints *C23InlayHints_0() {
     C23InlayHints *self = calloc(1u, sizeof *self);
     if (self == nullptr)
         THROW("C23InlayHints allocation refused: request %zu bytes", sizeof *self);
@@ -479,9 +479,9 @@ C23InlayHints *C23InlayHints_3(u32 documentId, const char *source, bytes length)
     return self;
 }
 
-C23InlayHints *C23InlayHints_zero(void) { return C23InlayHints_0(); }
+C23InlayHints *C23InlayHints_zero() { return C23InlayHints_0(); }
 
-void C23InlayHints_free(C23InlayHints *self) {
+fn C23InlayHints_free(C23InlayHints *self) {
     if (self == nullptr)
         return;
     free((*self).entries);
@@ -523,7 +523,7 @@ BoundedText C23InlayHints_toStringStruct(const C23InlayHints *self) {
     if (self == nullptr)
         return BoundedText_1("nullptr");
     return BoundedText_format("C23InlayHints { documentId=%u, count=%zu, entries=%p, labelBytes=%p, labelByteCount=%zu, source=%p, sourceLength=%zu }",
-        (*self).documentId, (*self).count, (void*) (*self).entries,
-        (void*) (*self).labelBytes, (*self).labelByteCount,
-        (const void*) (*self).source, (*self).sourceLength);
+        (*self).documentId, (*self).count, (any) (*self).entries,
+        (any) (*self).labelBytes, (*self).labelByteCount,
+        (const_any) (*self).source, (*self).sourceLength);
 }

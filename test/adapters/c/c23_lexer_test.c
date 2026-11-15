@@ -27,7 +27,7 @@ static bool sourceWhitespace(unsigned char byte) {
         || byte == '\f' || byte == '\v';
 }
 
-static void assertCoverage(u32 documentId, const char *source, bytes length) {
+static fn assertCoverage(u32 documentId, const char *source, bytes length) {
     C23Lexer *lexer = C23Lexer(documentId, source, length);
     assert(lexer != nullptr);
     bytes coveredThrough = 0u;
@@ -49,7 +49,7 @@ static void assertCoverage(u32 documentId, const char *source, bytes length) {
     C23Lexer_free(lexer);
 }
 
-int main(void) {
+int main() {
     _Static_assert(SYNTAX_ROLE_INVALID == 41, "existing syntax role ordinals stay stable");
     _Static_assert(SYNTAX_ROLE_IDENTIFIER == 42, "identifier is appended after existing roles");
     assert(strcmp(SyntaxRole_name(SYNTAX_ROLE_IDENTIFIER), "identifier") == 0);

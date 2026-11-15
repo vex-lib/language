@@ -49,23 +49,23 @@
  * FUNCTION REGISTRY:
  * ----------------------------------------------------------------------------
  * Constructors:
- *   Symbol Symbol_0(void)
+ *   Symbol Symbol_0()
  *     Construct an all-zero symbol.
  *   Symbol Symbol_1(u64 id)
  *     Construct an identity-only symbol; all other fields remain zero/null.
  *   Symbol Symbol_5(u64 id, u64 scopeId, SymbolKind kind,
  *                   const char *name, SourceRange declarationRange)
  *     Construct the complete record without validating or copying borrowed data.
- *   Symbol Symbol_zero(void)
+ *   Symbol Symbol_zero()
  *     Return the empty symbol identity.
  *   Symbol(...) dispatches the supported zero-, one-, and five-argument forms.
  *
  * Setters:
- *   void Symbol_setId(Symbol *self, u64 value)
- *   void Symbol_setScopeId(Symbol *self, u64 value)
- *   void Symbol_setKind(Symbol *self, SymbolKind value)
- *   void Symbol_setName(Symbol *self, const char *value)
- *   void Symbol_setDeclarationRange(Symbol *self, SourceRange value)
+ *   fn Symbol_setId(Symbol *self, u64 value)
+ *   fn Symbol_setScopeId(Symbol *self, u64 value)
+ *   fn Symbol_setKind(Symbol *self, SymbolKind value)
+ *   fn Symbol_setName(Symbol *self, const char *value)
+ *   fn Symbol_setDeclarationRange(Symbol *self, SourceRange value)
  *     Replace only the selected value. Name storage remains borrowed; callers
  *     must keep it alive while the Symbol is consumed.
  *
@@ -83,19 +83,19 @@
  * no allocations. Null setters do nothing.
  * ============================================================================
  */
-Symbol Symbol_0(void) { return (Symbol) {0}; }
+Symbol Symbol_0() { return (Symbol) {0}; }
 Symbol Symbol_1(u64 id) { return (Symbol) {.id = id}; }
 Symbol Symbol_5(u64 id, u64 scopeId, SymbolKind kind, const char *name, SourceRange declarationRange) {
     return (Symbol) {.id = id, .scopeId = scopeId, .kind = kind, .name = name, .declarationRange = declarationRange};
 }
-Symbol Symbol_zero(void) { return Symbol_0(); }
+Symbol Symbol_zero() { return Symbol_0(); }
 u64 Symbol_getId(const Symbol *self) { return self == nullptr ? 0 : (*self).id; }
-void Symbol_setId(Symbol *self, u64 value) { if (self != nullptr) (*self).id = value; }
+fn Symbol_setId(Symbol *self, u64 value) { if (self != nullptr) (*self).id = value; }
 u64 Symbol_getScopeId(const Symbol *self) { return self == nullptr ? 0 : (*self).scopeId; }
-void Symbol_setScopeId(Symbol *self, u64 value) { if (self != nullptr) (*self).scopeId = value; }
+fn Symbol_setScopeId(Symbol *self, u64 value) { if (self != nullptr) (*self).scopeId = value; }
 SymbolKind Symbol_getKind(const Symbol *self) { return self == nullptr ? SYMBOL_KIND_UNKNOWN : (*self).kind; }
-void Symbol_setKind(Symbol *self, SymbolKind value) { if (self != nullptr) (*self).kind = value; }
+fn Symbol_setKind(Symbol *self, SymbolKind value) { if (self != nullptr) (*self).kind = value; }
 const char *Symbol_getName(const Symbol *self) { return self == nullptr ? nullptr : (*self).name; }
-void Symbol_setName(Symbol *self, const char *value) { if (self != nullptr) (*self).name = value; }
+fn Symbol_setName(Symbol *self, const char *value) { if (self != nullptr) (*self).name = value; }
 SourceRange Symbol_getDeclarationRange(const Symbol *self) { return self == nullptr ? SourceRange_zero() : (*self).declarationRange; }
-void Symbol_setDeclarationRange(Symbol *self, SourceRange value) { if (self != nullptr) (*self).declarationRange = value; }
+fn Symbol_setDeclarationRange(Symbol *self, SourceRange value) { if (self != nullptr) (*self).declarationRange = value; }

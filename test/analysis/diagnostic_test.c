@@ -1,8 +1,9 @@
+#include "vex.h"
 #include "analysis/diagnostic.h"
 #include <assert.h>
 #include <string.h>
 
-int main(void) {
+int main() {
     Diagnostic empty = Diagnostic();
     assert(empty.severity == DIAGNOSTIC_SEVERITY_HINT);
     assert(empty.code == DIAGNOSTIC_CODE_NONE);

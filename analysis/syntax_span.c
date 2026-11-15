@@ -35,8 +35,8 @@
  * ============================================================================
  */
 
-SyntaxSpan SyntaxSpan_0(void) { return (SyntaxSpan) {0}; }
-SyntaxSpan SyntaxSpan_zero(void) { return SyntaxSpan_0(); }
+SyntaxSpan SyntaxSpan_0() { return (SyntaxSpan) {0}; }
+SyntaxSpan SyntaxSpan_zero() { return SyntaxSpan_0(); }
 SyntaxSpan SyntaxSpan_3(SourceRange range, SyntaxRole role, const char *styleKey) {
     return (SyntaxSpan) {.range = range, .role = role, .styleKey = styleKey};
 }

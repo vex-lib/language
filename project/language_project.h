@@ -1,16 +1,15 @@
 #ifndef LANGUAGE_PROJECT_LANGUAGE_PROJECT_H
 #define LANGUAGE_PROJECT_LANGUAGE_PROJECT_H
 
+#include "vex.h"
 #include "project/project_file.h"
 #include "project/build_target.h"
 #include "project/project_configuration.h"
-#include <stddef.h>
-#include <stdint.h>
 
 typedef struct LanguageProject LanguageProject;
 
 LanguageProject *LanguageProject_2(u64 projectId, const char *rootPath);
-void LanguageProject_free(LanguageProject *self);
+fn LanguageProject_free(LanguageProject *self);
 const ProjectFile *LanguageProject_addFile(LanguageProject *self,
                                            const char *relativePath,
                                            ProjectFileKind kind,

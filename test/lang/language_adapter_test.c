@@ -1,9 +1,10 @@
+#include "vex.h"
 #include "adapters/c23/c23_adapter.h"
 #include "lang/language_adapter.h"
 #include <assert.h>
 #include <string.h>
 
-int main(void) {
+int main() {
     const LanguageAdapter *adapter = C23Adapter_adapter();
     assert(LanguageAdapter_isValid(adapter));
     assert(strcmp(LanguageAdapter_getLanguageId(adapter), "c23") == 0);

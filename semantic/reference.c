@@ -46,22 +46,22 @@
  * FUNCTION REGISTRY:
  * ----------------------------------------------------------------------------
  * Constructors:
- *   Reference Reference_0(void)
+ *   Reference Reference_0()
  *     Construct an unresolved, empty reference.
  *   Reference Reference_1(u64 targetSymbolId)
  *     Construct an identity-only record; it does not set resolved=true.
  *   Reference Reference_4(u64 targetSymbolId, SourceRange range,
  *                         ReferenceRole role, bool resolved)
  *     Construct a complete record from caller-provided analysis results.
- *   Reference Reference_zero(void)
+ *   Reference Reference_zero()
  *     Return the empty reference identity.
  *   Reference(...) dispatches the supported zero-, one-, and four-argument forms.
  *
  * Setters:
- *   void Reference_setTargetSymbolId(Reference *self, u64 value)
- *   void Reference_setRange(Reference *self, SourceRange value)
- *   void Reference_setRole(Reference *self, ReferenceRole value)
- *   void Reference_setResolved(Reference *self, bool value)
+ *   fn Reference_setTargetSymbolId(Reference *self, u64 value)
+ *   fn Reference_setRange(Reference *self, SourceRange value)
+ *   fn Reference_setRole(Reference *self, ReferenceRole value)
+ *   fn Reference_setResolved(Reference *self, bool value)
  *     Replace one field. Related fields are not normalized automatically.
  *
  * Getters:
@@ -77,17 +77,17 @@
  * setters do nothing.
  * ============================================================================
  */
-Reference Reference_0(void) { return (Reference) {0}; }
+Reference Reference_0() { return (Reference) {0}; }
 Reference Reference_1(u64 targetSymbolId) { return (Reference) {.targetSymbolId = targetSymbolId}; }
 Reference Reference_4(u64 targetSymbolId, SourceRange range, ReferenceRole role, bool resolved) {
     return (Reference) {.targetSymbolId = targetSymbolId, .range = range, .role = role, .resolved = resolved};
 }
-Reference Reference_zero(void) { return Reference_0(); }
+Reference Reference_zero() { return Reference_0(); }
 u64 Reference_getTargetSymbolId(const Reference *self) { return self == nullptr ? 0 : (*self).targetSymbolId; }
-void Reference_setTargetSymbolId(Reference *self, u64 value) { if (self != nullptr) (*self).targetSymbolId = value; }
+fn Reference_setTargetSymbolId(Reference *self, u64 value) { if (self != nullptr) (*self).targetSymbolId = value; }
 SourceRange Reference_getRange(const Reference *self) { return self == nullptr ? SourceRange_zero() : (*self).range; }
-void Reference_setRange(Reference *self, SourceRange value) { if (self != nullptr) (*self).range = value; }
+fn Reference_setRange(Reference *self, SourceRange value) { if (self != nullptr) (*self).range = value; }
 ReferenceRole Reference_getRole(const Reference *self) { return self == nullptr ? REFERENCE_ROLE_UNKNOWN : (*self).role; }
-void Reference_setRole(Reference *self, ReferenceRole value) { if (self != nullptr) (*self).role = value; }
+fn Reference_setRole(Reference *self, ReferenceRole value) { if (self != nullptr) (*self).role = value; }
 bool Reference_isResolved(const Reference *self) { return self != nullptr && (*self).resolved; }
-void Reference_setResolved(Reference *self, bool value) { if (self != nullptr) (*self).resolved = value; }
+fn Reference_setResolved(Reference *self, bool value) { if (self != nullptr) (*self).resolved = value; }

@@ -11,7 +11,7 @@ typedef struct C23LexStep {
     SyntaxSpan span;
 } C23LexStep;
 
-C23LexStep C23LexStep_0(void);
+C23LexStep C23LexStep_0();
 C23LexStep C23LexStep_2(bool hasSpan, SyntaxSpan span);
 #define C23LexStep_1 C23LexStep_invalid_arity
 #define C23LexStep_3 C23LexStep_invalid_arity
@@ -23,7 +23,7 @@ C23LexStep C23LexStep_2(bool hasSpan, SyntaxSpan span);
     C23LEXSTEP_NARG_INNER(_ __VA_OPT__(,) __VA_ARGS__, 4, 3, 2, 1, 0)
 #define C23LexStep(...) \
     C23LEXSTEP_CAT(C23LexStep_, C23LEXSTEP_NARG(__VA_ARGS__))(__VA_ARGS__)
-C23LexStep C23LexStep_zero(void);
+C23LexStep C23LexStep_zero();
 bool C23LexStep_hasSpan(const C23LexStep *self);
 SyntaxSpan C23LexStep_getSpan(const C23LexStep *self);
 BoundedText C23LexStep_toString(const C23LexStep *self);

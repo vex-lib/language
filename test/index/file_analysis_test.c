@@ -1,8 +1,9 @@
+#include "vex.h"
 #include "index/file_analysis.h"
 #include <assert.h>
 #include <string.h>
 
-int main(void) {
+int main() {
     FileAnalysis *analysis = FileAnalysis_4(2u, 20u, 4u, 99u);
     assert(analysis != nullptr);
     assert(FileAnalysis_getFileId(analysis) == 2u);

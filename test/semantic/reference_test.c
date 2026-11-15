@@ -1,7 +1,8 @@
+#include "vex.h"
 #include "semantic/reference.h"
 #include <assert.h>
 
-int main(void) {
+int main() {
     Reference unresolved = Reference();
     Reference zero = Reference_zero();
     assert(!Reference_isResolved(&unresolved));

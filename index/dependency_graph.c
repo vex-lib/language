@@ -51,7 +51,7 @@ DependencyGraph *DependencyGraph_1(const LanguageProject *project) {
     return self;
 }
 
-void DependencyGraph_free(DependencyGraph *self) {
+fn DependencyGraph_free(DependencyGraph *self) {
     if (self == nullptr)
         return;
     for (bytes index = 0u; index < (*self).rowCount; ++index)

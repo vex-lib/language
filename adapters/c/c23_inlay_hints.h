@@ -12,7 +12,7 @@ typedef struct C23InlayHints C23InlayHints;
 // producer recognizes simple C function declarations/definitions and emits
 // parameter-name labels before corresponding call arguments. It does not
 // change source bytes or lexer span coordinates.
-C23InlayHints *C23InlayHints_0(void);
+C23InlayHints *C23InlayHints_0();
 C23InlayHints *C23InlayHints_3(u32 documentId, const char *source, bytes length);
 #define C23InlayHints_1 C23InlayHints_invalid_arity
 #define C23InlayHints_2 C23InlayHints_invalid_arity
@@ -24,8 +24,8 @@ C23InlayHints *C23InlayHints_3(u32 documentId, const char *source, bytes length)
     C23_INLAY_NARG_INNER(_ __VA_OPT__(,) __VA_ARGS__, 6, 5, 4, 3, 2, 1, 0)
 #define C23InlayHints(...) \
     C23_INLAY_CAT(C23InlayHints_, C23_INLAY_NARG(__VA_ARGS__))(__VA_ARGS__)
-C23InlayHints *C23InlayHints_zero(void);
-void C23InlayHints_free(C23InlayHints *self);
+C23InlayHints *C23InlayHints_zero();
+fn C23InlayHints_free(C23InlayHints *self);
 bytes C23InlayHints_getCount(const C23InlayHints *self);
 u32 C23InlayHints_getDocumentId(const C23InlayHints *self);
 // Hints are sorted by source byte offset. A missing/out-of-range query returns

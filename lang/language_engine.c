@@ -20,7 +20,7 @@
 struct LanguageEngine {
     const LanguageRegistry *registry;
     const LanguageAdapter *adapter;
-    void *session;
+    any session;
     TextSnapshot *snapshot;
     u64 compilationContextId;
 };
@@ -38,8 +38,8 @@ LanguageEngine *LanguageEngine_1(const LanguageRegistry *registry) {
     (*self).registry = registry;
     return self;
 }
-LanguageEngine *LanguageEngine_zero(void) { return nullptr; }
-void LanguageEngine_close(LanguageEngine *self) {
+LanguageEngine *LanguageEngine_zero() { return nullptr; }
+fn LanguageEngine_close(LanguageEngine *self) {
     if (self != nullptr && (*self).session != nullptr) {
         LanguageAdapter_close((*self).adapter, (*self).session);
         (*self).session = nullptr;
@@ -49,7 +49,7 @@ void LanguageEngine_close(LanguageEngine *self) {
         (*self).compilationContextId = 0u;
     }
 }
-void LanguageEngine_free(LanguageEngine *self) {
+fn LanguageEngine_free(LanguageEngine *self) {
     if (self != nullptr) {
         LanguageEngine_close(self);
         free(self);
@@ -71,7 +71,7 @@ bool LanguageEngine_open(LanguageEngine *self, const char *languageId,
     }
     if (!TextSnapshot_retain(snapshot))
         return false;
-    void *session = LanguageAdapter_open(adapter, TextSnapshot_getDocumentId(snapshot),
+    any session = LanguageAdapter_open(adapter, TextSnapshot_getDocumentId(snapshot),
                                          TextSnapshot_getBytes(snapshot),
                                          TextSnapshot_getLength(snapshot));
     if (session == nullptr) {

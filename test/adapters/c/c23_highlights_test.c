@@ -1,5 +1,7 @@
 // Owner: conservative C23 lexical highlight roles, not parser/symbol semantics.
 // The borrowed source stays immutable; spans stay ordered and non-overlapping.
+
+#include "vex.h"
 #include "adapters/c/c23_highlights.h"
 #include <assert.h>
 #include <stdio.h>
@@ -11,7 +13,7 @@ static SyntaxRole roleOf(C23Highlights *highlights, const char *source, const ch
     return C23Highlights_roleAt(highlights, (bytes) (found - source));
 }
 
-static void testClassification(void) {
+static fn testClassification() {
     const char source[] =
         "#include <stdio.h>\n"
         "#include \"annotation/debug.h\"\n"
@@ -87,7 +89,7 @@ static void testClassification(void) {
     C23Highlights_free(highlights);
 }
 
-static void testAdmission(void) {
+static fn testAdmission() {
     assert(C23Highlights_zero() != nullptr);
     C23Highlights *empty = C23Highlights(1u, nullptr, 0u);
     assert(empty != nullptr);
@@ -106,7 +108,7 @@ static void testAdmission(void) {
     assert(C23Highlights_roleAt(nullptr, 0u) == SYNTAX_ROLE_NONE);
 }
 
-int main(void) {
+int main() {
     testClassification();
     testAdmission();
     return 0;

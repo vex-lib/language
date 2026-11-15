@@ -1,7 +1,8 @@
+#include "vex.h"
 #include "style/style_key_registry.h"
 #include <assert.h>
 
-int main(void) {
+int main() {
     StyleKeyRegistry core = StyleKeyRegistry();
     assert(StyleKeyRegistry_count(&core) == StyleKeyRegistry_coreCount());
     assert(StyleKeyRegistry_isCore(&core, "text"));

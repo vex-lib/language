@@ -86,8 +86,8 @@ static bytes appendEscaped(char *dst, bytes capacity, bytes at,
     return at;
 }
 
-BoundedText BoundedText_0(void) { return (BoundedText) {0}; }
-BoundedText BoundedText_zero(void) { return BoundedText_0(); }
+BoundedText BoundedText_0() { return (BoundedText) {0}; }
+BoundedText BoundedText_zero() { return BoundedText_0(); }
 
 BoundedText BoundedText_1(const char *text) {
     if (text == nullptr)

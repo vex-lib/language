@@ -24,7 +24,7 @@ typedef struct Reference {
 
 // Construct empty, target-id-only, or complete reference values. Construction
 // is value-only and does not resolve names or check the target id.
-Reference Reference_0(void);
+Reference Reference_0();
 Reference Reference_1(u64 targetSymbolId);
 Reference Reference_4(u64 targetSymbolId, SourceRange range, ReferenceRole role, bool resolved);
 // Dispatch Reference(), Reference(targetSymbolId), or the four-field form;
@@ -33,14 +33,14 @@ Reference Reference_4(u64 targetSymbolId, SourceRange range, ReferenceRole role,
 #define REFERENCE_SELECT(_0, _1, _2, _3, _4, NAME, ...) NAME
 // Return the empty identity and provide symmetric field accessors. Null
 // getters return safe defaults; null setters do nothing.
-Reference Reference_zero(void);
+Reference Reference_zero();
 u64 Reference_getTargetSymbolId(const Reference *self);
-void Reference_setTargetSymbolId(Reference *self, u64 value);
+fn Reference_setTargetSymbolId(Reference *self, u64 value);
 SourceRange Reference_getRange(const Reference *self);
-void Reference_setRange(Reference *self, SourceRange value);
+fn Reference_setRange(Reference *self, SourceRange value);
 ReferenceRole Reference_getRole(const Reference *self);
-void Reference_setRole(Reference *self, ReferenceRole value);
+fn Reference_setRole(Reference *self, ReferenceRole value);
 bool Reference_isResolved(const Reference *self);
-void Reference_setResolved(Reference *self, bool value);
+fn Reference_setResolved(Reference *self, bool value);
 
 #endif

@@ -22,7 +22,7 @@ typedef enum ProjectFileAnalysisStatus {
 
 ProjectFile *ProjectFile_4(u64 fileId, const char *relativePath,
                            ProjectFileKind kind, const char *languageId);
-void ProjectFile_free(ProjectFile *self);
+fn ProjectFile_free(ProjectFile *self);
 u64 ProjectFile_getId(const ProjectFile *self);
 const char *ProjectFile_getRelativePath(const ProjectFile *self);
 ProjectFileKind ProjectFile_getKind(const ProjectFile *self);

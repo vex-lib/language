@@ -25,14 +25,14 @@ typedef struct BoundedText {
 
 // Construct empty, a copied C string, or a copied byte span. Truncation is
 // flagged, never silent. A null source or zero length yields the empty value.
-BoundedText BoundedText_0(void);
+BoundedText BoundedText_0();
 BoundedText BoundedText_1(const char *text);
 BoundedText BoundedText_2(const char *text, bytes length);
 // Dispatch BoundedText(), BoundedText(text), or BoundedText(text, length).
 #define BoundedText(...) BOUNDED_TEXT_SELECT(_ __VA_OPT__(,) __VA_ARGS__, BoundedText_2, BoundedText_1, BoundedText_0)(__VA_ARGS__)
 #define BOUNDED_TEXT_SELECT(_0, _1, _2, NAME, ...) NAME
 // Return the empty value.
-BoundedText BoundedText_zero(void);
+BoundedText BoundedText_zero();
 // Format into the bounded buffer; a cut reports truncation.
 BoundedText BoundedText_format(const char *format, ...);
 

@@ -80,7 +80,7 @@ ProjectFile *ProjectFile_4(u64 fileId, const char *relativePath,
     return self;
 }
 
-void ProjectFile_free(ProjectFile *self) {
+fn ProjectFile_free(ProjectFile *self) {
     if (self != nullptr) {
         free((*self).relativePath);
         (*self).relativePath = nullptr;

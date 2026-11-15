@@ -1,9 +1,10 @@
+#include "vex.h"
 #include "adapters/c23/c23_adapter.h"
 #include "lang/language_engine.h"
 #include <assert.h>
 #include <string.h>
 
-int main(void) {
+int main() {
     const char source[] = "nullptr typeof_unqual int value;";
 
     TextSnapshot *snapshot = TextSnapshot(42u, 6u, source, sizeof source - 1u);

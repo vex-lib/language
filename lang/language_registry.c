@@ -25,14 +25,14 @@ struct LanguageRegistry {
     bool exhaustionReported;
 };
 
-LanguageRegistry *LanguageRegistry_0(void) {
+LanguageRegistry *LanguageRegistry_0() {
     LanguageRegistry *self = calloc(1u, sizeof *self);
     if (self == nullptr)
         THROW("LanguageRegistry: allocation failed for registry object");
     return self;
 }
-LanguageRegistry *LanguageRegistry_zero(void) { return LanguageRegistry_0(); }
-void LanguageRegistry_free(LanguageRegistry *self) {
+LanguageRegistry *LanguageRegistry_zero() { return LanguageRegistry_0(); }
+fn LanguageRegistry_free(LanguageRegistry *self) {
     if (self == nullptr)
         return;
     free((*self).adapters);

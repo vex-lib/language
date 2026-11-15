@@ -21,7 +21,7 @@ typedef struct C23Highlights C23Highlights;
 // a well-formed `<...>` header name is emitted as one string-role span (a quoted
 // header already comes from the lexer as a string). It is not a parser,
 // preprocessor or symbol resolver, and it never changes source bytes.
-C23Highlights *C23Highlights_0(void);
+C23Highlights *C23Highlights_0();
 C23Highlights *C23Highlights_3(u32 documentId, const char *source, bytes length);
 #define C23Highlights_1 C23Highlights_invalid_arity
 #define C23Highlights_2 C23Highlights_invalid_arity
@@ -33,8 +33,8 @@ C23Highlights *C23Highlights_3(u32 documentId, const char *source, bytes length)
     C23_HIGHLIGHTS_NARG_INNER(_ __VA_OPT__(,) __VA_ARGS__, 4, 3, 2, 1, 0)
 #define C23Highlights(...) \
     C23_HIGHLIGHTS_CAT(C23Highlights_, C23_HIGHLIGHTS_NARG(__VA_ARGS__))(__VA_ARGS__)
-C23Highlights *C23Highlights_zero(void);
-void C23Highlights_free(C23Highlights *self);
+C23Highlights *C23Highlights_zero();
+fn C23Highlights_free(C23Highlights *self);
 bytes C23Highlights_getCount(const C23Highlights *self);
 u32 C23Highlights_getDocumentId(const C23Highlights *self);
 // Spans are ordered and non-overlapping. Out-of-range queries return safe zero

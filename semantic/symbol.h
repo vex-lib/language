@@ -28,7 +28,7 @@ typedef struct Symbol {
 
 // Construct empty, identity-only, or complete symbol values. These store the
 // name pointer without copying and do not validate id/scope/range relationships.
-Symbol Symbol_0(void);
+Symbol Symbol_0();
 Symbol Symbol_1(u64 id);
 Symbol Symbol_5(u64 id, u64 scopeId, SymbolKind kind, const char *name, SourceRange declarationRange);
 // Dispatch Symbol(), Symbol(id), or the five-field constructor; other arities
@@ -37,16 +37,16 @@ Symbol Symbol_5(u64 id, u64 scopeId, SymbolKind kind, const char *name, SourceRa
 #define SYMBOL_SELECT(_0, _1, _2, _3, _4, _5, NAME, ...) NAME
 // Return the all-zero identity and provide symmetric field accessors. Null
 // getters return safe defaults; null setters do nothing.
-Symbol Symbol_zero(void);
+Symbol Symbol_zero();
 u64 Symbol_getId(const Symbol *self);
-void Symbol_setId(Symbol *self, u64 value);
+fn Symbol_setId(Symbol *self, u64 value);
 u64 Symbol_getScopeId(const Symbol *self);
-void Symbol_setScopeId(Symbol *self, u64 value);
+fn Symbol_setScopeId(Symbol *self, u64 value);
 SymbolKind Symbol_getKind(const Symbol *self);
-void Symbol_setKind(Symbol *self, SymbolKind value);
+fn Symbol_setKind(Symbol *self, SymbolKind value);
 const char *Symbol_getName(const Symbol *self);
-void Symbol_setName(Symbol *self, const char *value);
+fn Symbol_setName(Symbol *self, const char *value);
 SourceRange Symbol_getDeclarationRange(const Symbol *self);
-void Symbol_setDeclarationRange(Symbol *self, SourceRange value);
+fn Symbol_setDeclarationRange(Symbol *self, SourceRange value);
 
 #endif

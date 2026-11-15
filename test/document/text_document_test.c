@@ -1,8 +1,9 @@
+#include "vex.h"
 #include "document/text_document.h"
 #include <assert.h>
 #include <string.h>
 
-int main(void) {
+int main() {
     TextDocument *document = TextDocument(10u, "old", 3u);
     assert(document != nullptr);
     assert(TextDocument_getDocumentId(document) == 10u);

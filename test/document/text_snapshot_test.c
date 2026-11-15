@@ -1,8 +1,9 @@
+#include "vex.h"
 #include "document/text_snapshot.h"
 #include <assert.h>
 #include <string.h>
 
-int main(void) {
+int main() {
     char source[] = {'a', '\0', 'b'};
     TextSnapshot *snapshot = TextSnapshot(8u, 2u, source, sizeof source);
     assert(snapshot != nullptr);

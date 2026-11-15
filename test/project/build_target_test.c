@@ -1,8 +1,9 @@
+#include "vex.h"
 #include "project/build_target.h"
 #include <assert.h>
 #include <string.h>
 
-int main(void) {
+int main() {
     char name[] = "app";
     BuildTarget *target = BuildTarget_3(4u, name, "c23");
     assert(target != nullptr);

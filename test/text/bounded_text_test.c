@@ -1,8 +1,9 @@
+#include "vex.h"
 #include "text/bounded_text.h"
 #include <assert.h>
 #include <string.h>
 
-int main(void) {
+int main() {
     BoundedText empty = BoundedText();
     assert(BoundedText_getLength(&empty) == 0u);
     BoundedText text = BoundedText("hello");

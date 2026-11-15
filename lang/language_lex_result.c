@@ -11,7 +11,7 @@
  * FUNCTION REGISTRY: zero and complete value constructors.
  * CONTRACT: absent results are canonicalized to a zero span. */
 
-LanguageLexResult LanguageLexResult_0(void) { return (LanguageLexResult) {0}; }
+LanguageLexResult LanguageLexResult_0() { return (LanguageLexResult) {0}; }
 LanguageLexResult LanguageLexResult_2(bool hasSpan, SyntaxSpan span) {
     return hasSpan ? (LanguageLexResult) {.hasSpan = true, .span = span}
                    : LanguageLexResult_0();
@@ -26,7 +26,7 @@ LanguageLexResult LanguageLexResult_4(bool hasSpan, SyntaxSpan span,
         .compilationContextId = compilationContextId
     };
 }
-LanguageLexResult LanguageLexResult_zero(void) { return LanguageLexResult_0(); }
+LanguageLexResult LanguageLexResult_zero() { return LanguageLexResult_0(); }
 LanguageLexResult LanguageLexResult_withContext(LanguageLexResult self,
                                                  u64 documentRevision,
                                                  u64 compilationContextId) {

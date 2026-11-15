@@ -47,19 +47,19 @@
  * FUNCTION REGISTRY:
  * ----------------------------------------------------------------------------
  * Constructors:
- *   Token Token_0(void)
+ *   Token Token_0()
  *     Construct the zero/unknown token.
  *   Token Token_1(TokenKind kind)
  *     Construct a kind with an empty source range.
  *   Token Token_2(TokenKind kind, SourceRange range)
  *     Construct a token value with its location.
- *   Token Token_zero(void)
+ *   Token Token_zero()
  *     Return the empty token identity.
  *   Token(...) dispatches the supported zero-, one-, and two-argument forms.
  *
  * Setters:
- *   void Token_setKind(Token *self, TokenKind value)
- *   void Token_setRange(Token *self, SourceRange value)
+ *   fn Token_setKind(Token *self, TokenKind value)
+ *   fn Token_setRange(Token *self, SourceRange value)
  *     Replace a field; a null self is ignored.
  *
  * Getters:
@@ -73,11 +73,11 @@
  * syntax analysis, semantic lookup, UTF conversion, or rendering.
  * ============================================================================
  */
-Token Token_0(void) { return (Token) {0}; }
+Token Token_0() { return (Token) {0}; }
 Token Token_1(TokenKind kind) { return (Token) {.kind = kind}; }
 Token Token_2(TokenKind kind, SourceRange range) { return (Token) {.kind = kind, .range = range}; }
-Token Token_zero(void) { return Token_0(); }
+Token Token_zero() { return Token_0(); }
 TokenKind Token_getKind(const Token *self) { return self == nullptr ? TOKEN_KIND_UNKNOWN : (*self).kind; }
-void Token_setKind(Token *self, TokenKind value) { if (self != nullptr) (*self).kind = value; }
+fn Token_setKind(Token *self, TokenKind value) { if (self != nullptr) (*self).kind = value; }
 SourceRange Token_getRange(const Token *self) { return self == nullptr ? SourceRange_zero() : (*self).range; }
-void Token_setRange(Token *self, SourceRange value) { if (self != nullptr) (*self).range = value; }
+fn Token_setRange(Token *self, SourceRange value) { if (self != nullptr) (*self).range = value; }

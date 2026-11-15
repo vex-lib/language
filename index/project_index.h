@@ -1,16 +1,14 @@
 #ifndef LANGUAGE_INDEX_PROJECT_INDEX_H
 #define LANGUAGE_INDEX_PROJECT_INDEX_H
 
+#include "vex.h"
 #include "index/file_analysis.h"
 #include "project/language_project.h"
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
 
 typedef struct ProjectIndex ProjectIndex;
 
 ProjectIndex *ProjectIndex_1(const LanguageProject *project);
-void ProjectIndex_free(ProjectIndex *self);
+fn ProjectIndex_free(ProjectIndex *self);
 bool ProjectIndex_publish(ProjectIndex *self, const FileAnalysis *analysis);
 const FileAnalysis *ProjectIndex_findAnalysis(const ProjectIndex *self, u64 fileId,
                                              u64 compilationContextId);

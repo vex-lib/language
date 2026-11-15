@@ -1,7 +1,8 @@
+#include "vex.h"
 #include "token/token.h"
 #include <assert.h>
 
-int main(void) {
+int main() {
     Token empty = Token();
     Token zero = Token_zero();
     assert(Token_getKind(&empty) == TOKEN_KIND_UNKNOWN);

@@ -1,14 +1,12 @@
 #ifndef LANGUAGE_DOCUMENT_TEXT_SNAPSHOT_H
 #define LANGUAGE_DOCUMENT_TEXT_SNAPSHOT_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include "vex.h"
 
 typedef struct TextSnapshot TextSnapshot;
 
 TextSnapshot *TextSnapshot_4(u32 documentId, u64 revision,
-                            const char *bytes, bytes length);
+                            const char *data, bytes length);
 #define TextSnapshot_0 TextSnapshot_invalid_arity
 #define TextSnapshot_1 TextSnapshot_invalid_arity
 #define TextSnapshot_2 TextSnapshot_invalid_arity
@@ -21,9 +19,9 @@ TextSnapshot *TextSnapshot_4(u32 documentId, u64 revision,
     TEXT_SNAPSHOT_NARG_INNER(_ __VA_OPT__(,) __VA_ARGS__, 5, 4, 3, 2, 1, 0)
 #define TextSnapshot(...) \
     TEXT_SNAPSHOT_CAT(TextSnapshot_, TEXT_SNAPSHOT_NARG(__VA_ARGS__))(__VA_ARGS__)
-void TextSnapshot_free(TextSnapshot *self);
+fn TextSnapshot_free(TextSnapshot *self);
 bool TextSnapshot_retain(TextSnapshot *self);
-void TextSnapshot_release(TextSnapshot *self);
+fn TextSnapshot_release(TextSnapshot *self);
 u32 TextSnapshot_getDocumentId(const TextSnapshot *self);
 u64 TextSnapshot_getRevision(const TextSnapshot *self);
 const char *TextSnapshot_getBytes(const TextSnapshot *self);

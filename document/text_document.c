@@ -22,12 +22,12 @@ struct TextDocument {
     TextSnapshot *current;
 };
 
-TextDocument *TextDocument_3(u32 documentId, const char *bytes, bytes length) {
+TextDocument *TextDocument_3(u32 documentId, const char *data, bytes length) {
     if (documentId == 0u) {
         THROW("TextDocument: rejected zero document identity");
         return nullptr;
     }
-    TextSnapshot *snapshot = TextSnapshot_4(documentId, 1u, bytes, length);
+    TextSnapshot *snapshot = TextSnapshot_4(documentId, 1u, data, length);
     if (snapshot == nullptr)
         return nullptr;
     TextDocument *self = calloc(1u, sizeof *self);
@@ -42,7 +42,7 @@ TextDocument *TextDocument_3(u32 documentId, const char *bytes, bytes length) {
     return self;
 }
 
-void TextDocument_free(TextDocument *self) {
+fn TextDocument_free(TextDocument *self) {
     if (self != nullptr) {
         TextSnapshot_free((*self).current);
         (*self).current = nullptr;
@@ -50,8 +50,8 @@ void TextDocument_free(TextDocument *self) {
     }
 }
 
-bool TextDocument_update(TextDocument *self, const char *bytes, bytes length) {
-    if (self == nullptr || (bytes == nullptr && length != 0u)) {
+bool TextDocument_update(TextDocument *self, const char *data, bytes length) {
+    if (self == nullptr || (data == nullptr && length != 0u)) {
         THROW("TextDocument: rejected invalid update bytes");
         return false;
     }
@@ -61,7 +61,7 @@ bool TextDocument_update(TextDocument *self, const char *bytes, bytes length) {
     }
     TextSnapshot *replacement = TextSnapshot_4((*self).documentId,
                                                (*self).revision + 1u,
-                                               bytes, length);
+                                               data, length);
     if (replacement == nullptr)
         return false;
     TextSnapshot *previous = (*self).current;

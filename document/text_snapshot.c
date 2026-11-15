@@ -25,8 +25,8 @@ struct TextSnapshot {
 };
 
 TextSnapshot *TextSnapshot_4(u32 documentId, u64 revision,
-                             const char *bytes, bytes length) {
-    if (documentId == 0u || revision == 0u || (bytes == nullptr && length != 0u)
+                             const char *data, bytes length) {
+    if (documentId == 0u || revision == 0u || (data == nullptr && length != 0u)
         || length == SIZE_MAX) {
         THROW("TextSnapshot: rejected invalid identity or byte span");
         return nullptr;
@@ -43,7 +43,7 @@ TextSnapshot *TextSnapshot_4(u32 documentId, u64 revision,
         return nullptr;
     }
     if (length != 0u)
-        memcpy((*self).bytes, bytes, length);
+        memcpy((*self).bytes, data, length);
     (*self).bytes[length] = '\0';
     (*self).documentId = documentId;
     (*self).revision = revision;
@@ -52,7 +52,7 @@ TextSnapshot *TextSnapshot_4(u32 documentId, u64 revision,
     return self;
 }
 
-void TextSnapshot_release(TextSnapshot *self) {
+fn TextSnapshot_release(TextSnapshot *self) {
     if (self == nullptr)
         return;
     if ((*self).referenceCount == 0u) {
@@ -66,7 +66,7 @@ void TextSnapshot_release(TextSnapshot *self) {
         free(self);
     }
 }
-void TextSnapshot_free(TextSnapshot *self) { TextSnapshot_release(self); }
+fn TextSnapshot_free(TextSnapshot *self) { TextSnapshot_release(self); }
 bool TextSnapshot_retain(TextSnapshot *self) {
     if (self == nullptr || (*self).referenceCount == 0u
         || (*self).referenceCount == UINT64_MAX) {

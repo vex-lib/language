@@ -1,7 +1,8 @@
+#include "vex.h"
 #include "style/text_style.h"
 #include <assert.h>
 
-int main(void) {
+int main() {
     TextStyle empty = TextStyle();
     assert(TextStyle_getForeground(&empty) == TEXT_STYLE_COLOR_DEFAULT);
     assert(TextStyle_getBackground(&empty) == TEXT_STYLE_COLOR_DEFAULT);

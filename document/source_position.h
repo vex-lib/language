@@ -10,8 +10,8 @@ typedef struct SourcePosition {
     bytes character;
 } SourcePosition;
 
-SourcePosition SourcePosition_0(void);
+SourcePosition SourcePosition_0();
 SourcePosition SourcePosition_3(bool valid, bytes line, bytes character);
-SourcePosition SourcePosition_zero(void);
+SourcePosition SourcePosition_zero();
 
 #endif

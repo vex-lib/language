@@ -86,7 +86,7 @@ with tempfile.TemporaryDirectory(prefix="c23-lexer-test-") as temporary:
             '#include "adapters/c/c23_lexer.h"\n'
             '#include "adapters/c/c23_inlay_hints.h"\n'
             '#include "adapters/c/c23_highlights.h"\n'
-            f'int main(void) {{ (void) {expression}; return 0; }}\n',
+            f'int main() {{ () {expression}; return 0; }}\n',
             encoding="utf-8",
         )
         result = subprocess.run([

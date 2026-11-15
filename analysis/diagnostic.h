@@ -28,12 +28,12 @@ typedef struct Diagnostic {
     BoundedText message;
 } Diagnostic;
 
-Diagnostic Diagnostic_0(void);
+Diagnostic Diagnostic_0();
 Diagnostic Diagnostic_4(SourceRange range, DiagnosticSeverity severity,
                         DiagnosticCode code, BoundedText message);
 #define Diagnostic(...) DIAGNOSTIC_SELECT(_ __VA_OPT__(,) __VA_ARGS__, Diagnostic_4, Diagnostic_invalid_arity, Diagnostic_invalid_arity, Diagnostic_invalid_arity, Diagnostic_0)(__VA_ARGS__)
 #define DIAGNOSTIC_SELECT(_0, _1, _2, _3, _4, NAME, ...) NAME
-Diagnostic Diagnostic_zero(void);
+Diagnostic Diagnostic_zero();
 const char *DiagnosticSeverity_name(DiagnosticSeverity value);
 const char *DiagnosticCode_name(DiagnosticCode value);
 BoundedText Diagnostic_toString(const Diagnostic *self);

@@ -5,23 +5,23 @@
 
 static int fakeSession;
 
-static void *openBad(u32 documentId, const char *bytes, bytes length) {
-    (void) documentId;
-    (void) bytes;
-    (void) length;
+static any openBad(u32 documentId, const char *data, bytes length) {
+    (discard) documentId;
+    (discard) data;
+    (discard) length;
     return &fakeSession;
 }
 
-static LanguageLexResult nextOutOfBounds(void *session) {
+static LanguageLexResult nextOutOfBounds(any session) {
     assert(session == &fakeSession);
     SyntaxSpan span = SyntaxSpan_3(SourceRange_3(40u, 0u, UINT64_MAX),
                                    SYNTAX_ROLE_IDENTIFIER, nullptr);
     return LanguageLexResult_2(true, span);
 }
 
-static void closeBad(void *session) { assert(session == &fakeSession); }
+static fn closeBad(any session) { assert(session == &fakeSession); }
 
-int main(void) {
+int main() {
     const char source[] = "int value = 23; // declaration\n";
     TextSnapshot *snapshot = TextSnapshot(40u, 7u, source, sizeof source - 1u);
     assert(snapshot != nullptr);

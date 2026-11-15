@@ -67,8 +67,8 @@ static const char *decorationName(TextStyleDecoration decoration) {
     return "unknown";
 }
 
-TextStyle TextStyle_0(void) { return (TextStyle) {0}; }
-TextStyle TextStyle_zero(void) { return TextStyle_0(); }
+TextStyle TextStyle_0() { return (TextStyle) {0}; }
+TextStyle TextStyle_zero() { return TextStyle_0(); }
 
 TextStyle TextStyle_2(u32 fg, u32 bg) {
     return (TextStyle) {.fg = fg, .bg = bg};
@@ -88,35 +88,35 @@ TextStyle TextStyle_5(u32 fg, u32 bg, u32 decorationColor,
 u32 TextStyle_getForeground(const TextStyle *self) {
     return self == nullptr ? TEXT_STYLE_COLOR_DEFAULT : (*self).fg;
 }
-void TextStyle_setForeground(TextStyle *self, u32 value) {
+fn TextStyle_setForeground(TextStyle *self, u32 value) {
     if (self != nullptr)
         (*self).fg = value;
 }
 u32 TextStyle_getBackground(const TextStyle *self) {
     return self == nullptr ? TEXT_STYLE_COLOR_DEFAULT : (*self).bg;
 }
-void TextStyle_setBackground(TextStyle *self, u32 value) {
+fn TextStyle_setBackground(TextStyle *self, u32 value) {
     if (self != nullptr)
         (*self).bg = value;
 }
 u32 TextStyle_getDecorationColor(const TextStyle *self) {
     return self == nullptr ? TEXT_STYLE_COLOR_DEFAULT : (*self).decorationColor;
 }
-void TextStyle_setDecorationColor(TextStyle *self, u32 value) {
+fn TextStyle_setDecorationColor(TextStyle *self, u32 value) {
     if (self != nullptr)
         (*self).decorationColor = value;
 }
 u16 TextStyle_getFlags(const TextStyle *self) {
     return self == nullptr ? 0u : (*self).flags;
 }
-void TextStyle_setFlags(TextStyle *self, u16 value) {
+fn TextStyle_setFlags(TextStyle *self, u16 value) {
     if (self != nullptr)
         (*self).flags = value;
 }
 TextStyleDecoration TextStyle_getDecoration(const TextStyle *self) {
     return self == nullptr ? TEXT_DECORATION_NONE : (*self).decoration;
 }
-void TextStyle_setDecoration(TextStyle *self, TextStyleDecoration value) {
+fn TextStyle_setDecoration(TextStyle *self, TextStyleDecoration value) {
     if (self != nullptr)
         (*self).decoration = value;
 }

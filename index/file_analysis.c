@@ -38,7 +38,7 @@ static char *copyName(const char *name) {
     return copy;
 }
 
-static void *reserve(void *items, bytes *capacity, bytes count,
+static any reserve(any items, bytes *capacity, bytes count,
                      bytes itemSize, const char *kind) {
     if (count < *capacity)
         return items;
@@ -47,7 +47,7 @@ static void *reserve(void *items, bytes *capacity, bytes count,
         THROW("FileAnalysis: %s capacity overflow", kind);
         return nullptr;
     }
-    void *grown = realloc(items, next * itemSize);
+    any grown = realloc(items, next * itemSize);
     if (grown == nullptr) {
         THROW("FileAnalysis: allocation failed for %s capacity %zu", kind, next);
         return nullptr;
@@ -76,11 +76,11 @@ FileAnalysis *FileAnalysis_4(u64 fileId, u32 documentId,
     return self;
 }
 
-void FileAnalysis_free(FileAnalysis *self) {
+fn FileAnalysis_free(FileAnalysis *self) {
     if (self == nullptr)
         return;
     for (bytes index = 0u; index < (*self).symbolCount; ++index)
-        free((void*) (*self).symbols[index].name);
+        free((any) (*self).symbols[index].name);
     free((*self).symbols);
     (*self).symbols = nullptr;
     free((*self).references);

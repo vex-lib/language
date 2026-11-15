@@ -1,8 +1,9 @@
+#include "vex.h"
 #include "project/project_configuration.h"
 #include <assert.h>
 #include <string.h>
 
-int main(void) {
+int main() {
     ProjectConfiguration *configuration = ProjectConfiguration_0();
     assert(configuration != nullptr);
     assert(ProjectConfiguration_getLanguageId(configuration) == nullptr);

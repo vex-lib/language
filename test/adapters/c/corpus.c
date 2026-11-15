@@ -1,5 +1,7 @@
 // C23 syntax corpus for the future adapter. Claims are compile-time markers;
 // the adapter must verify them against its parse and diagnose disagreement.
+
+#include "vex.h"
 #include <stdio.h>
 #define ANNOTATION(text) _Static_assert(1, text);
 #define WHAT(text) _Static_assert(1, text);
@@ -23,7 +25,7 @@ static int functionPointer(int (*fn)(int, int), int left, int right) {
 
 int corpus(int *ptr, Pair *pair, Scalar *scalar) {
     ;;WHAT("u64")
-    void *tokenCount = ptr;
+    any tokenCount = ptr;
     int first = 2 * *ptr;
     int second = *ptr * 2;
     int third = *scalar * *scalar;
@@ -32,13 +34,13 @@ int corpus(int *ptr, Pair *pair, Scalar *scalar) {
     int **f64Pointer = &ptr;
     int sizeofValue = (int) sizeof *ptr;
     int member = (*pair).x;
-    (void) tokenCount;
+    (discard) tokenCount;
     return multiply(first, second) + third + fourth + fifth +
            addressAndDeref(ptr) + functionPointer(multiply, member, sizeofValue) +
            **f64Pointer;
 }
 
-void controlFlow(int value) {
+fn controlFlow(int value) {
     if (value > 0)
         value -= 1;
     for (;;)
@@ -49,7 +51,7 @@ void controlFlow(int value) {
 }
 
 /* Documentation and ordinary comments must remain distinct. */
-void comments(void) {
+fn comments() {
     printf("hello");;
     /** documentation comment */
     /* ordinary comment */

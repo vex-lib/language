@@ -1,9 +1,10 @@
+#include "vex.h"
 #include "adapters/c23/c23_adapter.h"
 #include "lang/language_engine.h"
 #include <assert.h>
 #include <string.h>
 
-int main(void) {
+int main() {
     char source[] = "nullptr x";
 
     TextSnapshot *snapshot = TextSnapshot(3u, 17u, source, sizeof source - 1u);

@@ -45,8 +45,8 @@
 static const char *SEVERITIES[] = {"hint", "info", "warning", "error"};
 static const char *CODES[] = {"none", "unnecessary-semicolon", "empty-body", "invalid-claim", "ambiguous-syntax", "unknown-name", "style-key-invalid"};
 
-Diagnostic Diagnostic_0(void) { return (Diagnostic) {0}; }
-Diagnostic Diagnostic_zero(void) { return Diagnostic_0(); }
+Diagnostic Diagnostic_0() { return (Diagnostic) {0}; }
+Diagnostic Diagnostic_zero() { return Diagnostic_0(); }
 Diagnostic Diagnostic_4(SourceRange range, DiagnosticSeverity severity, DiagnosticCode code, BoundedText message) {
     return (Diagnostic) {.range = range, .severity = severity, .code = code, .message = message};
 }

@@ -1,9 +1,7 @@
 #ifndef LANGUAGE_STYLE_TEXT_STYLE_H
 #define LANGUAGE_STYLE_TEXT_STYLE_H
 
-#include <stdbool.h>
-#include <stdint.h>
-
+#include "vex.h"
 #include "text/bounded_text.h"
 
 // style/text_style.h — the themed appearance of one style key.
@@ -48,27 +46,27 @@ typedef struct TextStyle {
 } TextStyle;
 
 // Construct empty, colour-only, or the complete style. Other arities reject.
-TextStyle TextStyle_0(void);
+TextStyle TextStyle_0();
 TextStyle TextStyle_2(u32 fg, u32 bg);
 TextStyle TextStyle_5(u32 fg, u32 bg, u32 decorationColor,
                       u16 flags, TextStyleDecoration decoration);
 #define TextStyle(...) TEXT_STYLE_SELECT(_ __VA_OPT__(,) __VA_ARGS__, TextStyle_5, TextStyle_invalid_arity, TextStyle_invalid_arity, TextStyle_2, TextStyle_invalid_arity, TextStyle_0)(__VA_ARGS__)
 #define TEXT_STYLE_SELECT(_0, _1, _2, _3, _4, _5, NAME, ...) NAME
 // Return the all-default (inherit everything) value.
-TextStyle TextStyle_zero(void);
+TextStyle TextStyle_zero();
 
 // Symmetric field accessors. A null self is safe: getters return the default,
 // setters do nothing.
 u32 TextStyle_getForeground(const TextStyle *self);
-void TextStyle_setForeground(TextStyle *self, u32 value);
+fn TextStyle_setForeground(TextStyle *self, u32 value);
 u32 TextStyle_getBackground(const TextStyle *self);
-void TextStyle_setBackground(TextStyle *self, u32 value);
+fn TextStyle_setBackground(TextStyle *self, u32 value);
 u32 TextStyle_getDecorationColor(const TextStyle *self);
-void TextStyle_setDecorationColor(TextStyle *self, u32 value);
+fn TextStyle_setDecorationColor(TextStyle *self, u32 value);
 u16 TextStyle_getFlags(const TextStyle *self);
-void TextStyle_setFlags(TextStyle *self, u16 value);
+fn TextStyle_setFlags(TextStyle *self, u16 value);
 TextStyleDecoration TextStyle_getDecoration(const TextStyle *self);
-void TextStyle_setDecoration(TextStyle *self, TextStyleDecoration value);
+fn TextStyle_setDecoration(TextStyle *self, TextStyleDecoration value);
 
 // True when every bit of `flag` is set.
 bool TextStyle_hasFlag(const TextStyle *self, u16 flag);

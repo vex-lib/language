@@ -1,8 +1,9 @@
+#include "vex.h"
 #include "syntax/role.h"
 #include <assert.h>
 #include <string.h>
 
-int main(void) {
+int main() {
     assert(strcmp(SyntaxRole_name(SYNTAX_ROLE_DEREFERENCE), "operator.deref") == 0);
     assert(strcmp(SyntaxRole_styleKey(SYNTAX_ROLE_DEREFERENCE), "operator.deref") == 0);
     assert(SyntaxRole_isValid(SYNTAX_ROLE_MACRO_PARAMETER));

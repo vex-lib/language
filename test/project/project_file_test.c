@@ -1,8 +1,9 @@
+#include "vex.h"
 #include "project/project_file.h"
 #include <assert.h>
 #include <string.h>
 
-int main(void) {
+int main() {
     ProjectFile *file = ProjectFile_4(5u, "src/main.c", PROJECT_FILE_KIND_TEXT, "c23");
     assert(file != nullptr);
     assert(ProjectFile_getId(file) == 5u);

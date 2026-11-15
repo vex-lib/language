@@ -11,13 +11,13 @@ typedef enum ConfigurationOrigin {
     CONFIGURATION_ORIGIN_USER
 } ConfigurationOrigin;
 
-ProjectConfiguration *ProjectConfiguration_0(void);
-void ProjectConfiguration_free(ProjectConfiguration *self);
+ProjectConfiguration *ProjectConfiguration_0();
+fn ProjectConfiguration_free(ProjectConfiguration *self);
 bool ProjectConfiguration_setDetectedLanguage(ProjectConfiguration *self,
                                               const char *languageId);
 bool ProjectConfiguration_setUserLanguage(ProjectConfiguration *self,
                                           const char *languageId);
-void ProjectConfiguration_clearUserLanguage(ProjectConfiguration *self);
+fn ProjectConfiguration_clearUserLanguage(ProjectConfiguration *self);
 const char *ProjectConfiguration_getLanguageId(const ProjectConfiguration *self);
 ConfigurationOrigin ProjectConfiguration_getLanguageOrigin(const ProjectConfiguration *self);
 

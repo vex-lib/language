@@ -14,18 +14,18 @@
  * FUNCTION REGISTRY: C23Adapter_adapter returns the borrowed static table.
  * CONTRACT: one adapter instance serves strict C23 tokens only. */
 
-static void *openC23(u32 documentId, const char *source, bytes length) {
+static any openC23(u32 documentId, const char *source, bytes length) {
     return C23Lexer_3(documentId, source, length);
 }
 
-static LanguageLexResult nextC23(void *session) {
+static LanguageLexResult nextC23(any session) {
     C23LexStep step = C23Lexer_next(session);
     return LanguageLexResult_2(step.hasSpan, step.span);
 }
 
-static void closeC23(void *session) { C23Lexer_free(session); }
+static fn closeC23(any session) { C23Lexer_free(session); }
 
-const LanguageAdapter *C23Adapter_adapter(void) {
+const LanguageAdapter *C23Adapter_adapter() {
     static const LanguageAdapter adapter = {
         .languageId = "c23",
         .open = openC23,

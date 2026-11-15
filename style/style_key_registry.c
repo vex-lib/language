@@ -86,13 +86,13 @@ static bool validPrefix(const char *name) {
     return dot;
 }
 
-StyleKeyRegistry StyleKeyRegistry_0(void) { return (StyleKeyRegistry) {0}; }
-StyleKeyRegistry StyleKeyRegistry_zero(void) { return StyleKeyRegistry_0(); }
+StyleKeyRegistry StyleKeyRegistry_0() { return (StyleKeyRegistry) {0}; }
+StyleKeyRegistry StyleKeyRegistry_zero() { return StyleKeyRegistry_0(); }
 StyleKeyRegistry StyleKeyRegistry_2(const StyleKeyEntry *entries, bytes count) {
     return (StyleKeyRegistry) {.adapterEntries = entries, .adapterCount = count};
 }
 
-bytes StyleKeyRegistry_coreCount(void) { return sizeof CORE_KEYS / sizeof CORE_KEYS[0]; }
+bytes StyleKeyRegistry_coreCount() { return sizeof CORE_KEYS / sizeof CORE_KEYS[0]; }
 bytes StyleKeyRegistry_count(const StyleKeyRegistry *self) {
     return self == nullptr ? 0u : StyleKeyRegistry_coreCount() + (*self).adapterCount;
 }
@@ -105,7 +105,7 @@ const char *StyleKeyRegistry_name(const StyleKeyRegistry *self, bytes index) {
 }
 
 bool StyleKeyRegistry_isCore(const StyleKeyRegistry *self, const char *name) {
-    (void) self;
+    (discard) self;
     for (bytes i = 0u; i < StyleKeyRegistry_coreCount(); ++i)
         if (equal(CORE_KEYS[i], name)) return true;
     return false;
