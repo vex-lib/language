@@ -138,7 +138,7 @@ SourcePosition LineIndex_positionAtByte(const LineIndex *self, bytes byteOffset,
     bytes utf16 = 0u;
     bytes utf32 = 0u;
     while (offset < target) {
-        ScalarStep scalar = decodeScalar((const u8 *) source, lineEnd, offset);
+        ScalarStep scalar = decodeScalar((const u8*) source, lineEnd, offset);
         if (!scalar.valid || scalar.byteCount > target - offset) {
             THROW("LineIndex: byte offset is not a valid UTF-8 scalar boundary");
             return SourcePosition_zero();
