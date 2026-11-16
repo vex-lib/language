@@ -307,7 +307,7 @@ static C23LexStep scanComment(C23Lexer *self, bytes start) {
                 (*self).docComment ? SYNTAX_ROLE_DOC_COMMENT : SYNTAX_ROLE_COMMENT, nullptr));
         }
         if (byte >= 0x80u) {
-            Utf8ScalarResult scalar = validUtf8Scalar((const u8 *) source,
+            Utf8ScalarResult scalar = validUtf8Scalar((const u8*) source,
                                                        (*self).length, end);
             if (!scalar.valid) {
                 if (end != start) {
@@ -389,7 +389,7 @@ static C23LexStep scanQuotedPart(C23Lexer *self, bytes start, bool opening) {
             return C23LexStep_2(true, makeSpan(self, start, end, role, nullptr));
         }
         if (byte >= 0x80u) {
-            Utf8ScalarResult scalar = validUtf8Scalar((const u8 *) source,
+            Utf8ScalarResult scalar = validUtf8Scalar((const u8*) source,
                                                        (*self).length, end);
             if (!scalar.valid) {
                 if (end != start) {
@@ -511,7 +511,7 @@ C23LexStep C23Lexer_next(C23Lexer *self) {
         end = start + 1u;
         role = SYNTAX_ROLE_INVALID;
     } else if (byte >= 0x80u) {
-        Utf8ScalarResult scalar = validUtf8Scalar((const u8 *) source,
+        Utf8ScalarResult scalar = validUtf8Scalar((const u8*) source,
                                                    length, start);
         end = start + scalar.length;
         role = SYNTAX_ROLE_INVALID;
