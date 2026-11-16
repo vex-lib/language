@@ -2,15 +2,15 @@
 
 ## Constitution Link
 
-gist.md (`../../metadata/gists/preferences/gist.md`) is the compressed law list; all universal laws bind this repository. Read one on demand: `./tools/prefs law "<title>"`. Universal laws are inherited, never restated.
+gist.md (`../../../metadata/gists/preferences/gist.md`) is the compressed law list; all universal laws bind this repository. Read one on demand: `./tools/prefs law "<title>"`. Universal laws are inherited, never restated.
 
-Tier: core (R3 Language Grammars). Owns: grammar/AST semantics, hot-swappable grammar modules. Borrows: Vexspoke computation/behavior, Relational Engine memory/storage/native C search.
+Tier: core (Language Grammars). Owns: grammar/AST semantics, hot-swappable grammar modules. Borrows: Vexspoke computation/behavior, Relational Engine memory/storage/native C search.
 
 ## Exclusive Laws
 
 | Law Title | Scope | Enforcement |
-| **Hot-Swappable Grammar Module Law** | R3 Language Grammars | Mandatory for `language` |
-| **Single-Class-Per-File Grammar Law** | R3 Language Grammars | Mandatory for `language` |
+| **Hot-Swappable Grammar Module Law** | core Language Grammars | Mandatory for `language` |
+| **Single-Class-Per-File Grammar Law** | core Language Grammars | Mandatory for `language` |
 
 ### Hot-Swappable Grammar Module Law
 
