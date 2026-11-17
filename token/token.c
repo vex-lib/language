@@ -77,7 +77,9 @@ Token Token_0() { return (Token) {0}; }
 Token Token_1(TokenKind kind) { return (Token) {.kind = kind}; }
 Token Token_2(TokenKind kind, SourceRange range) { return (Token) {.kind = kind, .range = range}; }
 Token Token_zero() { return Token_0(); }
+;;GETTER
 TokenKind Token_getKind(const Token *self) { return self == nullptr ? TOKEN_KIND_UNKNOWN : (*self).kind; }
 fn Token_setKind(Token *self, TokenKind value) { if (self != nullptr) (*self).kind = value; }
+;;GETTER
 SourceRange Token_getRange(const Token *self) { return self == nullptr ? SourceRange_zero() : (*self).range; }
 fn Token_setRange(Token *self, SourceRange value) { if (self != nullptr) (*self).range = value; }
