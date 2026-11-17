@@ -40,21 +40,29 @@ SyntaxSpan SyntaxSpan_zero() { return SyntaxSpan_0(); }
 SyntaxSpan SyntaxSpan_3(SourceRange range, SyntaxRole role, const char *styleKey) {
     return (SyntaxSpan) {.range = range, .role = role, .styleKey = styleKey};
 }
+;;GETTER
+static inline SyntaxRole SyntaxSpan_role(const SyntaxSpan *self) { return (*self).role; }
+;;GETTER
+static inline SourceRange SyntaxSpan_range(const SyntaxSpan *self) { return (*self).range; }
+
+;;GETTER
 const char *SyntaxSpan_getStyleKey(const SyntaxSpan *self) {
     return self == nullptr ? nullptr : (*self).styleKey;
 }
 const char *SyntaxSpan_resolvedStyleKey(const SyntaxSpan *self) {
     if (self == nullptr) return "text";
-    return (*self).styleKey == nullptr ? SyntaxRole_styleKey((*self).role) : (*self).styleKey;
+    const char *styleKey = SyntaxSpan_getStyleKey(self);
+    return styleKey == nullptr ? SyntaxRole_styleKey(SyntaxSpan_role(self)) : styleKey;
 }
 BoundedText SyntaxSpan_toString(const SyntaxSpan *self) {
     if (self == nullptr) return BoundedText_1("nullptr");
-    SourceRange range = (*self).range;
-    return BoundedText_format("%s [%llu,%llu)", SyntaxRole_name((*self).role),
+    SourceRange range = SyntaxSpan_range(self);
+    return BoundedText_format("%s [%llu,%llu)", SyntaxRole_name(SyntaxSpan_role(self)),
         (u64) range.startByte, (u64) range.endByte);
 }
 BoundedText SyntaxSpan_toStringStruct(const SyntaxSpan *self) {
     if (self == nullptr) return BoundedText_1("nullptr");
-    return BoundedText_format("SyntaxSpan { role=%s, styleKey=%s }", SyntaxRole_name((*self).role),
-        (*self).styleKey == nullptr ? "nullptr" : (*self).styleKey);
+    const char *styleKey = SyntaxSpan_getStyleKey(self);
+    return BoundedText_format("SyntaxSpan { role=%s, styleKey=%s }", SyntaxRole_name(SyntaxSpan_role(self)),
+        styleKey == nullptr ? "nullptr" : styleKey);
 }

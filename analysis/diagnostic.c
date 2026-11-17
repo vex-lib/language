@@ -56,16 +56,25 @@ const char *DiagnosticSeverity_name(DiagnosticSeverity value) {
 const char *DiagnosticCode_name(DiagnosticCode value) {
     return (u32) value < sizeof CODES / sizeof CODES[0] ? CODES[value] : "unknown";
 }
+;;GETTER
+static inline BoundedText Diagnostic_message(const Diagnostic *self) { return (*self).message; }
+;;GETTER
+static inline DiagnosticSeverity Diagnostic_severity(const Diagnostic *self) { return (*self).severity; }
+;;GETTER
+static inline DiagnosticCode Diagnostic_code(const Diagnostic *self) { return (*self).code; }
+;;GETTER
+static inline SourceRange Diagnostic_range(const Diagnostic *self) { return (*self).range; }
+
 BoundedText Diagnostic_toString(const Diagnostic *self) {
     if (self == nullptr) return BoundedText_1("nullptr");
-    BoundedText message = (*self).message;
-    return BoundedText_format("%s: %s", DiagnosticSeverity_name((*self).severity), message.text);
+    BoundedText message = Diagnostic_message(self);
+    return BoundedText_format("%s: %s", DiagnosticSeverity_name(Diagnostic_severity(self)), message.text);
 }
 BoundedText Diagnostic_toStringStruct(const Diagnostic *self) {
     if (self == nullptr) return BoundedText_1("nullptr");
-    SourceRange range = (*self).range;
+    SourceRange range = Diagnostic_range(self);
     return BoundedText_format("Diagnostic { severity=%s, code=%s, range=%u:%llu-%llu }",
-        DiagnosticSeverity_name((*self).severity), DiagnosticCode_name((*self).code),
+        DiagnosticSeverity_name(Diagnostic_severity(self)), DiagnosticCode_name(Diagnostic_code(self)),
         range.documentId, (u64) range.startByte,
         (u64) range.endByte);
 }
