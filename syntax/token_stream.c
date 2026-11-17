@@ -76,34 +76,59 @@ static TokenKind tokenKindForRole(SyntaxRole role) {
     return TOKEN_KIND_UNKNOWN;
 }
 
+;;GETTER
+static inline TextSnapshot *TokenStream_snapshot(const TokenStream *self) { return (*self).snapshot; }
+;;SETTER
+static inline fn TokenStream_setSnapshot(TokenStream *self, TextSnapshot *v) { (*self).snapshot = v; }
+;;GETTER
+static inline u64 TokenStream_compilationContextId(const TokenStream *self) { return (*self).compilationContextId; }
+;;SETTER
+static inline fn TokenStream_setCompilationContextId(TokenStream *self, u64 v) { (*self).compilationContextId = v; }
+;;GETTER
+static inline Token *TokenStream_tokens(const TokenStream *self) { return (*self).tokens; }
+;;SETTER
+static inline fn TokenStream_setTokens(TokenStream *self, Token *v) { (*self).tokens = v; }
+;;GETTER
+static inline bytes TokenStream_count(const TokenStream *self) { return (*self).count; }
+;;SETTER
+static inline fn TokenStream_setCount(TokenStream *self, bytes v) { (*self).count = v; }
+;;GETTER
+static inline bytes TokenStream_capacity(const TokenStream *self) { return (*self).capacity; }
+;;SETTER
+static inline fn TokenStream_setCapacity(TokenStream *self, bytes v) { (*self).capacity = v; }
+;;GETTER
+static inline bool TokenStream_complete(const TokenStream *self) { return (*self).complete; }
+;;SETTER
+static inline fn TokenStream_setComplete(TokenStream *self, bool v) { (*self).complete = v; }
+
 static bool append(TokenStream *self, LanguageLexResult result,
                    u64 previousEnd) {
     SyntaxSpan span = result.span;
     SourceRange range = span.range;
-    u64 length = TextSnapshot_getLength((*self).snapshot);
-    if (range.documentId != TextSnapshot_getDocumentId((*self).snapshot)
+    u64 length = TextSnapshot_getLength(TokenStream_snapshot(self));
+    if (range.documentId != TextSnapshot_getDocumentId(TokenStream_snapshot(self))
         || range.startByte < previousEnd || range.startByte >= range.endByte
         || range.endByte > length || span.role < SYNTAX_ROLE_NONE
         || span.role > SYNTAX_ROLE_IDENTIFIER) {
         THROW("TokenStream: rejected invalid or unordered lexical span");
         return false;
     }
-    if ((*self).count == (*self).capacity) {
-        bytes next = (*self).capacity == 0u ? 16u : (*self).capacity * 2u;
-        if (next < (*self).capacity || next > SIZE_MAX / sizeof(Token)) {
+    if (TokenStream_count(self) == TokenStream_capacity(self)) {
+        bytes next = TokenStream_capacity(self) == 0u ? 16u : TokenStream_capacity(self) * 2u;
+        if (next < TokenStream_capacity(self) || next > SIZE_MAX / sizeof(Token)) {
             THROW("TokenStream: token capacity overflow");
             return false;
         }
-        Token *grown = realloc((*self).tokens, next * sizeof(Token));
+        Token *grown = realloc(TokenStream_tokens(self), next * sizeof(Token));
         if (grown == nullptr) {
             THROW("TokenStream: allocation failed for %zu tokens", next);
             return false;
         }
-        (*self).tokens = grown;
-        (*self).capacity = next;
+        TokenStream_setTokens(self, grown);
+        TokenStream_setCapacity(self, next);
     }
-    (*self).tokens[(*self).count] = Token(tokenKindForRole(span.role), range);
-    ++(*self).count;
+    TokenStream_tokens(self)[TokenStream_count(self)] = Token(tokenKindForRole(span.role), range);
+    TokenStream_setCount(self, TokenStream_count(self) + 1u);
     return true;
 }
 
@@ -127,22 +152,22 @@ TokenStream *TokenStream_collect(LanguageEngine *engine, TextSnapshot *snapshot)
         free(self);
         return nullptr;
     }
-    (*self).snapshot = snapshot;
+    TokenStream_setSnapshot(self, snapshot);
     u64 previousEnd = 0u;
     for (;;) {
         LanguageLexResult result = LanguageEngine_next(engine);
         if (result.documentRevision != TextSnapshot_getRevision(snapshot)
             || result.compilationContextId == 0u
-            || ((*self).compilationContextId != 0u
-                && (*self).compilationContextId != result.compilationContextId)) {
+            || (TokenStream_compilationContextId(self) != 0u
+                && TokenStream_compilationContextId(self) != result.compilationContextId)) {
             THROW("TokenStream: lexer result revision/context mismatch");
             TokenStream_free(self);
             return nullptr;
         }
-        if ((*self).compilationContextId == 0u)
-            (*self).compilationContextId = result.compilationContextId;
+        if (TokenStream_compilationContextId(self) == 0u)
+            TokenStream_setCompilationContextId(self, result.compilationContextId);
         if (!result.hasSpan) {
-            (*self).complete = true;
+            TokenStream_setComplete(self, true);
             return self;
         }
         if (!append(self, result, previousEnd)) {
@@ -157,42 +182,45 @@ TokenStream *TokenStream_collect(LanguageEngine *engine, TextSnapshot *snapshot)
 fn TokenStream_free(TokenStream *self) {
     if (self == nullptr)
         return;
-    TextSnapshot_release((*self).snapshot);
-    (*self).snapshot = nullptr;
-    free((*self).tokens);
-    (*self).tokens = nullptr;
+    TextSnapshot_release(TokenStream_snapshot(self));
+    TokenStream_setSnapshot(self, nullptr);
+    free(TokenStream_tokens(self));
+    TokenStream_setTokens(self, nullptr);
     free(self);
 }
 
 u32 TokenStream_getDocumentId(const TokenStream *self) {
-    return self == nullptr ? 0u : TextSnapshot_getDocumentId((*self).snapshot);
+    return self == nullptr ? 0u : TextSnapshot_getDocumentId(TokenStream_snapshot(self));
 }
 u64 TokenStream_getDocumentRevision(const TokenStream *self) {
-    return self == nullptr ? 0u : TextSnapshot_getRevision((*self).snapshot);
+    return self == nullptr ? 0u : TextSnapshot_getRevision(TokenStream_snapshot(self));
 }
+;;GETTER
 u64 TokenStream_getCompilationContextId(const TokenStream *self) {
-    return self == nullptr ? 0u : (*self).compilationContextId;
+    return self == nullptr ? 0u : TokenStream_compilationContextId(self);
 }
+;;GETTER
 bytes TokenStream_getCount(const TokenStream *self) {
-    return self == nullptr ? 0u : (*self).count;
+    return self == nullptr ? 0u : TokenStream_count(self);
 }
 Token TokenStream_getAt(const TokenStream *self, bytes index) {
-    return self == nullptr || index >= (*self).count ? Token_zero() : (*self).tokens[index];
+    return self == nullptr || index >= TokenStream_count(self) ? Token_zero() : TokenStream_tokens(self)[index];
 }
+;;GETTER
 bool TokenStream_isComplete(const TokenStream *self) {
-    return self != nullptr && (*self).complete;
+    return self != nullptr && TokenStream_complete(self);
 }
 BoundedText TokenStream_toString(const TokenStream *self) {
     return self == nullptr ? BoundedText_zero()
         : BoundedText_format("TokenStream(document=%u, revision=%llu, tokens=%zu)",
             TokenStream_getDocumentId(self),
-            (u64) TokenStream_getDocumentRevision(self), (*self).count);
+            (u64) TokenStream_getDocumentRevision(self), TokenStream_count(self));
 }
 BoundedText TokenStream_toStringStruct(const TokenStream *self) {
     return self == nullptr ? BoundedText_zero()
         : BoundedText_format("TokenStream{documentId=%u, revision=%llu, context=%llu, count=%zu, complete=%s}",
             TokenStream_getDocumentId(self),
             (u64) TokenStream_getDocumentRevision(self),
-            (u64) (*self).compilationContextId, (*self).count,
-            (*self).complete ? "true" : "false");
+            (u64) TokenStream_compilationContextId(self), TokenStream_count(self),
+            TokenStream_complete(self) ? "true" : "false");
 }
