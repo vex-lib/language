@@ -89,13 +89,18 @@ Symbol Symbol_5(u64 id, u64 scopeId, SymbolKind kind, const char *name, SourceRa
     return (Symbol) {.id = id, .scopeId = scopeId, .kind = kind, .name = name, .declarationRange = declarationRange};
 }
 Symbol Symbol_zero() { return Symbol_0(); }
+;;GETTER
 u64 Symbol_getId(const Symbol *self) { return self == nullptr ? 0 : (*self).id; }
 fn Symbol_setId(Symbol *self, u64 value) { if (self != nullptr) (*self).id = value; }
+;;GETTER
 u64 Symbol_getScopeId(const Symbol *self) { return self == nullptr ? 0 : (*self).scopeId; }
 fn Symbol_setScopeId(Symbol *self, u64 value) { if (self != nullptr) (*self).scopeId = value; }
+;;GETTER
 SymbolKind Symbol_getKind(const Symbol *self) { return self == nullptr ? SYMBOL_KIND_UNKNOWN : (*self).kind; }
 fn Symbol_setKind(Symbol *self, SymbolKind value) { if (self != nullptr) (*self).kind = value; }
+;;GETTER
 const char *Symbol_getName(const Symbol *self) { return self == nullptr ? nullptr : (*self).name; }
 fn Symbol_setName(Symbol *self, const char *value) { if (self != nullptr) (*self).name = value; }
+;;GETTER
 SourceRange Symbol_getDeclarationRange(const Symbol *self) { return self == nullptr ? SourceRange_zero() : (*self).declarationRange; }
 fn Symbol_setDeclarationRange(Symbol *self, SourceRange value) { if (self != nullptr) (*self).declarationRange = value; }

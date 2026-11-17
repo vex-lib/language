@@ -83,11 +83,15 @@ Reference Reference_4(u64 targetSymbolId, SourceRange range, ReferenceRole role,
     return (Reference) {.targetSymbolId = targetSymbolId, .range = range, .role = role, .resolved = resolved};
 }
 Reference Reference_zero() { return Reference_0(); }
+;;GETTER
 u64 Reference_getTargetSymbolId(const Reference *self) { return self == nullptr ? 0 : (*self).targetSymbolId; }
 fn Reference_setTargetSymbolId(Reference *self, u64 value) { if (self != nullptr) (*self).targetSymbolId = value; }
+;;GETTER
 SourceRange Reference_getRange(const Reference *self) { return self == nullptr ? SourceRange_zero() : (*self).range; }
 fn Reference_setRange(Reference *self, SourceRange value) { if (self != nullptr) (*self).range = value; }
+;;GETTER
 ReferenceRole Reference_getRole(const Reference *self) { return self == nullptr ? REFERENCE_ROLE_UNKNOWN : (*self).role; }
 fn Reference_setRole(Reference *self, ReferenceRole value) { if (self != nullptr) (*self).role = value; }
+;;GETTER
 bool Reference_isResolved(const Reference *self) { return self != nullptr && (*self).resolved; }
 fn Reference_setResolved(Reference *self, bool value) { if (self != nullptr) (*self).resolved = value; }
