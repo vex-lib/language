@@ -20,6 +20,19 @@ struct TextDocument {
     TextSnapshot *current;
 };
 
+;;GETTER
+static inline u32 TextDocument_documentId(const TextDocument *self) { return (*self).documentId; }
+;;SETTER
+static inline fn TextDocument_setDocumentId(TextDocument *self, u32 v) { (*self).documentId = v; }
+;;GETTER
+static inline u64 TextDocument_revision(const TextDocument *self) { return (*self).revision; }
+;;SETTER
+static inline fn TextDocument_setRevision(TextDocument *self, u64 v) { (*self).revision = v; }
+;;GETTER
+static inline TextSnapshot *TextDocument_current(const TextDocument *self) { return (*self).current; }
+;;SETTER
+static inline fn TextDocument_setCurrent(TextDocument *self, TextSnapshot *v) { (*self).current = v; }
+
 TextDocument *TextDocument_3(u32 documentId, const char *data, bytes length) {
     if (documentId == 0u) {
         THROW("TextDocument: rejected zero document identity");
@@ -34,16 +47,16 @@ TextDocument *TextDocument_3(u32 documentId, const char *data, bytes length) {
         TextSnapshot_free(snapshot);
         return nullptr;
     }
-    (*self).documentId = documentId;
-    (*self).revision = 1u;
-    (*self).current = snapshot;
+    TextDocument_setDocumentId(self, documentId);
+    TextDocument_setRevision(self, 1u);
+    TextDocument_setCurrent(self, snapshot);
     return self;
 }
 
 fn TextDocument_free(TextDocument *self) {
     if (self != nullptr) {
-        TextSnapshot_free((*self).current);
-        (*self).current = nullptr;
+        TextSnapshot_free(TextDocument_current(self));
+        TextDocument_setCurrent(self, nullptr);
         free(self);
     }
 }
@@ -53,30 +66,32 @@ bool TextDocument_update(TextDocument *self, const char *data, bytes length) {
         THROW("TextDocument: rejected invalid update bytes");
         return false;
     }
-    if ((*self).revision == UINT64_MAX) {
+    if (TextDocument_revision(self) == UINT64_MAX) {
         THROW("TextDocument: revision bound UINT64_MAX reached");
         return false;
     }
-    TextSnapshot *replacement = TextSnapshot_4((*self).documentId,
-                                               (*self).revision + 1u,
+    TextSnapshot *replacement = TextSnapshot_4(TextDocument_documentId(self),
+                                               TextDocument_revision(self) + 1u,
                                                data, length);
     if (replacement == nullptr)
         return false;
-    TextSnapshot *previous = (*self).current;
-    (*self).current = replacement;
-    ++(*self).revision;
+    TextSnapshot *previous = TextDocument_current(self);
+    TextDocument_setCurrent(self, replacement);
+    TextDocument_setRevision(self, TextDocument_revision(self) + 1u);
     TextSnapshot_free(previous);
     return true;
 }
 
 TextSnapshot *TextDocument_snapshot(const TextDocument *self) {
-    if (self == nullptr || !TextSnapshot_retain((*self).current))
+    if (self == nullptr || !TextSnapshot_retain(TextDocument_current(self)))
         return nullptr;
-    return (*self).current;
+    return TextDocument_current(self);
 }
+;;GETTER
 u32 TextDocument_getDocumentId(const TextDocument *self) {
-    return self == nullptr ? 0u : (*self).documentId;
+    return self == nullptr ? 0u : TextDocument_documentId(self);
 }
+;;GETTER
 u64 TextDocument_getRevision(const TextDocument *self) {
-    return self == nullptr ? 0u : (*self).revision;
+    return self == nullptr ? 0u : TextDocument_revision(self);
 }

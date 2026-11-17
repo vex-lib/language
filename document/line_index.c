@@ -61,6 +61,19 @@ static ScalarStep decodeScalar(const u8 *data, bytes length, bytes at) {
     return (ScalarStep) {0};
 }
 
+;;GETTER
+static inline TextSnapshot *LineIndex_snapshot(const LineIndex *self) { return (*self).snapshot; }
+;;SETTER
+static inline fn LineIndex_setSnapshot(LineIndex *self, TextSnapshot *v) { (*self).snapshot = v; }
+;;GETTER
+static inline bytes *LineIndex_lineStarts(const LineIndex *self) { return (*self).lineStarts; }
+;;SETTER
+static inline fn LineIndex_setLineStarts(LineIndex *self, bytes *v) { (*self).lineStarts = v; }
+;;GETTER
+static inline bytes LineIndex_lineCount(const LineIndex *self) { return (*self).lineCount; }
+;;SETTER
+static inline fn LineIndex_setLineCount(LineIndex *self, bytes v) { (*self).lineCount = v; }
+
 LineIndex *LineIndex_1(TextSnapshot *snapshot) {
     if (snapshot == nullptr || !TextSnapshot_retain(snapshot))
         return nullptr;
@@ -81,30 +94,30 @@ LineIndex *LineIndex_1(TextSnapshot *snapshot) {
         TextSnapshot_free(snapshot);
         return nullptr;
     }
-    (*self).lineStarts = malloc(lineCount * sizeof(bytes));
-    if ((*self).lineStarts == nullptr) {
+    LineIndex_setLineStarts(self, malloc(lineCount * sizeof(bytes)));
+    if (LineIndex_lineStarts(self) == nullptr) {
         THROW("LineIndex: allocation failed for %zu line starts", lineCount);
         TextSnapshot_free(snapshot);
         free(self);
         return nullptr;
     }
-    (*self).snapshot = snapshot;
-    (*self).lineCount = lineCount;
-    (*self).lineStarts[0] = 0u;
+    LineIndex_setSnapshot(self, snapshot);
+    LineIndex_setLineCount(self, lineCount);
+    LineIndex_lineStarts(self)[0] = 0u;
     bytes next = 1u;
     for (bytes index = 0u; index < length; ++index)
         if (data[index] == '\n')
-            (*self).lineStarts[next++] = index + 1u;
+            LineIndex_lineStarts(self)[next++] = index + 1u;
     return self;
 }
 
 LineIndex *LineIndex_zero() { return nullptr; }
 fn LineIndex_free(LineIndex *self) {
     if (self != nullptr) {
-        TextSnapshot_free((*self).snapshot);
-        (*self).snapshot = nullptr;
-        free((*self).lineStarts);
-        (*self).lineStarts = nullptr;
+        TextSnapshot_free(LineIndex_snapshot(self));
+        LineIndex_setSnapshot(self, nullptr);
+        free(LineIndex_lineStarts(self));
+        LineIndex_setLineStarts(self, nullptr);
         free(self);
     }
 }
@@ -113,24 +126,24 @@ SourcePosition LineIndex_positionAtByte(const LineIndex *self, bytes byteOffset,
                                          PositionEncoding encoding) {
     if (self == nullptr || encoding < POSITION_ENCODING_UTF8
         || encoding > POSITION_ENCODING_UTF32
-        || byteOffset > TextSnapshot_getLength((*self).snapshot)) {
+        || byteOffset > TextSnapshot_getLength(LineIndex_snapshot(self))) {
         THROW("LineIndex: rejected byte offset or position encoding");
         return SourcePosition_zero();
     }
-    const char *source = TextSnapshot_getBytes((*self).snapshot);
-    bytes length = TextSnapshot_getLength((*self).snapshot);
+    const char *source = TextSnapshot_getBytes(LineIndex_snapshot(self));
+    bytes length = TextSnapshot_getLength(LineIndex_snapshot(self));
     bytes low = 0u;
-    bytes high = (*self).lineCount;
+    bytes high = LineIndex_lineCount(self);
     while (low + 1u < high) {
         bytes middle = low + (high - low) / 2u;
-        if ((*self).lineStarts[middle] <= byteOffset)
+        if (LineIndex_lineStarts(self)[middle] <= byteOffset)
             low = middle;
         else
             high = middle;
     }
-    bytes lineStart = (*self).lineStarts[low];
-    bytes lineEnd = low + 1u < (*self).lineCount
-        ? (*self).lineStarts[low + 1u] - 1u : length;
+    bytes lineStart = LineIndex_lineStarts(self)[low];
+    bytes lineEnd = low + 1u < LineIndex_lineCount(self)
+        ? LineIndex_lineStarts(self)[low + 1u] - 1u : length;
     if (lineEnd > lineStart && source[lineEnd - 1u] == '\r')
         --lineEnd;
     bytes target = byteOffset > lineEnd ? lineEnd : byteOffset;
@@ -156,12 +169,13 @@ SourcePosition LineIndex_positionAtByte(const LineIndex *self, bytes byteOffset,
     return SourcePosition_3(true, low, character);
 }
 
+;;GETTER
 bytes LineIndex_getLineCount(const LineIndex *self) {
-    return self == nullptr ? 0u : (*self).lineCount;
+    return self == nullptr ? 0u : LineIndex_lineCount(self);
 }
 u32 LineIndex_getDocumentId(const LineIndex *self) {
-    return self == nullptr ? 0u : TextSnapshot_getDocumentId((*self).snapshot);
+    return self == nullptr ? 0u : TextSnapshot_getDocumentId(LineIndex_snapshot(self));
 }
 u64 LineIndex_getRevision(const LineIndex *self) {
-    return self == nullptr ? 0u : TextSnapshot_getRevision((*self).snapshot);
+    return self == nullptr ? 0u : TextSnapshot_getRevision(LineIndex_snapshot(self));
 }

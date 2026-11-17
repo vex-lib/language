@@ -81,11 +81,15 @@ SourceRange SourceRange_3(u32 documentId, u64 startByte, u64 endByte) {
 }
 SourceRange SourceRange_zero() { return SourceRange_0(); }
 bool SourceRange_isValid(const SourceRange *self) {
-    return self != nullptr && (*self).documentId != 0 && (*self).startByte <= (*self).endByte;
+    return self != nullptr && SourceRange_getDocumentId(self) != 0
+        && SourceRange_getStartByte(self) <= SourceRange_getEndByte(self);
 }
+;;GETTER
 u32 SourceRange_getDocumentId(const SourceRange *self) { return self == nullptr ? 0 : (*self).documentId; }
 fn SourceRange_setDocumentId(SourceRange *self, u32 value) { if (self != nullptr) (*self).documentId = value; }
+;;GETTER
 u64 SourceRange_getStartByte(const SourceRange *self) { return self == nullptr ? 0 : (*self).startByte; }
 fn SourceRange_setStartByte(SourceRange *self, u64 value) { if (self != nullptr) (*self).startByte = value; }
+;;GETTER
 u64 SourceRange_getEndByte(const SourceRange *self) { return self == nullptr ? 0 : (*self).endByte; }
 fn SourceRange_setEndByte(SourceRange *self, u64 value) { if (self != nullptr) (*self).endByte = value; }

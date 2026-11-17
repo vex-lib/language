@@ -23,6 +23,21 @@ struct TextSnapshot {
     u64 referenceCount;
 };
 
+;;GETTER
+static inline char *TextSnapshot_bytes(const TextSnapshot *self) { return (*self).bytes; }
+;;SETTER
+static inline fn TextSnapshot_setBytes(TextSnapshot *self, char *v) { (*self).bytes = v; }
+;;SETTER
+static inline fn TextSnapshot_setDocumentId(TextSnapshot *self, u32 v) { (*self).documentId = v; }
+;;SETTER
+static inline fn TextSnapshot_setRevision(TextSnapshot *self, u64 v) { (*self).revision = v; }
+;;SETTER
+static inline fn TextSnapshot_setLength(TextSnapshot *self, bytes v) { (*self).length = v; }
+;;GETTER
+static inline u64 TextSnapshot_referenceCount(const TextSnapshot *self) { return (*self).referenceCount; }
+;;SETTER
+static inline fn TextSnapshot_setReferenceCount(TextSnapshot *self, u64 v) { (*self).referenceCount = v; }
+
 TextSnapshot *TextSnapshot_4(u32 documentId, u64 revision,
                              const char *data, bytes length) {
     if (documentId == 0u || revision == 0u || (data == nullptr && length != 0u)
@@ -35,58 +50,63 @@ TextSnapshot *TextSnapshot_4(u32 documentId, u64 revision,
         THROW("TextSnapshot: allocation failed for snapshot metadata");
         return nullptr;
     }
-    (*self).bytes = malloc(length + 1u);
-    if ((*self).bytes == nullptr) {
+    TextSnapshot_setBytes(self, malloc(length + 1u));
+    if (TextSnapshot_bytes(self) == nullptr) {
         THROW("TextSnapshot: allocation failed for %zu source bytes", length);
         free(self);
         return nullptr;
     }
     if (length != 0u)
-        memcpy((*self).bytes, data, length);
-    (*self).bytes[length] = '\0';
-    (*self).documentId = documentId;
-    (*self).revision = revision;
-    (*self).length = length;
-    (*self).referenceCount = 1u;
+        memcpy(TextSnapshot_bytes(self), data, length);
+    TextSnapshot_bytes(self)[length] = '\0';
+    TextSnapshot_setDocumentId(self, documentId);
+    TextSnapshot_setRevision(self, revision);
+    TextSnapshot_setLength(self, length);
+    TextSnapshot_setReferenceCount(self, 1u);
     return self;
 }
 
 fn TextSnapshot_release(TextSnapshot *self) {
     if (self == nullptr)
         return;
-    if ((*self).referenceCount == 0u) {
+    if (TextSnapshot_referenceCount(self) == 0u) {
         THROW("TextSnapshot: rejected release with zero references");
         return;
     }
-    --(*self).referenceCount;
-    if ((*self).referenceCount == 0u) {
-        free((*self).bytes);
-        (*self).bytes = nullptr;
+    TextSnapshot_setReferenceCount(self, TextSnapshot_referenceCount(self) - 1u);
+    if (TextSnapshot_referenceCount(self) == 0u) {
+        free(TextSnapshot_bytes(self));
+        TextSnapshot_setBytes(self, nullptr);
         free(self);
     }
 }
 fn TextSnapshot_free(TextSnapshot *self) { TextSnapshot_release(self); }
 bool TextSnapshot_retain(TextSnapshot *self) {
-    if (self == nullptr || (*self).referenceCount == 0u
-        || (*self).referenceCount == UINT64_MAX) {
+    if (self == nullptr || TextSnapshot_referenceCount(self) == 0u
+        || TextSnapshot_referenceCount(self) == UINT64_MAX) {
         THROW("TextSnapshot: rejected retain at reference-count bound");
         return false;
     }
-    ++(*self).referenceCount;
+    TextSnapshot_setReferenceCount(self, TextSnapshot_referenceCount(self) + 1u);
     return true;
 }
+;;GETTER
 u32 TextSnapshot_getDocumentId(const TextSnapshot *self) {
     return self == nullptr ? 0u : (*self).documentId;
 }
+;;GETTER
 u64 TextSnapshot_getRevision(const TextSnapshot *self) {
     return self == nullptr ? 0u : (*self).revision;
 }
+;;GETTER
 const char *TextSnapshot_getBytes(const TextSnapshot *self) {
     return self == nullptr ? nullptr : (*self).bytes;
 }
+;;GETTER
 bytes TextSnapshot_getLength(const TextSnapshot *self) {
     return self == nullptr ? 0u : (*self).length;
 }
+;;GETTER
 u64 TextSnapshot_getReferenceCount(const TextSnapshot *self) {
     return self == nullptr ? 0u : (*self).referenceCount;
 }
