@@ -14,14 +14,24 @@
  * CONTRACT: callbacks are called only after complete table validation; a
  * missing session or callback is rejected and produces a zero span. */
 
+;;GETTER
+static inline const char *LanguageAdapter_languageId(const LanguageAdapter *self) { return (*self).languageId; }
+;;GETTER
+static inline LanguageAdapterOpenFn LanguageAdapter_openFn(const LanguageAdapter *self) { return (*self).open; }
+;;GETTER
+static inline LanguageAdapterNextFn LanguageAdapter_nextFn(const LanguageAdapter *self) { return (*self).next; }
+;;GETTER
+static inline LanguageAdapterCloseFn LanguageAdapter_closeFn(const LanguageAdapter *self) { return (*self).close; }
+
 bool LanguageAdapter_isValid(const LanguageAdapter *self) {
-    return self != nullptr && (*self).languageId != nullptr
-        && (*self).languageId[0] != '\0' && (*self).open != nullptr
-        && (*self).next != nullptr && (*self).close != nullptr;
+    return self != nullptr && LanguageAdapter_languageId(self) != nullptr
+        && LanguageAdapter_languageId(self)[0] != '\0' && LanguageAdapter_openFn(self) != nullptr
+        && LanguageAdapter_nextFn(self) != nullptr && LanguageAdapter_closeFn(self) != nullptr;
 }
 
+;;GETTER
 const char *LanguageAdapter_getLanguageId(const LanguageAdapter *self) {
-    return LanguageAdapter_isValid(self) ? (*self).languageId : nullptr;
+    return LanguageAdapter_isValid(self) ? LanguageAdapter_languageId(self) : nullptr;
 }
 
 any LanguageAdapter_open(const LanguageAdapter *self, u32 documentId,
@@ -31,7 +41,7 @@ any LanguageAdapter_open(const LanguageAdapter *self, u32 documentId,
         THROW("language adapter rejected invalid open request");
         return nullptr;
     }
-    return (*self).open(documentId, source, length);
+    return LanguageAdapter_openFn(self)(documentId, source, length);
 }
 
 LanguageLexResult LanguageAdapter_next(const LanguageAdapter *self, any session) {
@@ -39,7 +49,7 @@ LanguageLexResult LanguageAdapter_next(const LanguageAdapter *self, any session)
         THROW("language adapter rejected invalid next request");
         return LanguageLexResult_zero();
     }
-    return (*self).next(session);
+    return LanguageAdapter_nextFn(self)(session);
 }
 
 fn LanguageAdapter_close(const LanguageAdapter *self, any session) {
@@ -49,5 +59,5 @@ fn LanguageAdapter_close(const LanguageAdapter *self, any session) {
         THROW("language adapter rejected invalid close request");
         return;
     }
-    (*self).close(session);
+    LanguageAdapter_closeFn(self)(session);
 }

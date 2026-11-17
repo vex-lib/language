@@ -24,6 +24,27 @@ struct LanguageEngine {
     u64 compilationContextId;
 };
 
+;;GETTER
+static inline const LanguageRegistry *LanguageEngine_registry(const LanguageEngine *self) { return (*self).registry; }
+;;SETTER
+static inline fn LanguageEngine_setRegistry(LanguageEngine *self, const LanguageRegistry *v) { (*self).registry = v; }
+;;GETTER
+static inline const LanguageAdapter *LanguageEngine_adapter(const LanguageEngine *self) { return (*self).adapter; }
+;;SETTER
+static inline fn LanguageEngine_setAdapter(LanguageEngine *self, const LanguageAdapter *v) { (*self).adapter = v; }
+;;GETTER
+static inline any LanguageEngine_session(const LanguageEngine *self) { return (*self).session; }
+;;SETTER
+static inline fn LanguageEngine_setSession(LanguageEngine *self, any v) { (*self).session = v; }
+;;GETTER
+static inline TextSnapshot *LanguageEngine_snapshot(const LanguageEngine *self) { return (*self).snapshot; }
+;;SETTER
+static inline fn LanguageEngine_setSnapshot(LanguageEngine *self, TextSnapshot *v) { (*self).snapshot = v; }
+;;GETTER
+static inline u64 LanguageEngine_compilationContextId(const LanguageEngine *self) { return (*self).compilationContextId; }
+;;SETTER
+static inline fn LanguageEngine_setCompilationContextId(LanguageEngine *self, u64 v) { (*self).compilationContextId = v; }
+
 LanguageEngine *LanguageEngine_1(const LanguageRegistry *registry) {
     if (registry == nullptr) {
         THROW("LanguageEngine: rejected null registry");
@@ -34,18 +55,18 @@ LanguageEngine *LanguageEngine_1(const LanguageRegistry *registry) {
         THROW("LanguageEngine: allocation failed");
         return nullptr;
     }
-    (*self).registry = registry;
+    LanguageEngine_setRegistry(self, registry);
     return self;
 }
 LanguageEngine *LanguageEngine_zero() { return nullptr; }
 fn LanguageEngine_close(LanguageEngine *self) {
-    if (self != nullptr && (*self).session != nullptr) {
-        LanguageAdapter_close((*self).adapter, (*self).session);
-        (*self).session = nullptr;
-        (*self).adapter = nullptr;
-        TextSnapshot_release((*self).snapshot);
-        (*self).snapshot = nullptr;
-        (*self).compilationContextId = 0u;
+    if (self != nullptr && LanguageEngine_session(self) != nullptr) {
+        LanguageAdapter_close(LanguageEngine_adapter(self), LanguageEngine_session(self));
+        LanguageEngine_setSession(self, nullptr);
+        LanguageEngine_setAdapter(self, nullptr);
+        TextSnapshot_release(LanguageEngine_snapshot(self));
+        LanguageEngine_setSnapshot(self, nullptr);
+        LanguageEngine_setCompilationContextId(self, 0u);
     }
 }
 fn LanguageEngine_free(LanguageEngine *self) {
@@ -63,7 +84,7 @@ bool LanguageEngine_open(LanguageEngine *self, const char *languageId,
         THROW("LanguageEngine: rejected invalid open request");
         return false;
     }
-    const LanguageAdapter *adapter = LanguageRegistry_find((*self).registry, languageId);
+    const LanguageAdapter *adapter = LanguageRegistry_find(LanguageEngine_registry(self), languageId);
     if (adapter == nullptr) {
         THROW("LanguageEngine: language id is not registered");
         return false;
@@ -78,33 +99,34 @@ bool LanguageEngine_open(LanguageEngine *self, const char *languageId,
         return false;
     }
     LanguageEngine_close(self);
-    (*self).adapter = adapter;
-    (*self).session = session;
-    (*self).snapshot = snapshot;
-    (*self).compilationContextId = compilationContextId;
+    LanguageEngine_setAdapter(self, adapter);
+    LanguageEngine_setSession(self, session);
+    LanguageEngine_setSnapshot(self, snapshot);
+    LanguageEngine_setCompilationContextId(self, compilationContextId);
     return true;
 }
 LanguageLexResult LanguageEngine_next(LanguageEngine *self) {
-    if (self == nullptr || (*self).session == nullptr) {
+    if (self == nullptr || LanguageEngine_session(self) == nullptr) {
         THROW("LanguageEngine: rejected next without an open snapshot");
         return LanguageLexResult_zero();
     }
-    LanguageLexResult result = LanguageAdapter_next((*self).adapter, (*self).session);
-    return LanguageLexResult_withContext(result, TextSnapshot_getRevision((*self).snapshot),
-                                         (*self).compilationContextId);
+    LanguageLexResult result = LanguageAdapter_next(LanguageEngine_adapter(self), LanguageEngine_session(self));
+    return LanguageLexResult_withContext(result, TextSnapshot_getRevision(LanguageEngine_snapshot(self)),
+                                         LanguageEngine_compilationContextId(self));
 }
 const char *LanguageEngine_getLanguageId(const LanguageEngine *self) {
-    return self == nullptr || (*self).adapter == nullptr ? nullptr
-        : LanguageAdapter_getLanguageId((*self).adapter);
+    return self == nullptr || LanguageEngine_adapter(self) == nullptr ? nullptr
+        : LanguageAdapter_getLanguageId(LanguageEngine_adapter(self));
 }
 u32 LanguageEngine_getDocumentId(const LanguageEngine *self) {
-    return self == nullptr || (*self).snapshot == nullptr
-        ? 0u : TextSnapshot_getDocumentId((*self).snapshot);
+    return self == nullptr || LanguageEngine_snapshot(self) == nullptr
+        ? 0u : TextSnapshot_getDocumentId(LanguageEngine_snapshot(self));
 }
 u64 LanguageEngine_getDocumentRevision(const LanguageEngine *self) {
-    return self == nullptr || (*self).snapshot == nullptr
-        ? 0u : TextSnapshot_getRevision((*self).snapshot);
+    return self == nullptr || LanguageEngine_snapshot(self) == nullptr
+        ? 0u : TextSnapshot_getRevision(LanguageEngine_snapshot(self));
 }
+;;GETTER
 u64 LanguageEngine_getCompilationContextId(const LanguageEngine *self) {
-    return self == nullptr ? 0u : (*self).compilationContextId;
+    return self == nullptr ? 0u : LanguageEngine_compilationContextId(self);
 }

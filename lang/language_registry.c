@@ -24,6 +24,27 @@ struct LanguageRegistry {
     bool exhaustionReported;
 };
 
+;;GETTER
+static inline bytes LanguageRegistry_count(const LanguageRegistry *self) { return (*self).count; }
+;;SETTER
+static inline fn LanguageRegistry_setCount(LanguageRegistry *self, bytes v) { (*self).count = v; }
+;;GETTER
+static inline bytes LanguageRegistry_capacity(const LanguageRegistry *self) { return (*self).capacity; }
+;;SETTER
+static inline fn LanguageRegistry_setCapacity(LanguageRegistry *self, bytes v) { (*self).capacity = v; }
+;;GETTER
+static inline const LanguageAdapter **LanguageRegistry_adapters(const LanguageRegistry *self) { return (*self).adapters; }
+;;SETTER
+static inline fn LanguageRegistry_setAdapters(LanguageRegistry *self, const LanguageAdapter **v) { (*self).adapters = v; }
+;;GETTER
+static inline u64 LanguageRegistry_exhaustionCount(const LanguageRegistry *self) { return (*self).exhaustionCount; }
+;;SETTER
+static inline fn LanguageRegistry_setExhaustionCount(LanguageRegistry *self, u64 v) { (*self).exhaustionCount = v; }
+;;GETTER
+static inline bool LanguageRegistry_exhaustionReported(const LanguageRegistry *self) { return (*self).exhaustionReported; }
+;;SETTER
+static inline fn LanguageRegistry_setExhaustionReported(LanguageRegistry *self, bool v) { (*self).exhaustionReported = v; }
+
 LanguageRegistry *LanguageRegistry_0() {
     LanguageRegistry *self = calloc(1u, sizeof *self);
     if (self == nullptr)
@@ -34,8 +55,8 @@ LanguageRegistry *LanguageRegistry_zero() { return LanguageRegistry_0(); }
 fn LanguageRegistry_free(LanguageRegistry *self) {
     if (self == nullptr)
         return;
-    free((*self).adapters);
-    (*self).adapters = nullptr;
+    free(LanguageRegistry_adapters(self));
+    LanguageRegistry_setAdapters(self, nullptr);
     free(self);
 }
 
@@ -45,41 +66,41 @@ bool LanguageRegistry_register(LanguageRegistry *self, const LanguageAdapter *ad
         return false;
     }
     const char *id = LanguageAdapter_getLanguageId(adapter);
-    for (bytes index = 0u; index < (*self).count; ++index) {
-        if (strcmp(LanguageAdapter_getLanguageId((*self).adapters[index]), id) == 0) {
+    for (bytes index = 0u; index < LanguageRegistry_count(self); ++index) {
+        if (strcmp(LanguageAdapter_getLanguageId(LanguageRegistry_adapters(self)[index]), id) == 0) {
             THROW("LanguageRegistry: duplicate language id");
             return false;
         }
     }
-    if ((*self).count == (*self).capacity) {
-        bytes capacity = (*self).capacity == 0u ? 4u : (*self).capacity * 2u;
-        if (capacity < (*self).capacity || capacity > SIZE_MAX / sizeof(LanguageAdapter*)) {
-            if ((*self).exhaustionCount != UINT64_MAX)
-                ++(*self).exhaustionCount;
-            if (!(*self).exhaustionReported) {
+    if (LanguageRegistry_count(self) == LanguageRegistry_capacity(self)) {
+        bytes capacity = LanguageRegistry_capacity(self) == 0u ? 4u : LanguageRegistry_capacity(self) * 2u;
+        if (capacity < LanguageRegistry_capacity(self) || capacity > SIZE_MAX / sizeof(LanguageAdapter*)) {
+            if (LanguageRegistry_exhaustionCount(self) != UINT64_MAX)
+                LanguageRegistry_setExhaustionCount(self, LanguageRegistry_exhaustionCount(self) + 1u);
+            if (!LanguageRegistry_exhaustionReported(self)) {
                 THROW("LanguageRegistry: capacity overflow, request %zu adapters",
-                      (*self).count + 1u);
-                (*self).exhaustionReported = true;
+                      LanguageRegistry_count(self) + 1u);
+                LanguageRegistry_setExhaustionReported(self, true);
             }
             return false;
         }
-        const LanguageAdapter **grown = realloc((*self).adapters,
+        const LanguageAdapter **grown = realloc(LanguageRegistry_adapters(self),
                                                  capacity * sizeof(LanguageAdapter*));
         if (grown == nullptr) {
-            if ((*self).exhaustionCount != UINT64_MAX)
-                ++(*self).exhaustionCount;
-            if (!(*self).exhaustionReported) {
+            if (LanguageRegistry_exhaustionCount(self) != UINT64_MAX)
+                LanguageRegistry_setExhaustionCount(self, LanguageRegistry_exhaustionCount(self) + 1u);
+            if (!LanguageRegistry_exhaustionReported(self)) {
                 THROW("LanguageRegistry: allocation refused, request %zu adapters (capacity %zu)",
-                      (*self).count + 1u, (*self).capacity);
-                (*self).exhaustionReported = true;
+                      LanguageRegistry_count(self) + 1u, LanguageRegistry_capacity(self));
+                LanguageRegistry_setExhaustionReported(self, true);
             }
             return false;
         }
-        (*self).adapters = grown;
-        (*self).capacity = capacity;
+        LanguageRegistry_setAdapters(self, grown);
+        LanguageRegistry_setCapacity(self, capacity);
     }
-    (*self).adapters[(*self).count] = adapter;
-    ++(*self).count;
+    LanguageRegistry_adapters(self)[LanguageRegistry_count(self)] = adapter;
+    LanguageRegistry_setCount(self, LanguageRegistry_count(self) + 1u);
     return true;
 }
 
@@ -87,14 +108,16 @@ const LanguageAdapter *LanguageRegistry_find(const LanguageRegistry *self,
                                              const char *languageId) {
     if (self == nullptr || languageId == nullptr)
         return nullptr;
-    for (bytes index = 0u; index < (*self).count; ++index)
-        if (strcmp(LanguageAdapter_getLanguageId((*self).adapters[index]), languageId) == 0)
-            return (*self).adapters[index];
+    for (bytes index = 0u; index < LanguageRegistry_count(self); ++index)
+        if (strcmp(LanguageAdapter_getLanguageId(LanguageRegistry_adapters(self)[index]), languageId) == 0)
+            return LanguageRegistry_adapters(self)[index];
     return nullptr;
 }
+;;GETTER
 bytes LanguageRegistry_getCount(const LanguageRegistry *self) {
-    return self == nullptr ? 0u : (*self).count;
+    return self == nullptr ? 0u : LanguageRegistry_count(self);
 }
+;;GETTER
 u64 LanguageRegistry_getExhaustionCount(const LanguageRegistry *self) {
-    return self == nullptr ? 0u : (*self).exhaustionCount;
+    return self == nullptr ? 0u : LanguageRegistry_exhaustionCount(self);
 }
