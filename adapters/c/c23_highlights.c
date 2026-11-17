@@ -92,6 +92,31 @@ struct C23Highlights {
     bytes sourceLength;
 };
 
+;;GETTER
+static inline u32 C23Highlights_documentId(const C23Highlights *self) { return (*self).documentId; }
+;;SETTER
+static inline fn C23Highlights_setDocumentId(C23Highlights *self, u32 v) { (*self).documentId = v; }
+;;GETTER
+static inline bytes C23Highlights_count(const C23Highlights *self) { return (*self).count; }
+;;SETTER
+static inline fn C23Highlights_setCount(C23Highlights *self, bytes v) { (*self).count = v; }
+;;GETTER
+static inline bytes C23Highlights_capacity(const C23Highlights *self) { return (*self).capacity; }
+;;SETTER
+static inline fn C23Highlights_setCapacity(C23Highlights *self, bytes v) { (*self).capacity = v; }
+;;GETTER
+static inline C23HighlightEntry *C23Highlights_entries(const C23Highlights *self) { return (*self).entries; }
+;;SETTER
+static inline fn C23Highlights_setEntries(C23Highlights *self, C23HighlightEntry *v) { (*self).entries = v; }
+;;GETTER
+static inline const char *C23Highlights_source(const C23Highlights *self) { return (*self).source; }
+;;SETTER
+static inline fn C23Highlights_setSource(C23Highlights *self, const char *v) { (*self).source = v; }
+;;GETTER
+static inline bytes C23Highlights_sourceLength(const C23Highlights *self) { return (*self).sourceLength; }
+;;SETTER
+static inline fn C23Highlights_setSourceLength(C23Highlights *self, bytes v) { (*self).sourceLength = v; }
+
 static bool tokenIs(const C23Token *tokens, bytes count, bytes index, const char *text,
                     const char *source) {
     if (index >= count)
@@ -119,19 +144,19 @@ static bool tokenStartsLine(const C23Token *tokens, bytes count, bytes index,
 }
 
 static bool appendEntry(C23Highlights *self, C23HighlightEntry entry) {
-    if ((*self).count == (*self).capacity) {
-        bytes next = (*self).capacity == 0u ? 64u : (*self).capacity * 2u;
-        if (next < (*self).capacity || next > SIZE_MAX / sizeof *(*self).entries)
+    if (C23Highlights_count(self) == C23Highlights_capacity(self)) {
+        bytes next = C23Highlights_capacity(self) == 0u ? 64u : C23Highlights_capacity(self) * 2u;
+        if (next < C23Highlights_capacity(self) || next > SIZE_MAX / sizeof *C23Highlights_entries(self))
             return false;
-        C23HighlightEntry *grown = realloc((*self).entries,
-                                           next * sizeof *(*self).entries);
+        C23HighlightEntry *grown = realloc(C23Highlights_entries(self),
+                                           next * sizeof *C23Highlights_entries(self));
         if (grown == nullptr)
             return false;
-        (*self).entries = grown;
-        (*self).capacity = next;
+        C23Highlights_setEntries(self, grown);
+        C23Highlights_setCapacity(self, next);
     }
-    (*self).entries[(*self).count] = entry;
-    ++(*self).count;
+    C23Highlights_entries(self)[C23Highlights_count(self)] = entry;
+    C23Highlights_setCount(self, C23Highlights_count(self) + 1u);
     return true;
 }
 
@@ -315,18 +340,19 @@ C23Highlights *C23Highlights_3(u32 documentId, const char *source, bytes length)
     C23Highlights *self = C23Highlights_0();
     if (self == nullptr)
         return nullptr;
-    (*self).documentId = documentId;
-    (*self).source = source == nullptr ? "" : source;
-    (*self).sourceLength = length;
+    C23Highlights_setDocumentId(self, documentId);
+    C23Highlights_setSource(self, source == nullptr ? "" : source);
+    C23Highlights_setSourceLength(self, length);
     C23Token *tokens = nullptr;
     bytes tokenCount = 0u;
-    bool success = tokenizeC23(documentId, (*self).source, length, &tokens, &tokenCount);
+    const char *src = C23Highlights_source(self);
+    bool success = tokenizeC23(documentId, src, length, &tokens, &tokenCount);
     for (bytes index = 0u; success && index < tokenCount; ++index) {
         C23Token token = tokens[index];
         SyntaxRole role = token.role == SYNTAX_ROLE_IDENTIFIER
-            ? classifyIdentifier(tokens, tokenCount, index, (*self).source)
+            ? classifyIdentifier(tokens, tokenCount, index, src)
             : token.role;
-        if (tokenStartsLine(tokens, tokenCount, index, (*self).source))
+        if (tokenStartsLine(tokens, tokenCount, index, src))
             role = SYNTAX_ROLE_MACRO;
         C23HighlightEntry entry = {
             .start = token.start, .end = token.end, .role = role
@@ -336,10 +362,10 @@ C23Highlights *C23Highlights_3(u32 documentId, const char *source, bytes length)
             break;
         }
         if (token.role == SYNTAX_ROLE_IDENTIFIER
-            && tokenIs(tokens, tokenCount, index, "include", (*self).source)
-            && previousIsDirectiveHash(tokens, tokenCount, index, (*self).source)) {
+            && tokenIs(tokens, tokenCount, index, "include", src)
+            && previousIsDirectiveHash(tokens, tokenCount, index, src)) {
             bytes open = SIZE_MAX;
-            bytes close = includeHeaderEnd(tokens, tokenCount, index, (*self).source, &open);
+            bytes close = includeHeaderEnd(tokens, tokenCount, index, src, &open);
             if (close != SIZE_MAX) {
                 C23HighlightEntry header = {
                     .start = tokens[open].start,
@@ -357,7 +383,7 @@ C23Highlights *C23Highlights_3(u32 documentId, const char *source, bytes length)
     free(tokens);
     if (!success) {
         THROW("C23Highlights analysis allocation failed for %zu source bytes", length);
-        free((*self).entries);
+        free(C23Highlights_entries(self));
         free(self);
         return nullptr;
     }
@@ -369,44 +395,46 @@ C23Highlights *C23Highlights_zero() { return C23Highlights_0(); }
 fn C23Highlights_free(C23Highlights *self) {
     if (self == nullptr)
         return;
-    free((*self).entries);
+    free(C23Highlights_entries(self));
     free(self);
 }
 
+;;GETTER
 bytes C23Highlights_getCount(const C23Highlights *self) {
-    return self == nullptr ? 0u : (*self).count;
+    return self == nullptr ? 0u : C23Highlights_count(self);
 }
 
+;;GETTER
 u32 C23Highlights_getDocumentId(const C23Highlights *self) {
-    return self == nullptr ? 0u : (*self).documentId;
+    return self == nullptr ? 0u : C23Highlights_documentId(self);
 }
 
 bytes C23Highlights_getStart(const C23Highlights *self, bytes index) {
-    if (self == nullptr || index >= (*self).count)
+    if (self == nullptr || index >= C23Highlights_count(self))
         return 0u;
-    return (*self).entries[index].start;
+    return C23Highlights_entries(self)[index].start;
 }
 
 bytes C23Highlights_getEnd(const C23Highlights *self, bytes index) {
-    if (self == nullptr || index >= (*self).count)
+    if (self == nullptr || index >= C23Highlights_count(self))
         return 0u;
-    return (*self).entries[index].end;
+    return C23Highlights_entries(self)[index].end;
 }
 
 SyntaxRole C23Highlights_getRole(const C23Highlights *self, bytes index) {
-    if (self == nullptr || index >= (*self).count)
+    if (self == nullptr || index >= C23Highlights_count(self))
         return SYNTAX_ROLE_NONE;
-    return (*self).entries[index].role;
+    return C23Highlights_entries(self)[index].role;
 }
 
 SyntaxRole C23Highlights_roleAt(const C23Highlights *self, bytes byte) {
     if (self == nullptr)
         return SYNTAX_ROLE_NONE;
     bytes low = 0u;
-    bytes high = (*self).count;
+    bytes high = C23Highlights_count(self);
     while (low < high) {
         bytes middle = low + (high - low) / 2u;
-        C23HighlightEntry entry = (*self).entries[middle];
+        C23HighlightEntry entry = C23Highlights_entries(self)[middle];
         if (byte < entry.start)
             high = middle;
         else if (byte >= entry.end)
@@ -421,13 +449,13 @@ BoundedText C23Highlights_toString(const C23Highlights *self) {
     if (self == nullptr)
         return BoundedText_1("nullptr");
     return BoundedText_format("C23Highlights(document=%u, count=%zu)",
-                              (*self).documentId, (*self).count);
+                              C23Highlights_documentId(self), C23Highlights_count(self));
 }
 
 BoundedText C23Highlights_toStringStruct(const C23Highlights *self) {
     if (self == nullptr)
         return BoundedText_1("nullptr");
     return BoundedText_format("C23Highlights { documentId=%u, count=%zu, capacity=%zu, entries=%p, source=%p, sourceLength=%zu }",
-        (*self).documentId, (*self).count, (*self).capacity, (any) (*self).entries,
-        (const_any) (*self).source, (*self).sourceLength);
+        C23Highlights_documentId(self), C23Highlights_count(self), C23Highlights_capacity(self),
+        (any) C23Highlights_entries(self), (const_any) C23Highlights_source(self), C23Highlights_sourceLength(self));
 }

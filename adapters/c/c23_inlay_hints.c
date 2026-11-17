@@ -96,6 +96,39 @@ struct C23InlayHints {
     bytes sourceLength;
 };
 
+;;GETTER
+static inline bytes C23Signature_parameterStart(const C23Signature *s) { return (*s).parameterStart; }
+;;GETTER
+static inline bytes C23Signature_parameterCount(const C23Signature *s) { return (*s).parameterCount; }
+;;GETTER
+static inline u32 C23InlayHints_documentId(const C23InlayHints *self) { return (*self).documentId; }
+;;SETTER
+static inline fn C23InlayHints_setDocumentId(C23InlayHints *self, u32 v) { (*self).documentId = v; }
+;;GETTER
+static inline bytes C23InlayHints_count(const C23InlayHints *self) { return (*self).count; }
+;;SETTER
+static inline fn C23InlayHints_setCount(C23InlayHints *self, bytes v) { (*self).count = v; }
+;;GETTER
+static inline C23HintEntry *C23InlayHints_entries(const C23InlayHints *self) { return (*self).entries; }
+;;SETTER
+static inline fn C23InlayHints_setEntries(C23InlayHints *self, C23HintEntry *v) { (*self).entries = v; }
+;;GETTER
+static inline char *C23InlayHints_labelBytes(const C23InlayHints *self) { return (*self).labelBytes; }
+;;SETTER
+static inline fn C23InlayHints_setLabelBytes(C23InlayHints *self, char *v) { (*self).labelBytes = v; }
+;;GETTER
+static inline bytes C23InlayHints_labelByteCount(const C23InlayHints *self) { return (*self).labelByteCount; }
+;;SETTER
+static inline fn C23InlayHints_setLabelByteCount(C23InlayHints *self, bytes v) { (*self).labelByteCount = v; }
+;;GETTER
+static inline const char *C23InlayHints_source(const C23InlayHints *self) { return (*self).source; }
+;;SETTER
+static inline fn C23InlayHints_setSource(C23InlayHints *self, const char *v) { (*self).source = v; }
+;;GETTER
+static inline bytes C23InlayHints_sourceLength(const C23InlayHints *self) { return (*self).sourceLength; }
+;;SETTER
+static inline fn C23InlayHints_setSourceLength(C23InlayHints *self, bytes v) { (*self).sourceLength = v; }
+
 static bool tokenIs(const C23Token *tokens, bytes count, bytes index, const char *text,
                     const char *source) {
     if (index >= count)
@@ -216,31 +249,31 @@ static bool appendSignature(C23Signature **signatures, bytes *count,
 static bool appendHint(C23InlayHints *self, bytes offset, bytes nameStart,
                        bytes nameEnd) {
     if (nameEnd < nameStart || nameEnd - nameStart > SIZE_MAX - 2u
-        || (*self).count == SIZE_MAX / sizeof *(*self).entries)
+        || C23InlayHints_count(self) == SIZE_MAX / sizeof *C23InlayHints_entries(self))
         return false;
     bytes labelLength = nameEnd - nameStart + 1u;
-    if ((*self).count + 1u > SIZE_MAX / sizeof *(*self).entries)
+    if (C23InlayHints_count(self) + 1u > SIZE_MAX / sizeof *C23InlayHints_entries(self))
         return false;
-    C23HintEntry *entries = realloc((*self).entries,
-                                    ((*self).count + 1u) * sizeof *(*self).entries);
+    C23HintEntry *entries = realloc(C23InlayHints_entries(self),
+                                    (C23InlayHints_count(self) + 1u) * sizeof *C23InlayHints_entries(self));
     if (entries == nullptr)
         return false;
-    (*self).entries = entries;
-    bytes used = (*self).labelByteCount;
+    C23InlayHints_setEntries(self, entries);
+    bytes used = C23InlayHints_labelByteCount(self);
     if (used > SIZE_MAX - labelLength - 1u)
         return false;
-    char *labels = realloc((*self).labelBytes, used + labelLength + 1u);
+    char *labels = realloc(C23InlayHints_labelBytes(self), used + labelLength + 1u);
     if (labels == nullptr)
         return false;
-    (*self).labelBytes = labels;
-    memcpy(labels + used, (*self).source + nameStart, nameEnd - nameStart);
+    C23InlayHints_setLabelBytes(self, labels);
+    memcpy(labels + used, C23InlayHints_source(self) + nameStart, nameEnd - nameStart);
     labels[used + labelLength - 1u] = ':';
     labels[used + labelLength] = '\0';
-    (*self).entries[(*self).count] = (C23HintEntry) {
+    C23InlayHints_entries(self)[C23InlayHints_count(self)] = (C23HintEntry) {
         .offset = offset, .labelOffset = used, .labelLength = labelLength
     };
-    (*self).labelByteCount = used + labelLength + 1u;
-    ++(*self).count;
+    C23InlayHints_setLabelByteCount(self, used + labelLength + 1u);
+    C23InlayHints_setCount(self, C23InlayHints_count(self) + 1u);
     return true;
 }
 
@@ -250,7 +283,7 @@ static bool collectSignatures(C23InlayHints *self, const C23Token *tokens,
                               bytes *signatureCount) {
     bytes parameterCapacity = 0u;
     bytes signatureCapacity = 0u;
-    const char *source = (*self).source;
+    const char *source = C23InlayHints_source(self);
     for (bytes open = 1u; open + 1u < tokenCount; ++open) {
         if (!tokenIs(tokens, tokenCount, open, "(", source)
             || !isIdentifier(tokens[open - 1u]) || open < 2u
@@ -332,7 +365,7 @@ static bool collectSignatures(C23InlayHints *self, const C23Token *tokens,
 static bool matchCalls(C23InlayHints *self, const C23Token *tokens,
                        bytes tokenCount, const C23Parameter *parameters,
                        const C23Signature *signatures, bytes signatureCount) {
-    const char *source = (*self).source;
+    const char *source = C23InlayHints_source(self);
     for (bytes nameIndex = 0u; nameIndex + 1u < tokenCount; ++nameIndex) {
         if (!isIdentifier(tokens[nameIndex])
             || !tokenIs(tokens, tokenCount, nameIndex + 1u, "(", source))
@@ -366,10 +399,10 @@ static bool matchCalls(C23InlayHints *self, const C23Token *tokens,
                           tokens[nameIndex].end - tokens[nameIndex].start) != 0)
                 continue;
             if (signature != nullptr) {
-                bool sameParameters = (*signature).parameterCount == candidate.parameterCount;
+                bool sameParameters = C23Signature_parameterCount(signature) == candidate.parameterCount;
                 for (bytes parameter = 0u; sameParameters
                      && parameter < candidate.parameterCount; ++parameter) {
-                    C23Parameter first = parameters[(*signature).parameterStart + parameter];
+                    C23Parameter first = parameters[C23Signature_parameterStart(signature) + parameter];
                     C23Parameter next = parameters[candidate.parameterStart + parameter];
                     bytes firstLength = first.end - first.start;
                     bytes nextLength = next.end - next.start;
@@ -407,7 +440,7 @@ static bool matchCalls(C23InlayHints *self, const C23Token *tokens,
                     ++actualArgumentCount;
             }
         }
-        if (actualArgumentCount != (*signature).parameterCount)
+        if (actualArgumentCount != C23Signature_parameterCount(signature))
             continue;
         bytes argStart = nameIndex + 2u;
         bytes argument = 0u;
@@ -426,8 +459,8 @@ static bool matchCalls(C23InlayHints *self, const C23Token *tokens,
                     --depth;
                 continue;
             }
-            if (argStart < index && argument < (*signature).parameterCount) {
-                C23Parameter parameter = parameters[(*signature).parameterStart + argument];
+            if (argStart < index && argument < C23Signature_parameterCount(signature)) {
+                C23Parameter parameter = parameters[C23Signature_parameterStart(signature) + argument];
                 bytes argOffset = tokens[argStart].start;
                 if (!appendHint(self, argOffset, parameter.start, parameter.end))
                     return false;
@@ -454,16 +487,16 @@ C23InlayHints *C23InlayHints_3(u32 documentId, const char *source, bytes length)
     C23InlayHints *self = C23InlayHints_0();
     if (self == nullptr)
         return nullptr;
-    (*self).documentId = documentId;
-    (*self).source = source == nullptr ? "" : source;
-    (*self).sourceLength = length;
+    C23InlayHints_setDocumentId(self, documentId);
+    C23InlayHints_setSource(self, source == nullptr ? "" : source);
+    C23InlayHints_setSourceLength(self, length);
     C23Token *tokens = nullptr;
     bytes tokenCount = 0u;
     C23Parameter *parameters = nullptr;
     bytes parameterCount = 0u;
     C23Signature *signatures = nullptr;
     bytes signatureCount = 0u;
-    bool success = tokenize(documentId, (*self).source, length, &tokens, &tokenCount)
+    bool success = tokenize(documentId, C23InlayHints_source(self), length, &tokens, &tokenCount)
         && collectSignatures(self, tokens, tokenCount, &parameters, &parameterCount,
                              &signatures, &signatureCount)
         && matchCalls(self, tokens, tokenCount, parameters, signatures, signatureCount);
@@ -483,46 +516,48 @@ C23InlayHints *C23InlayHints_zero() { return C23InlayHints_0(); }
 fn C23InlayHints_free(C23InlayHints *self) {
     if (self == nullptr)
         return;
-    free((*self).entries);
-    free((*self).labelBytes);
+    free(C23InlayHints_entries(self));
+    free(C23InlayHints_labelBytes(self));
     free(self);
 }
 
+;;GETTER
 bytes C23InlayHints_getCount(const C23InlayHints *self) {
-    return self == nullptr ? 0u : (*self).count;
+    return self == nullptr ? 0u : C23InlayHints_count(self);
 }
+;;GETTER
 u32 C23InlayHints_getDocumentId(const C23InlayHints *self) {
-    return self == nullptr ? 0u : (*self).documentId;
+    return self == nullptr ? 0u : C23InlayHints_documentId(self);
 }
 bytes C23InlayHints_getOffset(const C23InlayHints *self, bytes index) {
-    if (self == nullptr || index >= (*self).count)
+    if (self == nullptr || index >= C23InlayHints_count(self))
         return 0u;
-    C23HintEntry entry = (*self).entries[index];
+    C23HintEntry entry = C23InlayHints_entries(self)[index];
     return entry.offset;
 }
 const char *C23InlayHints_getLabel(const C23InlayHints *self, bytes index) {
-    if (self == nullptr || index >= (*self).count)
+    if (self == nullptr || index >= C23InlayHints_count(self))
         return nullptr;
-    C23HintEntry entry = (*self).entries[index];
-    return (*self).labelBytes + entry.labelOffset;
+    C23HintEntry entry = C23InlayHints_entries(self)[index];
+    return C23InlayHints_labelBytes(self) + entry.labelOffset;
 }
 bytes C23InlayHints_getLabelLength(const C23InlayHints *self, bytes index) {
-    if (self == nullptr || index >= (*self).count)
+    if (self == nullptr || index >= C23InlayHints_count(self))
         return 0u;
-    C23HintEntry entry = (*self).entries[index];
+    C23HintEntry entry = C23InlayHints_entries(self)[index];
     return entry.labelLength;
 }
 BoundedText C23InlayHints_toString(const C23InlayHints *self) {
     if (self == nullptr)
         return BoundedText_1("nullptr");
     return BoundedText_format("C23InlayHints(document=%u, count=%zu)",
-                              (*self).documentId, (*self).count);
+                              C23InlayHints_documentId(self), C23InlayHints_count(self));
 }
 BoundedText C23InlayHints_toStringStruct(const C23InlayHints *self) {
     if (self == nullptr)
         return BoundedText_1("nullptr");
     return BoundedText_format("C23InlayHints { documentId=%u, count=%zu, entries=%p, labelBytes=%p, labelByteCount=%zu, source=%p, sourceLength=%zu }",
-        (*self).documentId, (*self).count, (any) (*self).entries,
-        (any) (*self).labelBytes, (*self).labelByteCount,
-        (const_any) (*self).source, (*self).sourceLength);
+        C23InlayHints_documentId(self), C23InlayHints_count(self), (any) C23InlayHints_entries(self),
+        (any) C23InlayHints_labelBytes(self), C23InlayHints_labelByteCount(self),
+        (const_any) C23InlayHints_source(self), C23InlayHints_sourceLength(self));
 }

@@ -83,6 +83,43 @@ struct C23Lexer {
     bool docComment;
 };
 
+;;GETTER
+static inline u32 C23Lexer_documentId(const C23Lexer *self) { return (*self).documentId; }
+;;SETTER
+static inline fn C23Lexer_setDocumentId(C23Lexer *self, u32 v) { (*self).documentId = v; }
+;;GETTER
+static inline const char *C23Lexer_source(const C23Lexer *self) { return (*self).source; }
+;;SETTER
+static inline fn C23Lexer_setSourcePtr(C23Lexer *self, const char *v) { (*self).source = v; }
+;;GETTER
+static inline bytes C23Lexer_length(const C23Lexer *self) { return (*self).length; }
+;;SETTER
+static inline fn C23Lexer_setLength(C23Lexer *self, bytes v) { (*self).length = v; }
+;;GETTER
+static inline bytes C23Lexer_offset(const C23Lexer *self) { return (*self).offset; }
+;;SETTER
+static inline fn C23Lexer_setOffset(C23Lexer *self, bytes v) { (*self).offset = v; }
+;;GETTER
+static inline C23LexerProfile C23Lexer_profile(const C23Lexer *self) { return (*self).profile; }
+;;SETTER
+static inline fn C23Lexer_setProfileField(C23Lexer *self, C23LexerProfile v) { (*self).profile = v; }
+;;GETTER
+static inline bool C23Lexer_stopped(const C23Lexer *self) { return (*self).stopped; }
+;;SETTER
+static inline fn C23Lexer_setStopped(C23Lexer *self, bool v) { (*self).stopped = v; }
+;;GETTER
+static inline u8 C23Lexer_mode(const C23Lexer *self) { return (*self).mode; }
+;;SETTER
+static inline fn C23Lexer_setMode(C23Lexer *self, u8 v) { (*self).mode = v; }
+;;GETTER
+static inline char C23Lexer_quote(const C23Lexer *self) { return (*self).quote; }
+;;SETTER
+static inline fn C23Lexer_setQuote(C23Lexer *self, char v) { (*self).quote = v; }
+;;GETTER
+static inline bool C23Lexer_docComment(const C23Lexer *self) { return (*self).docComment; }
+;;SETTER
+static inline fn C23Lexer_setDocComment(C23Lexer *self, bool v) { (*self).docComment = v; }
+
 enum {
     C23_LEXER_MODE_NORMAL = 0u,
     C23_LEXER_MODE_LINE_COMMENT,
@@ -184,8 +221,8 @@ static SyntaxRole keywordRole(const char *word, bytes length) {
 }
 
 static bytes skipWhitespace(const C23Lexer *self, bytes offset) {
-    while (offset < (*self).length) {
-        u8 byte = (u8) (*self).source[offset];
+    while (offset < C23Lexer_length(self)) {
+        u8 byte = (u8) C23Lexer_source(self)[offset];
         if (byte != ' ' && byte != '\t' && byte != '\r' && byte != '\n'
             && byte != '\f' && byte != '\v')
             break;
@@ -256,7 +293,7 @@ static SyntaxRole punctuatorRole(const char *source, bytes start, bytes end) {
 
 static SyntaxSpan makeSpan(const C23Lexer *self, bytes start, bytes end,
                            SyntaxRole role, const char *styleKey) {
-    return SyntaxSpan_3(SourceRange_3((*self).documentId, start, end), role, styleKey);
+    return SyntaxSpan_3(SourceRange_3(C23Lexer_documentId(self), start, end), role, styleKey);
 }
 
 static QuotePrefixResult quotePrefix(const char *source, bytes length, bytes start) {
@@ -280,98 +317,98 @@ static QuotePrefixResult quotePrefix(const char *source, bytes length, bytes sta
 }
 
 static C23LexStep invalidSpan(C23Lexer *self, bytes start, bytes end) {
-    (*self).offset = end;
+    C23Lexer_setOffset(self, end);
     return C23LexStep_2(true, makeSpan(self, start, end, SYNTAX_ROLE_INVALID, nullptr));
 }
 
 static C23LexStep scanComment(C23Lexer *self, bytes start) {
-    const char *source = (*self).source;
-    bool blockComment = (*self).mode == C23_LEXER_MODE_BLOCK_COMMENT;
-    bytes end = (*self).offset > start ? (*self).offset : start;
-    while (end < (*self).length) {
+    const char *source = C23Lexer_source(self);
+    bool blockComment = C23Lexer_mode(self) == C23_LEXER_MODE_BLOCK_COMMENT;
+    bytes end = C23Lexer_offset(self) > start ? C23Lexer_offset(self) : start;
+    while (end < C23Lexer_length(self)) {
         u8 byte = (u8) source[end];
-        if ((*self).mode == C23_LEXER_MODE_LINE_COMMENT && (byte == '\n' || byte == '\r')) {
-            (*self).mode = C23_LEXER_MODE_NORMAL;
-            (*self).offset = end;
+        if (C23Lexer_mode(self) == C23_LEXER_MODE_LINE_COMMENT && (byte == '\n' || byte == '\r')) {
+            C23Lexer_setMode(self, C23_LEXER_MODE_NORMAL);
+            C23Lexer_setOffset(self, end);
             if (end == start)
                 return C23Lexer_next(self);
             return C23LexStep_2(true, makeSpan(self, start, end,
-                (*self).docComment ? SYNTAX_ROLE_DOC_COMMENT : SYNTAX_ROLE_COMMENT, nullptr));
+                C23Lexer_docComment(self) ? SYNTAX_ROLE_DOC_COMMENT : SYNTAX_ROLE_COMMENT, nullptr));
         }
-        if ((*self).mode == C23_LEXER_MODE_BLOCK_COMMENT && byte == '*' && end + 1u < (*self).length
+        if (C23Lexer_mode(self) == C23_LEXER_MODE_BLOCK_COMMENT && byte == '*' && end + 1u < C23Lexer_length(self)
             && source[end + 1u] == '/') {
             end += 2u;
-            (*self).mode = C23_LEXER_MODE_NORMAL;
-            (*self).offset = end;
+            C23Lexer_setMode(self, C23_LEXER_MODE_NORMAL);
+            C23Lexer_setOffset(self, end);
             return C23LexStep_2(true, makeSpan(self, start, end,
-                (*self).docComment ? SYNTAX_ROLE_DOC_COMMENT : SYNTAX_ROLE_COMMENT, nullptr));
+                C23Lexer_docComment(self) ? SYNTAX_ROLE_DOC_COMMENT : SYNTAX_ROLE_COMMENT, nullptr));
         }
         if (byte >= 0x80u) {
             Utf8ScalarResult scalar = validUtf8Scalar((const u8*) source,
-                                                       (*self).length, end);
+                                                       C23Lexer_length(self), end);
             if (!scalar.valid) {
                 if (end != start) {
-                    (*self).offset = end;
+                    C23Lexer_setOffset(self, end);
                     return C23LexStep_2(true, makeSpan(self, start, end,
-                        (*self).docComment ? SYNTAX_ROLE_DOC_COMMENT : SYNTAX_ROLE_COMMENT, nullptr));
+                        C23Lexer_docComment(self) ? SYNTAX_ROLE_DOC_COMMENT : SYNTAX_ROLE_COMMENT, nullptr));
                 }
                 return invalidSpan(self, end, end + scalar.length);
             }
             end += scalar.length;
         } else if (byte == 0u) {
             if (end != start) {
-                (*self).offset = end;
+                C23Lexer_setOffset(self, end);
                 return C23LexStep_2(true, makeSpan(self, start, end,
-                    (*self).docComment ? SYNTAX_ROLE_DOC_COMMENT : SYNTAX_ROLE_COMMENT, nullptr));
+                    C23Lexer_docComment(self) ? SYNTAX_ROLE_DOC_COMMENT : SYNTAX_ROLE_COMMENT, nullptr));
             }
             return invalidSpan(self, end, end + 1u);
         } else {
             ++end;
         }
     }
-    (*self).mode = C23_LEXER_MODE_NORMAL;
+    C23Lexer_setMode(self, C23_LEXER_MODE_NORMAL);
     if (blockComment) {
-        (*self).offset = end;
+        C23Lexer_setOffset(self, end);
         return C23LexStep_2(true, makeSpan(self, start, end, SYNTAX_ROLE_INVALID, nullptr));
     }
-    (*self).offset = end;
+    C23Lexer_setOffset(self, end);
     return C23LexStep_2(true, makeSpan(self, start, end,
-        (*self).docComment ? SYNTAX_ROLE_DOC_COMMENT : SYNTAX_ROLE_COMMENT, nullptr));
+        C23Lexer_docComment(self) ? SYNTAX_ROLE_DOC_COMMENT : SYNTAX_ROLE_COMMENT, nullptr));
 }
 
 static C23LexStep scanQuotedPart(C23Lexer *self, bytes start, bool opening) {
-    const char *source = (*self).source;
+    const char *source = C23Lexer_source(self);
     bytes end = start;
     if (opening) {
-        QuotePrefixResult prefix = quotePrefix(source, (*self).length, start);
-        (*self).quote = prefix.quote;
-        (*self).mode = prefix.quote == '"'
-            ? C23_LEXER_MODE_STRING : C23_LEXER_MODE_CHARACTER;
+        QuotePrefixResult prefix = quotePrefix(source, C23Lexer_length(self), start);
+        C23Lexer_setQuote(self, prefix.quote);
+        C23Lexer_setMode(self, prefix.quote == '"'
+            ? C23_LEXER_MODE_STRING : C23_LEXER_MODE_CHARACTER);
         end = prefix.quoteAt + 1u;
     }
-    while (end < (*self).length) {
+    while (end < C23Lexer_length(self)) {
         u8 byte = (u8) source[end];
         if (byte == 0u) {
-            (*self).mode = C23_LEXER_MODE_NORMAL;
-            (*self).quote = 0;
+            C23Lexer_setMode(self, C23_LEXER_MODE_NORMAL);
+            C23Lexer_setQuote(self, 0);
             return invalidSpan(self, start, end + 1u);
         }
         if (byte == '\n' || byte == '\r') {
-            (*self).mode = C23_LEXER_MODE_NORMAL;
+            C23Lexer_setMode(self, C23_LEXER_MODE_NORMAL);
             if (end == start)
                 return C23Lexer_next(self);
-            (*self).offset = end;
+            C23Lexer_setOffset(self, end);
             return C23LexStep_2(true, makeSpan(self, start, end, SYNTAX_ROLE_INVALID, nullptr));
         }
         if (byte == '\\') {
-            if (end + 1u >= (*self).length) {
-                (*self).mode = C23_LEXER_MODE_NORMAL;
-                return invalidSpan(self, start, (*self).length);
+            if (end + 1u >= C23Lexer_length(self)) {
+                C23Lexer_setMode(self, C23_LEXER_MODE_NORMAL);
+                return invalidSpan(self, start, C23Lexer_length(self));
             }
             u8 escaped = (u8) source[end + 1u];
             if (escaped == '\n' || escaped == '\r') {
-                (*self).mode = C23_LEXER_MODE_NORMAL;
-                (*self).quote = 0;
+                C23Lexer_setMode(self, C23_LEXER_MODE_NORMAL);
+                C23Lexer_setQuote(self, 0);
                 return invalidSpan(self, start, end + 1u);
             }
             if (escaped == 0u || escaped >= 0x80u) {
@@ -381,21 +418,21 @@ static C23LexStep scanQuotedPart(C23Lexer *self, bytes start, bool opening) {
             end += 2u;
             continue;
         }
-        if (byte == (u8) (*self).quote) {
+        if (byte == (u8) C23Lexer_quote(self)) {
             ++end;
-            (*self).mode = C23_LEXER_MODE_NORMAL;
-            (*self).offset = end;
-            SyntaxRole role = (*self).quote == '"' ? SYNTAX_ROLE_STRING : SYNTAX_ROLE_CHARACTER;
+            C23Lexer_setMode(self, C23_LEXER_MODE_NORMAL);
+            C23Lexer_setOffset(self, end);
+            SyntaxRole role = C23Lexer_quote(self) == '"' ? SYNTAX_ROLE_STRING : SYNTAX_ROLE_CHARACTER;
             return C23LexStep_2(true, makeSpan(self, start, end, role, nullptr));
         }
         if (byte >= 0x80u) {
             Utf8ScalarResult scalar = validUtf8Scalar((const u8*) source,
-                                                       (*self).length, end);
+                                                       C23Lexer_length(self), end);
             if (!scalar.valid) {
                 if (end != start) {
-                    (*self).offset = end;
+                    C23Lexer_setOffset(self, end);
                     return C23LexStep_2(true, makeSpan(self, start, end,
-                        (*self).quote == '"' ? SYNTAX_ROLE_STRING : SYNTAX_ROLE_CHARACTER, nullptr));
+                        C23Lexer_quote(self) == '"' ? SYNTAX_ROLE_STRING : SYNTAX_ROLE_CHARACTER, nullptr));
                 }
                 return invalidSpan(self, end, end + scalar.length);
             }
@@ -404,8 +441,8 @@ static C23LexStep scanQuotedPart(C23Lexer *self, bytes start, bool opening) {
             ++end;
         }
     }
-    (*self).mode = C23_LEXER_MODE_NORMAL;
-    return invalidSpan(self, start, (*self).length);
+    C23Lexer_setMode(self, C23_LEXER_MODE_NORMAL);
+    return invalidSpan(self, start, C23Lexer_length(self));
 }
 
 C23Lexer *C23Lexer_0() {
@@ -440,14 +477,14 @@ bool C23Lexer_setSource(C23Lexer *self, u32 documentId,
         THROW("C23Lexer rejected source admission: document id/source invalid for %zu bytes", length);
         return false;
     }
-    (*self).documentId = documentId;
-    (*self).source = source == nullptr ? "" : source;
-    (*self).length = length;
-    (*self).offset = 0u;
-    (*self).stopped = false;
-    (*self).mode = C23_LEXER_MODE_NORMAL;
-    (*self).quote = 0;
-    (*self).docComment = false;
+    C23Lexer_setDocumentId(self, documentId);
+    C23Lexer_setSourcePtr(self, source == nullptr ? "" : source);
+    C23Lexer_setLength(self, length);
+    C23Lexer_setOffset(self, 0u);
+    C23Lexer_setStopped(self, false);
+    C23Lexer_setMode(self, C23_LEXER_MODE_NORMAL);
+    C23Lexer_setQuote(self, 0);
+    C23Lexer_setDocComment(self, false);
     return true;
 }
 
@@ -457,50 +494,50 @@ bool C23Lexer_setProfile(C23Lexer *self, C23LexerProfile profile) {
         THROW("C23Lexer rejected unsupported lexical profile %u", (u32) profile);
         return false;
     }
-    (*self).profile = profile;
+    C23Lexer_setProfileField(self, profile);
     return true;
 }
 
 u32 C23Lexer_getDocumentId(const C23Lexer *self) {
-    return self == nullptr ? 0u : (*self).documentId;
+    return self == nullptr ? 0u : C23Lexer_documentId(self);
 }
 const char *C23Lexer_getSource(const C23Lexer *self) {
-    return self == nullptr ? nullptr : (*self).source;
+    return self == nullptr ? nullptr : C23Lexer_source(self);
 }
 bytes C23Lexer_getLength(const C23Lexer *self) {
-    return self == nullptr ? 0u : (*self).length;
+    return self == nullptr ? 0u : C23Lexer_length(self);
 }
 bytes C23Lexer_getOffset(const C23Lexer *self) {
-    return self == nullptr ? 0u : (*self).offset;
+    return self == nullptr ? 0u : C23Lexer_offset(self);
 }
 C23LexerProfile C23Lexer_getProfile(const C23Lexer *self) {
-    return self == nullptr ? C23_LEXER_PROFILE_STRICT_C23 : (*self).profile;
+    return self == nullptr ? C23_LEXER_PROFILE_STRICT_C23 : C23Lexer_profile(self);
 }
 bool C23Lexer_isDone(const C23Lexer *self) {
-    return self == nullptr || (*self).stopped
-        || ((*self).mode == C23_LEXER_MODE_NORMAL
-            && skipWhitespace(self, (*self).offset) >= (*self).length);
+    return self == nullptr || C23Lexer_stopped(self)
+        || (C23Lexer_mode(self) == C23_LEXER_MODE_NORMAL
+            && skipWhitespace(self, C23Lexer_offset(self)) >= C23Lexer_length(self));
 }
 
 C23LexStep C23Lexer_next(C23Lexer *self) {
-    if (self == nullptr || (*self).stopped)
+    if (self == nullptr || C23Lexer_stopped(self))
         return C23LexStep_0();
-    if ((*self).mode != C23_LEXER_MODE_NORMAL && (*self).offset >= (*self).length) {
-        (*self).mode = C23_LEXER_MODE_NORMAL;
-        return C23LexStep_0();
-    }
-    bytes start = (*self).mode == C23_LEXER_MODE_NORMAL
-        ? skipWhitespace(self, (*self).offset) : (*self).offset;
-    if (start >= (*self).length) {
-        (*self).offset = (*self).length;
+    if (C23Lexer_mode(self) != C23_LEXER_MODE_NORMAL && C23Lexer_offset(self) >= C23Lexer_length(self)) {
+        C23Lexer_setMode(self, C23_LEXER_MODE_NORMAL);
         return C23LexStep_0();
     }
-    const char *source = (*self).source;
-    bytes length = (*self).length;
-    if ((*self).mode == C23_LEXER_MODE_LINE_COMMENT
-        || (*self).mode == C23_LEXER_MODE_BLOCK_COMMENT)
+    bytes start = C23Lexer_mode(self) == C23_LEXER_MODE_NORMAL
+        ? skipWhitespace(self, C23Lexer_offset(self)) : C23Lexer_offset(self);
+    if (start >= C23Lexer_length(self)) {
+        C23Lexer_setOffset(self, C23Lexer_length(self));
+        return C23LexStep_0();
+    }
+    const char *source = C23Lexer_source(self);
+    bytes length = C23Lexer_length(self);
+    if (C23Lexer_mode(self) == C23_LEXER_MODE_LINE_COMMENT
+        || C23Lexer_mode(self) == C23_LEXER_MODE_BLOCK_COMMENT)
         return scanComment(self, start);
-    if ((*self).mode == C23_LEXER_MODE_STRING || (*self).mode == C23_LEXER_MODE_CHARACTER)
+    if (C23Lexer_mode(self) == C23_LEXER_MODE_STRING || C23Lexer_mode(self) == C23_LEXER_MODE_CHARACTER)
         return scanQuotedPart(self, start, false);
     bytes end = start;
     SyntaxRole role = SYNTAX_ROLE_PUNCTUATION;
@@ -517,11 +554,11 @@ C23LexStep C23Lexer_next(C23Lexer *self) {
         role = SYNTAX_ROLE_INVALID;
     } else if (startsWith(source, length, start, "//") || startsWith(source, length, start, "/*")) {
         bool lineComment = startsWith(source, length, start, "//");
-        (*self).mode = lineComment ? C23_LEXER_MODE_LINE_COMMENT : C23_LEXER_MODE_BLOCK_COMMENT;
-        (*self).docComment = lineComment
+        C23Lexer_setMode(self, lineComment ? C23_LEXER_MODE_LINE_COMMENT : C23_LEXER_MODE_BLOCK_COMMENT);
+        C23Lexer_setDocComment(self, lineComment
             ? startsWith(source, length, start, "///") || startsWith(source, length, start, "//!")
-            : startsWith(source, length, start, "/**") || startsWith(source, length, start, "/*!");
-        (*self).offset = start + 2u;
+            : startsWith(source, length, start, "/**") || startsWith(source, length, start, "/*!"));
+        C23Lexer_setOffset(self, start + 2u);
         return scanComment(self, start);
     } else {
         QuotePrefixResult prefix = quotePrefix(source, length, start);
@@ -537,7 +574,7 @@ C23LexStep C23Lexer_next(C23Lexer *self) {
                        && source[start + 1u] >= '0' && source[start + 1u] <= '9')) {
             end = numberEnd(source, length, start);
             role = SYNTAX_ROLE_NUMBER;
-        } else if ((*self).profile == C23_LEXER_PROFILE_VEX_ANNOTATION
+        } else if (C23Lexer_profile(self) == C23_LEXER_PROFILE_VEX_ANNOTATION
                    && startsWith(source, length, start, ";;")
                    && start + 2u < length
                    && identifierStart((u8) source[start + 2u])) {
@@ -565,25 +602,25 @@ C23LexStep C23Lexer_next(C23Lexer *self) {
     }
 
     if (end <= start || end > length) {
-        (*self).stopped = true;
+        C23Lexer_setStopped(self, true);
         return C23LexStep_2(true, makeSpan(self, start, start + 1u, SYNTAX_ROLE_INVALID, nullptr));
     }
-    (*self).offset = end;
+    C23Lexer_setOffset(self, end);
     return C23LexStep_2(true, makeSpan(self, start, end, role, styleKey));
 }
 
 BoundedText C23Lexer_toString(const C23Lexer *self) {
     if (self == nullptr) return BoundedText_1("nullptr");
     return BoundedText_format("C23Lexer(document=%u, length=%zu, offset=%zu)",
-                              (*self).documentId, (*self).length, (*self).offset);
+                              C23Lexer_documentId(self), C23Lexer_length(self), C23Lexer_offset(self));
 }
 
 BoundedText C23Lexer_toStringStruct(const C23Lexer *self) {
     if (self == nullptr) return BoundedText_1("nullptr");
     return BoundedText_format("C23Lexer { documentId=%u, source=%p, length=%zu, offset=%zu, profile=%u, stopped=%s, mode=%u, quote=%u, docComment=%s }",
-                              (*self).documentId, (any) (*self).source, (*self).length,
-                              (*self).offset, (u32) (*self).profile,
-                              (*self).stopped ? "true" : "false", (u32) (*self).mode,
-                              (u8) (*self).quote,
-                              (*self).docComment ? "true" : "false");
+                              C23Lexer_documentId(self), (any) C23Lexer_source(self), C23Lexer_length(self),
+                              C23Lexer_offset(self), (u32) C23Lexer_profile(self),
+                              C23Lexer_stopped(self) ? "true" : "false", (u32) C23Lexer_mode(self),
+                              (u8) C23Lexer_quote(self),
+                              C23Lexer_docComment(self) ? "true" : "false");
 }

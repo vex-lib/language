@@ -35,10 +35,12 @@ C23LexStep C23LexStep_zero() {
     return C23LexStep_0();
 }
 
+;;GETTER
 bool C23LexStep_hasSpan(const C23LexStep *self) {
     return self != nullptr && (*self).hasSpan;
 }
 
+;;GETTER
 SyntaxSpan C23LexStep_getSpan(const C23LexStep *self) {
     return self == nullptr ? (SyntaxSpan) {0} : (*self).span;
 }
@@ -46,16 +48,17 @@ SyntaxSpan C23LexStep_getSpan(const C23LexStep *self) {
 BoundedText C23LexStep_toString(const C23LexStep *self) {
     if (self == nullptr)
         return BoundedText_1("nullptr");
-    SyntaxSpan span = (*self).span;
-    return BoundedText_format("C23LexStep(%s, %s)", (*self).hasSpan ? "span" : "end",
+    SyntaxSpan span = C23LexStep_getSpan(self);
+    return BoundedText_format("C23LexStep(%s, %s)", C23LexStep_hasSpan(self) ? "span" : "end",
                               SyntaxRole_name(span.role));
 }
 
 BoundedText C23LexStep_toStringStruct(const C23LexStep *self) {
     if (self == nullptr)
         return BoundedText_1("nullptr");
-    BoundedText spanText = SyntaxSpan_toString(&(*self).span);
+    SyntaxSpan span = C23LexStep_getSpan(self);
+    BoundedText spanText = SyntaxSpan_toString(&span);
     return BoundedText_format("C23LexStep { hasSpan=%s, span=%s }",
-                              (*self).hasSpan ? "true" : "false",
+                              C23LexStep_hasSpan(self) ? "true" : "false",
                               BoundedText_getText(&spanText));
 }
