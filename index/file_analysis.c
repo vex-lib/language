@@ -55,6 +55,47 @@ static any reserve(any items, bytes *capacity, bytes count,
     return grown;
 }
 
+;;GETTER
+static inline u64 FileAnalysis_fileId(const FileAnalysis *self) { return (*self).fileId; }
+;;SETTER
+static inline fn FileAnalysis_setFileId(FileAnalysis *self, u64 v) { (*self).fileId = v; }
+;;GETTER
+static inline u32 FileAnalysis_documentId(const FileAnalysis *self) { return (*self).documentId; }
+;;SETTER
+static inline fn FileAnalysis_setDocumentId(FileAnalysis *self, u32 v) { (*self).documentId = v; }
+;;GETTER
+static inline u64 FileAnalysis_documentRevision(const FileAnalysis *self) { return (*self).documentRevision; }
+;;SETTER
+static inline fn FileAnalysis_setDocumentRevision(FileAnalysis *self, u64 v) { (*self).documentRevision = v; }
+;;GETTER
+static inline u64 FileAnalysis_compilationContextId(const FileAnalysis *self) { return (*self).compilationContextId; }
+;;SETTER
+static inline fn FileAnalysis_setCompilationContextId(FileAnalysis *self, u64 v) { (*self).compilationContextId = v; }
+;;GETTER
+static inline Symbol *FileAnalysis_symbols(const FileAnalysis *self) { return (*self).symbols; }
+;;SETTER
+static inline fn FileAnalysis_setSymbols(FileAnalysis *self, Symbol *v) { (*self).symbols = v; }
+;;GETTER
+static inline bytes FileAnalysis_symbolCount(const FileAnalysis *self) { return (*self).symbolCount; }
+;;SETTER
+static inline fn FileAnalysis_setSymbolCount(FileAnalysis *self, bytes v) { (*self).symbolCount = v; }
+;;GETTER
+static inline bytes FileAnalysis_symbolCapacity(const FileAnalysis *self) { return (*self).symbolCapacity; }
+;;SETTER
+static inline fn FileAnalysis_setSymbolCapacity(FileAnalysis *self, bytes v) { (*self).symbolCapacity = v; }
+;;GETTER
+static inline Reference *FileAnalysis_references(const FileAnalysis *self) { return (*self).references; }
+;;SETTER
+static inline fn FileAnalysis_setReferences(FileAnalysis *self, Reference *v) { (*self).references = v; }
+;;GETTER
+static inline bytes FileAnalysis_referenceCount(const FileAnalysis *self) { return (*self).referenceCount; }
+;;SETTER
+static inline fn FileAnalysis_setReferenceCount(FileAnalysis *self, bytes v) { (*self).referenceCount = v; }
+;;GETTER
+static inline bytes FileAnalysis_referenceCapacity(const FileAnalysis *self) { return (*self).referenceCapacity; }
+;;SETTER
+static inline fn FileAnalysis_setReferenceCapacity(FileAnalysis *self, bytes v) { (*self).referenceCapacity = v; }
+
 FileAnalysis *FileAnalysis_4(u64 fileId, u32 documentId,
                              u64 documentRevision,
                              u64 compilationContextId) {
@@ -68,35 +109,35 @@ FileAnalysis *FileAnalysis_4(u64 fileId, u32 documentId,
         THROW("FileAnalysis: allocation failed");
         return nullptr;
     }
-    (*self).fileId = fileId;
-    (*self).documentId = documentId;
-    (*self).documentRevision = documentRevision;
-    (*self).compilationContextId = compilationContextId;
+    FileAnalysis_setFileId(self, fileId);
+    FileAnalysis_setDocumentId(self, documentId);
+    FileAnalysis_setDocumentRevision(self, documentRevision);
+    FileAnalysis_setCompilationContextId(self, compilationContextId);
     return self;
 }
 
 fn FileAnalysis_free(FileAnalysis *self) {
     if (self == nullptr)
         return;
-    for (bytes index = 0u; index < (*self).symbolCount; ++index)
-        free((any) (*self).symbols[index].name);
-    free((*self).symbols);
-    (*self).symbols = nullptr;
-    free((*self).references);
-    (*self).references = nullptr;
+    for (bytes index = 0u; index < FileAnalysis_symbolCount(self); ++index)
+        free((any) FileAnalysis_symbols(self)[index].name);
+    free(FileAnalysis_symbols(self));
+    FileAnalysis_setSymbols(self, nullptr);
+    free(FileAnalysis_references(self));
+    FileAnalysis_setReferences(self, nullptr);
     free(self);
 }
 
 bool FileAnalysis_addSymbol(FileAnalysis *self, Symbol symbol) {
     if (self == nullptr || symbol.id == 0u || symbol.name == nullptr || symbol.name[0] == '\0'
-        || symbol.declarationRange.documentId != (*self).documentId
+        || symbol.declarationRange.documentId != FileAnalysis_documentId(self)
         || !SourceRange_isValid(&symbol.declarationRange)
         || symbol.kind <= SYMBOL_KIND_UNKNOWN || symbol.kind > SYMBOL_KIND_TYPE_ALIAS) {
         THROW("FileAnalysis: rejected invalid declaration identity or range");
         return false;
     }
-    for (bytes index = 0u; index < (*self).symbolCount; ++index)
-        if ((*self).symbols[index].id == symbol.id) {
+    for (bytes index = 0u; index < FileAnalysis_symbolCount(self); ++index)
+        if (FileAnalysis_symbols(self)[index].id == symbol.id) {
             THROW("FileAnalysis: duplicate symbol id in one file contribution");
             return false;
         }
@@ -105,21 +146,23 @@ bool FileAnalysis_addSymbol(FileAnalysis *self, Symbol symbol) {
         THROW("FileAnalysis: allocation failed copying symbol name");
         return false;
     }
-    Symbol *symbols = reserve((*self).symbols, &(*self).symbolCapacity,
-                              (*self).symbolCount, sizeof(Symbol), "symbol");
+    bytes symbolCapacity = FileAnalysis_symbolCapacity(self);
+    Symbol *symbols = reserve(FileAnalysis_symbols(self), &symbolCapacity,
+                              FileAnalysis_symbolCount(self), sizeof(Symbol), "symbol");
+    FileAnalysis_setSymbolCapacity(self, symbolCapacity);
     if (symbols == nullptr) {
         free(name);
         return false;
     }
-    (*self).symbols = symbols;
+    FileAnalysis_setSymbols(self, symbols);
     symbol.name = name;
-    (*self).symbols[(*self).symbolCount] = symbol;
-    ++(*self).symbolCount;
+    FileAnalysis_symbols(self)[FileAnalysis_symbolCount(self)] = symbol;
+    FileAnalysis_setSymbolCount(self, FileAnalysis_symbolCount(self) + 1u);
     return true;
 }
 
 bool FileAnalysis_addReference(FileAnalysis *self, Reference reference) {
-    if (self == nullptr || reference.range.documentId != (*self).documentId
+    if (self == nullptr || reference.range.documentId != FileAnalysis_documentId(self)
         || !SourceRange_isValid(&reference.range)
         || (reference.resolved && reference.targetSymbolId == 0u)
         || (!reference.resolved && reference.targetSymbolId != 0u)
@@ -128,33 +171,41 @@ bool FileAnalysis_addReference(FileAnalysis *self, Reference reference) {
         THROW("FileAnalysis: rejected invalid reference target or range");
         return false;
     }
-    Reference *references = reserve((*self).references, &(*self).referenceCapacity,
-                                    (*self).referenceCount, sizeof(Reference), "reference");
+    bytes referenceCapacity = FileAnalysis_referenceCapacity(self);
+    Reference *references = reserve(FileAnalysis_references(self), &referenceCapacity,
+                                    FileAnalysis_referenceCount(self), sizeof(Reference), "reference");
+    FileAnalysis_setReferenceCapacity(self, referenceCapacity);
     if (references == nullptr)
         return false;
-    (*self).references = references;
-    (*self).references[(*self).referenceCount] = reference;
-    ++(*self).referenceCount;
+    FileAnalysis_setReferences(self, references);
+    FileAnalysis_references(self)[FileAnalysis_referenceCount(self)] = reference;
+    FileAnalysis_setReferenceCount(self, FileAnalysis_referenceCount(self) + 1u);
     return true;
 }
-u64 FileAnalysis_getFileId(const FileAnalysis *self) { return self == nullptr ? 0u : (*self).fileId; }
-u32 FileAnalysis_getDocumentId(const FileAnalysis *self) { return self == nullptr ? 0u : (*self).documentId; }
+;;GETTER
+u64 FileAnalysis_getFileId(const FileAnalysis *self) { return self == nullptr ? 0u : FileAnalysis_fileId(self); }
+;;GETTER
+u32 FileAnalysis_getDocumentId(const FileAnalysis *self) { return self == nullptr ? 0u : FileAnalysis_documentId(self); }
+;;GETTER
 u64 FileAnalysis_getDocumentRevision(const FileAnalysis *self) {
-    return self == nullptr ? 0u : (*self).documentRevision;
+    return self == nullptr ? 0u : FileAnalysis_documentRevision(self);
 }
+;;GETTER
 u64 FileAnalysis_getCompilationContextId(const FileAnalysis *self) {
-    return self == nullptr ? 0u : (*self).compilationContextId;
+    return self == nullptr ? 0u : FileAnalysis_compilationContextId(self);
 }
+;;GETTER
 bytes FileAnalysis_getSymbolCount(const FileAnalysis *self) {
-    return self == nullptr ? 0u : (*self).symbolCount;
+    return self == nullptr ? 0u : FileAnalysis_symbolCount(self);
 }
 Symbol FileAnalysis_getSymbolAt(const FileAnalysis *self, bytes index) {
-    return self == nullptr || index >= (*self).symbolCount ? Symbol_zero() : (*self).symbols[index];
+    return self == nullptr || index >= FileAnalysis_symbolCount(self) ? Symbol_zero() : FileAnalysis_symbols(self)[index];
 }
+;;GETTER
 bytes FileAnalysis_getReferenceCount(const FileAnalysis *self) {
-    return self == nullptr ? 0u : (*self).referenceCount;
+    return self == nullptr ? 0u : FileAnalysis_referenceCount(self);
 }
 Reference FileAnalysis_getReferenceAt(const FileAnalysis *self, bytes index) {
-    return self == nullptr || index >= (*self).referenceCount
-        ? Reference_zero() : (*self).references[index];
+    return self == nullptr || index >= FileAnalysis_referenceCount(self)
+        ? Reference_zero() : FileAnalysis_references(self)[index];
 }

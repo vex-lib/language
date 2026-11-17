@@ -25,16 +25,36 @@ struct ProjectIndex {
     bytes analysisCapacity;
 };
 
+;;GETTER
+static inline const LanguageProject *ProjectIndex_project(const ProjectIndex *self) { return (*self).project; }
+;;SETTER
+static inline fn ProjectIndex_setProject(ProjectIndex *self, const LanguageProject *v) { (*self).project = v; }
+;;GETTER
+static inline FileAnalysis **ProjectIndex_analyses(const ProjectIndex *self) { return (*self).analyses; }
+;;SETTER
+static inline fn ProjectIndex_setAnalyses(ProjectIndex *self, FileAnalysis **v) { (*self).analyses = v; }
+;;GETTER
+static inline bytes ProjectIndex_analysisCount(const ProjectIndex *self) { return (*self).analysisCount; }
+;;SETTER
+static inline fn ProjectIndex_setAnalysisCount(ProjectIndex *self, bytes v) { (*self).analysisCount = v; }
+;;GETTER
+static inline bytes ProjectIndex_analysisCapacity(const ProjectIndex *self) { return (*self).analysisCapacity; }
+;;SETTER
+static inline fn ProjectIndex_setAnalysisCapacity(ProjectIndex *self, bytes v) { (*self).analysisCapacity = v; }
+
 static bool symbolMatches(const Symbol *left, const Symbol *right) {
-    return (*left).id == (*right).id && (*left).scopeId == (*right).scopeId
-        && (*left).kind == (*right).kind && (*left).name != nullptr
-        && (*right).name != nullptr && strcmp((*left).name, (*right).name) == 0;
+    return Symbol_getId(left) == Symbol_getId(right)
+        && Symbol_getScopeId(left) == Symbol_getScopeId(right)
+        && Symbol_getKind(left) == Symbol_getKind(right)
+        && Symbol_getName(left) != nullptr
+        && Symbol_getName(right) != nullptr
+        && strcmp(Symbol_getName(left), Symbol_getName(right)) == 0;
 }
 
 static FileAnalysis *findMutable(ProjectIndex *self, u64 fileId, u64 contextId,
                                  bytes *indexOut) {
-    for (bytes index = 0u; index < (*self).analysisCount; ++index) {
-        FileAnalysis *analysis = (*self).analyses[index];
+    for (bytes index = 0u; index < ProjectIndex_analysisCount(self); ++index) {
+        FileAnalysis *analysis = ProjectIndex_analyses(self)[index];
         if (FileAnalysis_getFileId(analysis) == fileId
             && FileAnalysis_getCompilationContextId(analysis) == contextId) {
             if (indexOut != nullptr)
@@ -74,23 +94,23 @@ ProjectIndex *ProjectIndex_1(const LanguageProject *project) {
         THROW("ProjectIndex: allocation failed");
         return nullptr;
     }
-    (*self).project = project;
+    ProjectIndex_setProject(self, project);
     return self;
 }
 
 fn ProjectIndex_free(ProjectIndex *self) {
     if (self == nullptr)
         return;
-    for (bytes index = 0u; index < (*self).analysisCount; ++index)
-        FileAnalysis_free((*self).analyses[index]);
-    free((*self).analyses);
-    (*self).analyses = nullptr;
+    for (bytes index = 0u; index < ProjectIndex_analysisCount(self); ++index)
+        FileAnalysis_free(ProjectIndex_analyses(self)[index]);
+    free(ProjectIndex_analyses(self));
+    ProjectIndex_setAnalyses(self, nullptr);
     free(self);
 }
 
 bool ProjectIndex_publish(ProjectIndex *self, const FileAnalysis *analysis) {
     if (self == nullptr || analysis == nullptr
-        || LanguageProject_findFileById((*self).project,
+        || LanguageProject_findFileById(ProjectIndex_project(self),
                                         FileAnalysis_getFileId(analysis)) == nullptr) {
         THROW("ProjectIndex: rejected contribution for unknown project file");
         return false;
@@ -108,8 +128,8 @@ bool ProjectIndex_publish(ProjectIndex *self, const FileAnalysis *analysis) {
     for (bytes incomingIndex = 0u;
          incomingIndex < FileAnalysis_getSymbolCount(analysis); ++incomingIndex) {
         Symbol incoming = FileAnalysis_getSymbolAt(analysis, incomingIndex);
-        for (bytes existingIndex = 0u; existingIndex < (*self).analysisCount; ++existingIndex) {
-            FileAnalysis *existingAnalysis = (*self).analyses[existingIndex];
+        for (bytes existingIndex = 0u; existingIndex < ProjectIndex_analysisCount(self); ++existingIndex) {
+            FileAnalysis *existingAnalysis = ProjectIndex_analyses(self)[existingIndex];
             if (existingAnalysis == previous)
                 continue;
             for (bytes symbolIndex = 0u;
@@ -126,28 +146,28 @@ bool ProjectIndex_publish(ProjectIndex *self, const FileAnalysis *analysis) {
     if (copy == nullptr)
         return false;
     if (previous != nullptr) {
-        (*self).analyses[replaceIndex] = copy;
+        ProjectIndex_analyses(self)[replaceIndex] = copy;
         FileAnalysis_free(previous);
         return true;
     }
-    if ((*self).analysisCount == (*self).analysisCapacity) {
-        bytes capacity = (*self).analysisCapacity == 0u ? 8u : (*self).analysisCapacity * 2u;
-        if (capacity < (*self).analysisCapacity || capacity > SIZE_MAX / sizeof(FileAnalysis*)) {
+    if (ProjectIndex_analysisCount(self) == ProjectIndex_analysisCapacity(self)) {
+        bytes capacity = ProjectIndex_analysisCapacity(self) == 0u ? 8u : ProjectIndex_analysisCapacity(self) * 2u;
+        if (capacity < ProjectIndex_analysisCapacity(self) || capacity > SIZE_MAX / sizeof(FileAnalysis*)) {
             THROW("ProjectIndex: contribution table capacity overflow");
             FileAnalysis_free(copy);
             return false;
         }
-        FileAnalysis **grown = realloc((*self).analyses, capacity * sizeof(FileAnalysis*));
+        FileAnalysis **grown = realloc(ProjectIndex_analyses(self), capacity * sizeof(FileAnalysis*));
         if (grown == nullptr) {
             THROW("ProjectIndex: allocation failed for %zu contributions", capacity);
             FileAnalysis_free(copy);
             return false;
         }
-        (*self).analyses = grown;
-        (*self).analysisCapacity = capacity;
+        ProjectIndex_setAnalyses(self, grown);
+        ProjectIndex_setAnalysisCapacity(self, capacity);
     }
-    (*self).analyses[(*self).analysisCount] = copy;
-    ++(*self).analysisCount;
+    ProjectIndex_analyses(self)[ProjectIndex_analysisCount(self)] = copy;
+    ProjectIndex_setAnalysisCount(self, ProjectIndex_analysisCount(self) + 1u);
     return true;
 }
 
@@ -155,24 +175,25 @@ const FileAnalysis *ProjectIndex_findAnalysis(const ProjectIndex *self, u64 file
                                              u64 compilationContextId) {
     if (self == nullptr || fileId == 0u || compilationContextId == 0u)
         return nullptr;
-    for (bytes index = 0u; index < (*self).analysisCount; ++index) {
-        FileAnalysis *analysis = (*self).analyses[index];
+    for (bytes index = 0u; index < ProjectIndex_analysisCount(self); ++index) {
+        FileAnalysis *analysis = ProjectIndex_analyses(self)[index];
         if (FileAnalysis_getFileId(analysis) == fileId
             && FileAnalysis_getCompilationContextId(analysis) == compilationContextId)
             return analysis;
     }
     return nullptr;
 }
+;;GETTER
 bytes ProjectIndex_getAnalysisCount(const ProjectIndex *self) {
-    return self == nullptr ? 0u : (*self).analysisCount;
+    return self == nullptr ? 0u : ProjectIndex_analysisCount(self);
 }
 bytes ProjectIndex_getDeclarationCount(const ProjectIndex *self, u64 symbolId,
                                         u64 compilationContextId) {
     if (self == nullptr || symbolId == 0u || compilationContextId == 0u)
         return 0u;
     bytes count = 0u;
-    for (bytes fileIndex = 0u; fileIndex < (*self).analysisCount; ++fileIndex) {
-        FileAnalysis *analysis = (*self).analyses[fileIndex];
+    for (bytes fileIndex = 0u; fileIndex < ProjectIndex_analysisCount(self); ++fileIndex) {
+        FileAnalysis *analysis = ProjectIndex_analyses(self)[fileIndex];
         if (FileAnalysis_getCompilationContextId(analysis) != compilationContextId)
             continue;
         for (bytes index = 0u; index < FileAnalysis_getSymbolCount(analysis); ++index)
@@ -186,8 +207,8 @@ Symbol ProjectIndex_getDeclarationAt(const ProjectIndex *self, u64 symbolId,
     if (self == nullptr || symbolId == 0u || compilationContextId == 0u)
         return Symbol_zero();
     bytes found = 0u;
-    for (bytes fileIndex = 0u; fileIndex < (*self).analysisCount; ++fileIndex) {
-        FileAnalysis *analysis = (*self).analyses[fileIndex];
+    for (bytes fileIndex = 0u; fileIndex < ProjectIndex_analysisCount(self); ++fileIndex) {
+        FileAnalysis *analysis = ProjectIndex_analyses(self)[fileIndex];
         if (FileAnalysis_getCompilationContextId(analysis) != compilationContextId)
             continue;
         for (bytes index = 0u; index < FileAnalysis_getSymbolCount(analysis); ++index) {
@@ -203,8 +224,8 @@ bytes ProjectIndex_getReferenceCount(const ProjectIndex *self, u64 symbolId,
     if (self == nullptr || symbolId == 0u || compilationContextId == 0u)
         return 0u;
     bytes count = 0u;
-    for (bytes fileIndex = 0u; fileIndex < (*self).analysisCount; ++fileIndex) {
-        FileAnalysis *analysis = (*self).analyses[fileIndex];
+    for (bytes fileIndex = 0u; fileIndex < ProjectIndex_analysisCount(self); ++fileIndex) {
+        FileAnalysis *analysis = ProjectIndex_analyses(self)[fileIndex];
         if (FileAnalysis_getCompilationContextId(analysis) != compilationContextId)
             continue;
         for (bytes index = 0u; index < FileAnalysis_getReferenceCount(analysis); ++index) {
@@ -220,8 +241,8 @@ Reference ProjectIndex_getReferenceAt(const ProjectIndex *self, u64 symbolId,
     if (self == nullptr || symbolId == 0u || compilationContextId == 0u)
         return Reference_zero();
     bytes found = 0u;
-    for (bytes fileIndex = 0u; fileIndex < (*self).analysisCount; ++fileIndex) {
-        FileAnalysis *analysis = (*self).analyses[fileIndex];
+    for (bytes fileIndex = 0u; fileIndex < ProjectIndex_analysisCount(self); ++fileIndex) {
+        FileAnalysis *analysis = ProjectIndex_analyses(self)[fileIndex];
         if (FileAnalysis_getCompilationContextId(analysis) != compilationContextId)
             continue;
         for (bytes index = 0u; index < FileAnalysis_getReferenceCount(analysis); ++index) {
@@ -234,5 +255,5 @@ Reference ProjectIndex_getReferenceAt(const ProjectIndex *self, u64 symbolId,
     return Reference_zero();
 }
 u64 ProjectIndex_getProjectId(const ProjectIndex *self) {
-    return self == nullptr ? 0u : LanguageProject_getId((*self).project);
+    return self == nullptr ? 0u : LanguageProject_getId(ProjectIndex_project(self));
 }

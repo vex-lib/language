@@ -29,9 +29,26 @@ struct DependencyGraph {
     bytes rowCapacity;
 };
 
+;;GETTER
+static inline const LanguageProject *DependencyGraph_project(const DependencyGraph *self) { return (*self).project; }
+;;SETTER
+static inline fn DependencyGraph_setProject(DependencyGraph *self, const LanguageProject *v) { (*self).project = v; }
+;;GETTER
+static inline DependencyRow *DependencyGraph_rows(const DependencyGraph *self) { return (*self).rows; }
+;;SETTER
+static inline fn DependencyGraph_setRows(DependencyGraph *self, DependencyRow *v) { (*self).rows = v; }
+;;GETTER
+static inline bytes DependencyGraph_rowCount(const DependencyGraph *self) { return (*self).rowCount; }
+;;SETTER
+static inline fn DependencyGraph_setRowCount(DependencyGraph *self, bytes v) { (*self).rowCount = v; }
+;;GETTER
+static inline bytes DependencyGraph_rowCapacity(const DependencyGraph *self) { return (*self).rowCapacity; }
+;;SETTER
+static inline fn DependencyGraph_setRowCapacity(DependencyGraph *self, bytes v) { (*self).rowCapacity = v; }
+
 static bytes findRow(const DependencyGraph *self, u64 fileId) {
-    for (bytes index = 0u; index < (*self).rowCount; ++index)
-        if ((*self).rows[index].fileId == fileId)
+    for (bytes index = 0u; index < DependencyGraph_rowCount(self); ++index)
+        if (DependencyGraph_rows(self)[index].fileId == fileId)
             return index;
     return SIZE_MAX;
 }
@@ -46,24 +63,24 @@ DependencyGraph *DependencyGraph_1(const LanguageProject *project) {
         THROW("DependencyGraph: allocation failed");
         return nullptr;
     }
-    (*self).project = project;
+    DependencyGraph_setProject(self, project);
     return self;
 }
 
 fn DependencyGraph_free(DependencyGraph *self) {
     if (self == nullptr)
         return;
-    for (bytes index = 0u; index < (*self).rowCount; ++index)
-        free((*self).rows[index].dependencyFileIds);
-    free((*self).rows);
-    (*self).rows = nullptr;
+    for (bytes index = 0u; index < DependencyGraph_rowCount(self); ++index)
+        free(DependencyGraph_rows(self)[index].dependencyFileIds);
+    free(DependencyGraph_rows(self));
+    DependencyGraph_setRows(self, nullptr);
     free(self);
 }
 
 bool DependencyGraph_setDependencies(DependencyGraph *self, u64 fileId,
                                      const u64 *dependencyFileIds,
                                      bytes dependencyCount) {
-    if (self == nullptr || LanguageProject_findFileById((*self).project, fileId) == nullptr
+    if (self == nullptr || LanguageProject_findFileById(DependencyGraph_project(self), fileId) == nullptr
         || (dependencyCount != 0u && dependencyFileIds == nullptr)
         || dependencyCount > SIZE_MAX / sizeof(u64)) {
         THROW("DependencyGraph: rejected invalid file or dependency list");
@@ -71,7 +88,7 @@ bool DependencyGraph_setDependencies(DependencyGraph *self, u64 fileId,
     }
     for (bytes index = 0u; index < dependencyCount; ++index) {
         if (dependencyFileIds[index] == 0u
-            || LanguageProject_findFileById((*self).project, dependencyFileIds[index]) == nullptr) {
+            || LanguageProject_findFileById(DependencyGraph_project(self), dependencyFileIds[index]) == nullptr) {
             THROW("DependencyGraph: dependency does not identify a project file");
             return false;
         }
@@ -94,32 +111,32 @@ bool DependencyGraph_setDependencies(DependencyGraph *self, u64 fileId,
 
     bytes rowIndex = findRow(self, fileId);
     if (rowIndex != SIZE_MAX) {
-        u64 *previous = (*self).rows[rowIndex].dependencyFileIds;
-        (*self).rows[rowIndex].dependencyFileIds = copy;
-        (*self).rows[rowIndex].dependencyCount = dependencyCount;
+        u64 *previous = DependencyGraph_rows(self)[rowIndex].dependencyFileIds;
+        DependencyGraph_rows(self)[rowIndex].dependencyFileIds = copy;
+        DependencyGraph_rows(self)[rowIndex].dependencyCount = dependencyCount;
         free(previous);
         return true;
     }
-    if ((*self).rowCount == (*self).rowCapacity) {
-        bytes next = (*self).rowCapacity == 0u ? 8u : (*self).rowCapacity * 2u;
-        if (next < (*self).rowCapacity || next > SIZE_MAX / sizeof(DependencyRow)) {
+    if (DependencyGraph_rowCount(self) == DependencyGraph_rowCapacity(self)) {
+        bytes next = DependencyGraph_rowCapacity(self) == 0u ? 8u : DependencyGraph_rowCapacity(self) * 2u;
+        if (next < DependencyGraph_rowCapacity(self) || next > SIZE_MAX / sizeof(DependencyRow)) {
             THROW("DependencyGraph: row capacity overflow");
             free(copy);
             return false;
         }
-        DependencyRow *grown = realloc((*self).rows, next * sizeof(DependencyRow));
+        DependencyRow *grown = realloc(DependencyGraph_rows(self), next * sizeof(DependencyRow));
         if (grown == nullptr) {
             THROW("DependencyGraph: allocation failed for row capacity %zu", next);
             free(copy);
             return false;
         }
-        (*self).rows = grown;
-        (*self).rowCapacity = next;
+        DependencyGraph_setRows(self, grown);
+        DependencyGraph_setRowCapacity(self, next);
     }
-    (*self).rows[(*self).rowCount] = (DependencyRow) {
+    DependencyGraph_rows(self)[DependencyGraph_rowCount(self)] = (DependencyRow) {
         .fileId = fileId, .dependencyFileIds = copy, .dependencyCount = dependencyCount
     };
-    ++(*self).rowCount;
+    DependencyGraph_setRowCount(self, DependencyGraph_rowCount(self) + 1u);
     return true;
 }
 
@@ -127,7 +144,7 @@ bytes DependencyGraph_getDependencyCount(const DependencyGraph *self, u64 fileId
     if (self == nullptr || fileId == 0u)
         return 0u;
     bytes index = findRow(self, fileId);
-    return index == SIZE_MAX ? 0u : (*self).rows[index].dependencyCount;
+    return index == SIZE_MAX ? 0u : DependencyGraph_rows(self)[index].dependencyCount;
 }
 
 u64 DependencyGraph_getDependencyAt(const DependencyGraph *self,
@@ -135,31 +152,31 @@ u64 DependencyGraph_getDependencyAt(const DependencyGraph *self,
     if (self == nullptr || fileId == 0u)
         return 0u;
     bytes rowIndex = findRow(self, fileId);
-    return rowIndex == SIZE_MAX || index >= (*self).rows[rowIndex].dependencyCount
-        ? 0u : (*self).rows[rowIndex].dependencyFileIds[index];
+    return rowIndex == SIZE_MAX || index >= DependencyGraph_rows(self)[rowIndex].dependencyCount
+        ? 0u : DependencyGraph_rows(self)[rowIndex].dependencyFileIds[index];
 }
 
 bytes DependencyGraph_getDependentCount(const DependencyGraph *self, u64 fileId) {
-    if (self == nullptr || LanguageProject_findFileById((*self).project, fileId) == nullptr)
+    if (self == nullptr || LanguageProject_findFileById(DependencyGraph_project(self), fileId) == nullptr)
         return 0u;
     bytes count = 0u;
-    for (bytes row = 0u; row < (*self).rowCount; ++row)
-        for (bytes edge = 0u; edge < (*self).rows[row].dependencyCount; ++edge)
-            if ((*self).rows[row].dependencyFileIds[edge] == fileId)
+    for (bytes row = 0u; row < DependencyGraph_rowCount(self); ++row)
+        for (bytes edge = 0u; edge < DependencyGraph_rows(self)[row].dependencyCount; ++edge)
+            if (DependencyGraph_rows(self)[row].dependencyFileIds[edge] == fileId)
                 ++count;
     return count;
 }
 
 u64 DependencyGraph_getDependentAt(const DependencyGraph *self,
                                         u64 fileId, bytes targetIndex) {
-    if (self == nullptr || LanguageProject_findFileById((*self).project, fileId) == nullptr)
+    if (self == nullptr || LanguageProject_findFileById(DependencyGraph_project(self), fileId) == nullptr)
         return 0u;
     bytes found = 0u;
-    for (bytes row = 0u; row < (*self).rowCount; ++row)
-        for (bytes edge = 0u; edge < (*self).rows[row].dependencyCount; ++edge)
-            if ((*self).rows[row].dependencyFileIds[edge] == fileId
+    for (bytes row = 0u; row < DependencyGraph_rowCount(self); ++row)
+        for (bytes edge = 0u; edge < DependencyGraph_rows(self)[row].dependencyCount; ++edge)
+            if (DependencyGraph_rows(self)[row].dependencyFileIds[edge] == fileId
                 && found++ == targetIndex)
-                return (*self).rows[row].fileId;
+                return DependencyGraph_rows(self)[row].fileId;
     return 0u;
 }
 
@@ -167,12 +184,12 @@ bool DependencyGraph_isAffectedBy(const DependencyGraph *self,
                                   u64 candidateFileId,
                                   u64 changedFileId) {
     if (self == nullptr || candidateFileId == 0u || changedFileId == 0u
-        || LanguageProject_findFileById((*self).project, candidateFileId) == nullptr
-        || LanguageProject_findFileById((*self).project, changedFileId) == nullptr)
+        || LanguageProject_findFileById(DependencyGraph_project(self), candidateFileId) == nullptr
+        || LanguageProject_findFileById(DependencyGraph_project(self), changedFileId) == nullptr)
         return false;
     if (candidateFileId == changedFileId)
         return true;
-    bytes fileCount = LanguageProject_getFileCount((*self).project);
+    bytes fileCount = LanguageProject_getFileCount(DependencyGraph_project(self));
     if (fileCount > SIZE_MAX / sizeof(u64))
         return false;
     u64 *queue = malloc(fileCount * sizeof(u64));
@@ -193,7 +210,7 @@ bool DependencyGraph_isAffectedBy(const DependencyGraph *self,
         bytes rowIndex = findRow(self, current);
         if (rowIndex == SIZE_MAX)
             continue;
-        DependencyRow row = (*self).rows[rowIndex];
+        DependencyRow row = DependencyGraph_rows(self)[rowIndex];
         for (bytes edge = 0u; edge < row.dependencyCount; ++edge) {
             u64 dependency = row.dependencyFileIds[edge];
             if (dependency == changedFileId) {
@@ -216,5 +233,5 @@ bool DependencyGraph_isAffectedBy(const DependencyGraph *self,
 }
 
 u64 DependencyGraph_getProjectId(const DependencyGraph *self) {
-    return self == nullptr ? 0u : LanguageProject_getId((*self).project);
+    return self == nullptr ? 0u : LanguageProject_getId(DependencyGraph_project(self));
 }
