@@ -50,6 +50,27 @@ static char *copyString(const char *text) {
     return copy;
 }
 
+;;GETTER
+static inline u64 ProjectFile_id(const ProjectFile *self) { return (*self).id; }
+;;SETTER
+static inline fn ProjectFile_setId(ProjectFile *self, u64 v) { (*self).id = v; }
+;;GETTER
+static inline char *ProjectFile_relativePath(const ProjectFile *self) { return (*self).relativePath; }
+;;SETTER
+static inline fn ProjectFile_setRelativePath(ProjectFile *self, char *v) { (*self).relativePath = v; }
+;;GETTER
+static inline ProjectFileKind ProjectFile_kind(const ProjectFile *self) { return (*self).kind; }
+;;SETTER
+static inline fn ProjectFile_setKind(ProjectFile *self, ProjectFileKind v) { (*self).kind = v; }
+;;GETTER
+static inline char *ProjectFile_languageId(const ProjectFile *self) { return (*self).languageId; }
+;;SETTER
+static inline fn ProjectFile_setLanguageId(ProjectFile *self, char *v) { (*self).languageId = v; }
+;;GETTER
+static inline ProjectFileAnalysisStatus ProjectFile_status(const ProjectFile *self) { return (*self).status; }
+;;SETTER
+static inline fn ProjectFile_setStatus(ProjectFile *self, ProjectFileAnalysisStatus v) { (*self).status = v; }
+
 ProjectFile *ProjectFile_4(u64 fileId, const char *relativePath,
                            ProjectFileKind kind, const char *languageId) {
     if (fileId == 0u || !pathIsSafeRelative(relativePath)
@@ -63,52 +84,57 @@ ProjectFile *ProjectFile_4(u64 fileId, const char *relativePath,
         THROW("ProjectFile: allocation failed");
         return nullptr;
     }
-    (*self).relativePath = copyString(relativePath);
-    (*self).languageId = languageId == nullptr ? nullptr : copyString(languageId);
-    if ((*self).relativePath == nullptr || (languageId != nullptr && (*self).languageId == nullptr)) {
+    ProjectFile_setRelativePath(self, copyString(relativePath));
+    ProjectFile_setLanguageId(self, languageId == nullptr ? nullptr : copyString(languageId));
+    if (ProjectFile_relativePath(self) == nullptr || (languageId != nullptr && ProjectFile_languageId(self) == nullptr)) {
         THROW("ProjectFile: allocation failed while copying metadata");
-        free((*self).relativePath);
-        free((*self).languageId);
+        free(ProjectFile_relativePath(self));
+        free(ProjectFile_languageId(self));
         free(self);
         return nullptr;
     }
-    (*self).id = fileId;
-    (*self).kind = kind;
-    (*self).status = kind == PROJECT_FILE_KIND_TEXT && languageId != nullptr
-        ? PROJECT_FILE_ANALYSIS_PENDING : PROJECT_FILE_ANALYSIS_UNSUPPORTED;
+    ProjectFile_setId(self, fileId);
+    ProjectFile_setKind(self, kind);
+    ProjectFile_setStatus(self, kind == PROJECT_FILE_KIND_TEXT && languageId != nullptr
+        ? PROJECT_FILE_ANALYSIS_PENDING : PROJECT_FILE_ANALYSIS_UNSUPPORTED);
     return self;
 }
 
 fn ProjectFile_free(ProjectFile *self) {
     if (self != nullptr) {
-        free((*self).relativePath);
-        (*self).relativePath = nullptr;
-        free((*self).languageId);
-        (*self).languageId = nullptr;
+        free(ProjectFile_relativePath(self));
+        ProjectFile_setRelativePath(self, nullptr);
+        free(ProjectFile_languageId(self));
+        ProjectFile_setLanguageId(self, nullptr);
         free(self);
     }
 }
-u64 ProjectFile_getId(const ProjectFile *self) { return self == nullptr ? 0u : (*self).id; }
+;;GETTER
+u64 ProjectFile_getId(const ProjectFile *self) { return self == nullptr ? 0u : ProjectFile_id(self); }
+;;GETTER
 const char *ProjectFile_getRelativePath(const ProjectFile *self) {
-    return self == nullptr ? nullptr : (*self).relativePath;
+    return self == nullptr ? nullptr : ProjectFile_relativePath(self);
 }
+;;GETTER
 ProjectFileKind ProjectFile_getKind(const ProjectFile *self) {
-    return self == nullptr ? PROJECT_FILE_KIND_TEXT : (*self).kind;
+    return self == nullptr ? PROJECT_FILE_KIND_TEXT : ProjectFile_kind(self);
 }
+;;GETTER
 const char *ProjectFile_getLanguageId(const ProjectFile *self) {
-    return self == nullptr ? nullptr : (*self).languageId;
+    return self == nullptr ? nullptr : ProjectFile_languageId(self);
 }
+;;GETTER
 ProjectFileAnalysisStatus ProjectFile_getAnalysisStatus(const ProjectFile *self) {
-    return self == nullptr ? PROJECT_FILE_ANALYSIS_UNSUPPORTED : (*self).status;
+    return self == nullptr ? PROJECT_FILE_ANALYSIS_UNSUPPORTED : ProjectFile_status(self);
 }
 bool ProjectFile_setAnalysisStatus(ProjectFile *self, ProjectFileAnalysisStatus status) {
     if (self == nullptr || status < PROJECT_FILE_ANALYSIS_PENDING
         || status > PROJECT_FILE_ANALYSIS_UNSUPPORTED
         || (status != PROJECT_FILE_ANALYSIS_UNSUPPORTED
-            && ((*self).kind != PROJECT_FILE_KIND_TEXT || (*self).languageId == nullptr))) {
+            && (ProjectFile_kind(self) != PROJECT_FILE_KIND_TEXT || ProjectFile_languageId(self) == nullptr))) {
         THROW("ProjectFile: rejected incompatible analysis status");
         return false;
     }
-    (*self).status = status;
+    ProjectFile_setStatus(self, status);
     return true;
 }

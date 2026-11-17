@@ -47,6 +47,15 @@ static bool replaceId(char **destination, const char *languageId) {
     return true;
 }
 
+;;GETTER
+static inline char *ProjectConfiguration_detectedLanguageId(const ProjectConfiguration *self) { return (*self).detectedLanguageId; }
+;;SETTER
+static inline fn ProjectConfiguration_setDetectedLanguageId(ProjectConfiguration *self, char *v) { (*self).detectedLanguageId = v; }
+;;GETTER
+static inline char *ProjectConfiguration_userLanguageId(const ProjectConfiguration *self) { return (*self).userLanguageId; }
+;;SETTER
+static inline fn ProjectConfiguration_setUserLanguageId(ProjectConfiguration *self, char *v) { (*self).userLanguageId = v; }
+
 ProjectConfiguration *ProjectConfiguration_0() {
     ProjectConfiguration *self = calloc(1u, sizeof *self);
     if (self == nullptr)
@@ -55,10 +64,10 @@ ProjectConfiguration *ProjectConfiguration_0() {
 }
 fn ProjectConfiguration_free(ProjectConfiguration *self) {
     if (self != nullptr) {
-        free((*self).detectedLanguageId);
-        (*self).detectedLanguageId = nullptr;
-        free((*self).userLanguageId);
-        (*self).userLanguageId = nullptr;
+        free(ProjectConfiguration_detectedLanguageId(self));
+        ProjectConfiguration_setDetectedLanguageId(self, nullptr);
+        free(ProjectConfiguration_userLanguageId(self));
+        ProjectConfiguration_setUserLanguageId(self, nullptr);
         free(self);
     }
 }
@@ -68,7 +77,11 @@ bool ProjectConfiguration_setDetectedLanguage(ProjectConfiguration *self,
         THROW("ProjectConfiguration: rejected null detected-language owner");
         return false;
     }
-    return replaceId(&(*self).detectedLanguageId, languageId);
+    char *value = ProjectConfiguration_detectedLanguageId(self);
+    if (!replaceId(&value, languageId))
+        return false;
+    ProjectConfiguration_setDetectedLanguageId(self, value);
+    return true;
 }
 bool ProjectConfiguration_setUserLanguage(ProjectConfiguration *self,
                                           const char *languageId) {
@@ -76,25 +89,30 @@ bool ProjectConfiguration_setUserLanguage(ProjectConfiguration *self,
         THROW("ProjectConfiguration: rejected null user-language owner");
         return false;
     }
-    return replaceId(&(*self).userLanguageId, languageId);
+    char *value = ProjectConfiguration_userLanguageId(self);
+    if (!replaceId(&value, languageId))
+        return false;
+    ProjectConfiguration_setUserLanguageId(self, value);
+    return true;
 }
 fn ProjectConfiguration_clearUserLanguage(ProjectConfiguration *self) {
     if (self != nullptr) {
-        free((*self).userLanguageId);
-        (*self).userLanguageId = nullptr;
+        free(ProjectConfiguration_userLanguageId(self));
+        ProjectConfiguration_setUserLanguageId(self, nullptr);
     }
 }
 const char *ProjectConfiguration_getLanguageId(const ProjectConfiguration *self) {
     if (self == nullptr)
         return nullptr;
-    return (*self).userLanguageId != nullptr ? (*self).userLanguageId
-                                              : (*self).detectedLanguageId;
+    return ProjectConfiguration_userLanguageId(self) != nullptr
+        ? ProjectConfiguration_userLanguageId(self)
+        : ProjectConfiguration_detectedLanguageId(self);
 }
 ConfigurationOrigin ProjectConfiguration_getLanguageOrigin(const ProjectConfiguration *self) {
     if (self == nullptr)
         return CONFIGURATION_ORIGIN_NONE;
-    if ((*self).userLanguageId != nullptr)
+    if (ProjectConfiguration_userLanguageId(self) != nullptr)
         return CONFIGURATION_ORIGIN_USER;
-    return (*self).detectedLanguageId != nullptr
+    return ProjectConfiguration_detectedLanguageId(self) != nullptr
         ? CONFIGURATION_ORIGIN_DETECTED : CONFIGURATION_ORIGIN_NONE;
 }
