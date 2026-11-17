@@ -85,20 +85,25 @@ TextStyle TextStyle_5(u32 fg, u32 bg, u32 decorationColor,
     };
 }
 
+;;GETTER
 u32 TextStyle_getForeground(const TextStyle *self) {
     return self == nullptr ? TEXT_STYLE_COLOR_DEFAULT : (*self).fg;
 }
+;;SETTER
 fn TextStyle_setForeground(TextStyle *self, u32 value) {
     if (self != nullptr)
         (*self).fg = value;
 }
+;;GETTER
 u32 TextStyle_getBackground(const TextStyle *self) {
     return self == nullptr ? TEXT_STYLE_COLOR_DEFAULT : (*self).bg;
 }
+;;SETTER
 fn TextStyle_setBackground(TextStyle *self, u32 value) {
     if (self != nullptr)
         (*self).bg = value;
 }
+;;GETTER
 u32 TextStyle_getDecorationColor(const TextStyle *self) {
     return self == nullptr ? TEXT_STYLE_COLOR_DEFAULT : (*self).decorationColor;
 }
@@ -106,6 +111,7 @@ fn TextStyle_setDecorationColor(TextStyle *self, u32 value) {
     if (self != nullptr)
         (*self).decorationColor = value;
 }
+;;GETTER
 u16 TextStyle_getFlags(const TextStyle *self) {
     return self == nullptr ? 0u : (*self).flags;
 }
@@ -113,6 +119,7 @@ fn TextStyle_setFlags(TextStyle *self, u16 value) {
     if (self != nullptr)
         (*self).flags = value;
 }
+;;GETTER
 TextStyleDecoration TextStyle_getDecoration(const TextStyle *self) {
     return self == nullptr ? TEXT_DECORATION_NONE : (*self).decoration;
 }
@@ -124,7 +131,7 @@ fn TextStyle_setDecoration(TextStyle *self, TextStyleDecoration value) {
 bool TextStyle_hasFlag(const TextStyle *self, u16 flag) {
     if (self == nullptr || flag == 0u)
         return false;
-    return ((*self).flags & flag) == flag;
+    return (TextStyle_getFlags(self) & flag) == flag;
 }
 
 TextStyle TextStyle_overlay(TextStyle base, TextStyle over) {
@@ -145,14 +152,16 @@ BoundedText TextStyle_toString(const TextStyle *self) {
     if (self == nullptr)
         return BoundedText_1("nullptr");
     return BoundedText_format("TextStyle(fg=0x%08X, bg=0x%08X, deco=%s, decoColor=0x%08X, flags=0x%04X)",
-                              (*self).fg, (*self).bg, decorationName((*self).decoration),
-                              (*self).decorationColor, (u32) (*self).flags);
+                              TextStyle_getForeground(self), TextStyle_getBackground(self),
+                              decorationName(TextStyle_getDecoration(self)),
+                              TextStyle_getDecorationColor(self), (u32) TextStyle_getFlags(self));
 }
 
 BoundedText TextStyle_toStringStruct(const TextStyle *self) {
     if (self == nullptr)
         return BoundedText_1("nullptr");
     return BoundedText_format("TextStyle { fg=0x%08X, bg=0x%08X, decorationColor=0x%08X, flags=0x%04X, decoration=%s }",
-                              (*self).fg, (*self).bg, (*self).decorationColor,
-                              (u32) (*self).flags, decorationName((*self).decoration));
+                              TextStyle_getForeground(self), TextStyle_getBackground(self),
+                              TextStyle_getDecorationColor(self),
+                              (u32) TextStyle_getFlags(self), decorationName(TextStyle_getDecoration(self)));
 }
