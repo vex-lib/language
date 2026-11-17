@@ -126,14 +126,17 @@ BoundedText BoundedText_format(const char *format, ...) {
     return self;
 }
 
+;;GETTER
 const char *BoundedText_getText(const BoundedText *self) {
     return self == nullptr ? "" : (*self).text;
 }
 
+;;GETTER
 bytes BoundedText_getLength(const BoundedText *self) {
     return self == nullptr ? 0u : (*self).length;
 }
 
+;;GETTER
 bool BoundedText_isTruncated(const BoundedText *self) {
     return self == nullptr ? false : (*self).truncated;
 }
@@ -142,7 +145,7 @@ bool BoundedText_equals(const BoundedText *self, const char *text) {
     if (self == nullptr || text == nullptr)
         return false;
     bytes length = strlen(text);
-    return length == (*self).length && memcmp((*self).text, text, length) == 0;
+    return length == BoundedText_getLength(self) && memcmp(BoundedText_getText(self), text, length) == 0;
 }
 
 BoundedText BoundedText_toString(const BoundedText *self) {
@@ -152,12 +155,12 @@ BoundedText BoundedText_toString(const BoundedText *self) {
     bytes at = 0u;
     if (at + 1u < sizeof buffer)
         buffer[at++] = '"';
-    at = appendEscaped(buffer, sizeof buffer, at, (*self).text, (*self).length);
+    at = appendEscaped(buffer, sizeof buffer, at, BoundedText_getText(self), BoundedText_getLength(self));
     if (at + 1u < sizeof buffer)
         buffer[at++] = '"';
     buffer[at] = '\0';
     BoundedText result = BoundedText_2(buffer, at);
-    if ((*self).truncated)
+    if (BoundedText_isTruncated(self))
         (*((&result))).truncated = true;
     return result;
 }
@@ -166,5 +169,5 @@ BoundedText BoundedText_toStringStruct(const BoundedText *self) {
     if (self == nullptr)
         return BoundedText_1("nullptr");
     return BoundedText_format("BoundedText { length=%zu, truncated=%s }",
-                              (*self).length, (*self).truncated ? "true" : "false");
+                              BoundedText_getLength(self), BoundedText_isTruncated(self) ? "true" : "false");
 }
